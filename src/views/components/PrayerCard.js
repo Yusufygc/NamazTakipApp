@@ -1,25 +1,36 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { COLORS } from '../../constants/colors';
 
-const PrayerCard = ({ name, time, isPerformed, isNext, onPress }) => {
+const PrayerCard = ({ name, time, isPerformed, isMissed, isNext, onPress }) => {
     return (
         <TouchableOpacity
             style={[
                 styles.container,
                 isNext && styles.nextContainer,
-                isPerformed && styles.performedContainer
+                isPerformed && styles.performedContainer,
+                isMissed && styles.missedContainer
             ]}
             onPress={onPress}
+            activeOpacity={0.7}
         >
             <View style={styles.info}>
-                <Text style={[styles.name, isNext && styles.nextText]}>{name}</Text>
-                <Text style={[styles.time, isNext && styles.nextText]}>{time}</Text>
+                <Text style={[styles.name, isNext && styles.nextText, isMissed && styles.missedText]}>{name}</Text>
+                <Text style={[styles.time, isNext && styles.nextText, isMissed && styles.missedText]}>{time}</Text>
             </View>
             <View style={styles.status}>
                 {isPerformed ? (
-                    <Text style={styles.checked}>✅</Text>
+                    <View style={styles.checkedCircle}>
+                        <Text style={styles.checkmark}>✓</Text>
+                    </View>
+                ) : isMissed ? (
+                    <View style={styles.missedCircle}>
+                        <Text style={styles.missedMark}>✕</Text>
+                    </View>
                 ) : (
-                    <Text style={styles.unchecked}>{isNext ? '⏱️' : '⚪'}</Text>
+                    <View style={[styles.circle, isNext && styles.nextCircle]}>
+                        {isNext && <Text style={styles.nextIcon}>⏳</Text>}
+                    </View>
                 )}
             </View>
         </TouchableOpacity>
@@ -30,46 +41,105 @@ const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        padding: 15,
-        marginVertical: 5,
-        backgroundColor: '#f0f0f0',
-        borderRadius: 10,
-        alignItems: 'center'
+        padding: 20,
+        marginVertical: 8,
+        backgroundColor: COLORS.white,
+        borderRadius: 16,
+        alignItems: 'center',
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.05,
+        shadowRadius: 3.84,
+        elevation: 2,
     },
     nextContainer: {
-        backgroundColor: '#e3f2fd',
-        borderWidth: 1,
-        borderColor: '#2196f3'
+        backgroundColor: COLORS.primary, // Sage
+        borderLeftWidth: 5,
+        borderLeftColor: COLORS.dark
     },
     performedContainer: {
-        backgroundColor: '#e8f5e9'
+        backgroundColor: COLORS.secondary + '40', // Lime with opacity
+        borderColor: COLORS.secondary,
+        borderWidth: 1
+    },
+    missedContainer: {
+        backgroundColor: COLORS.danger + '25', // Red with opacity
+        borderColor: COLORS.danger,
+        borderWidth: 1
     },
     info: {
         flexDirection: 'row',
-        width: '60%',
-        justifyContent: 'space-between'
+        width: '65%',
+        justifyContent: 'space-between',
+        alignItems: 'center'
     },
     name: {
         fontSize: 18,
-        fontWeight: '500'
+        fontWeight: '600',
+        color: COLORS.text
     },
     time: {
         fontSize: 18,
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        color: COLORS.text
     },
     nextText: {
-        color: '#1565c0'
+        color: COLORS.white
+    },
+    missedText: {
+        color: COLORS.danger
     },
     status: {
+        width: 40,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    circle: {
         width: 30,
-        alignItems: 'center'
+        height: 30,
+        borderRadius: 15,
+        borderWidth: 2,
+        borderColor: COLORS.textLight,
+        alignItems: 'center',
+        justifyContent: 'center'
     },
-    checked: {
-        fontSize: 20
+    checkedCircle: {
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        backgroundColor: COLORS.secondary,
+        alignItems: 'center',
+        justifyContent: 'center'
     },
-    unchecked: {
-        fontSize: 20
+    missedCircle: {
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        backgroundColor: COLORS.danger,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    nextCircle: {
+        borderColor: COLORS.white,
+        backgroundColor: COLORS.white + '30'
+    },
+    checkmark: {
+        color: COLORS.dark,
+        fontSize: 16,
+        fontWeight: 'bold'
+    },
+    missedMark: {
+        color: COLORS.white,
+        fontSize: 16,
+        fontWeight: 'bold'
+    },
+    nextIcon: {
+        fontSize: 14
     }
 });
 
 export default PrayerCard;
+
