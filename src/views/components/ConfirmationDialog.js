@@ -1,7 +1,15 @@
 import React from 'react';
 import { Modal, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { COLORS } from '../../constants/colors';
 
 const ConfirmationDialog = ({ visible, prayerName, onClose, onConfirm, onMissed, onLater }) => {
+    const [isCongregation, setIsCongregation] = React.useState(false);
+
+    // Reset state when visible changes (if necessary, but modal unmounts usually reset? No, visible prop controls. Better to use useEffect)
+    React.useEffect(() => {
+        if (visible) setIsCongregation(false);
+    }, [visible]);
+
     return (
         <Modal
             transparent={true}
@@ -15,8 +23,18 @@ const ConfirmationDialog = ({ visible, prayerName, onClose, onConfirm, onMissed,
                     <Text style={styles.title}>{prayerName?.toUpperCase()} NAMAZINI</Text>
                     <Text style={styles.subtitle}>KILDINIZ MI?</Text>
 
+                    <View style={styles.checkboxContainer}>
+                        <TouchableOpacity
+                            style={styles.checkbox}
+                            onPress={() => setIsCongregation(!isCongregation)}
+                        >
+                            <Text style={styles.checkboxIcon}>{isCongregation ? '☑️' : '⬜'}</Text>
+                            <Text style={styles.checkboxText}>Cemaatle kıldım</Text>
+                        </TouchableOpacity>
+                    </View>
+
                     <View style={styles.buttonRow}>
-                        <TouchableOpacity style={[styles.button, styles.confirmButton]} onPress={onConfirm}>
+                        <TouchableOpacity style={[styles.button, styles.confirmButton]} onPress={() => onConfirm(isCongregation)}>
                             <Text style={styles.buttonText}>Kıldım ✅</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={[styles.button, styles.missedButton]} onPress={onMissed}>
@@ -41,27 +59,32 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     dialog: {
-        backgroundColor: '#fff',
+        backgroundColor: COLORS.white,
         width: '85%',
         borderRadius: 20,
         padding: 20,
         alignItems: 'center',
-        elevation: 5
+        elevation: 5,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
     },
     icon: {
         fontSize: 40,
         marginBottom: 10
     },
     title: {
-        fontSize: 18,
-        color: '#555',
-        fontWeight: 'bold'
+        fontSize: 16,
+        color: COLORS.textLight,
+        fontWeight: '600',
+        marginBottom: 5
     },
     subtitle: {
-        fontSize: 22,
+        fontSize: 24,
         fontWeight: 'bold',
-        marginBottom: 20,
-        color: '#333'
+        marginBottom: 25,
+        color: COLORS.text
     },
     buttonRow: {
         flexDirection: 'row',
@@ -72,30 +95,52 @@ const styles = StyleSheet.create({
     button: {
         flex: 1,
         padding: 15,
-        borderRadius: 10,
+        borderRadius: 12,
         alignItems: 'center',
         marginHorizontal: 5
     },
     confirmButton: {
-        backgroundColor: '#e8f5e9',
-        borderWidth: 1,
-        borderColor: '#4caf50'
+        backgroundColor: COLORS.secondary, // Lime
+        borderWidth: 0, // No border for cleaner look
     },
     missedButton: {
-        backgroundColor: '#ffebee',
-        borderWidth: 1,
+        backgroundColor: '#FFEBEE', // Keep red tint for negative action but softer? Or use maybe COLORS.accent?
+        // Let's stick to conventional red for missed/danger but soften it.
+        // Or user asked for specific palette. 
+        // Let's use COLORS.white with red border?
+        backgroundColor: COLORS.white,
+        borderWidth: 2,
         borderColor: '#ef5350'
     },
     buttonText: {
         fontSize: 16,
-        fontWeight: '600'
+        fontWeight: 'bold',
+        color: COLORS.text
     },
     laterButton: {
         padding: 10
     },
     laterText: {
-        color: '#757575',
+        color: COLORS.textLight,
         textDecorationLine: 'underline'
+    },
+    checkboxContainer: {
+        marginBottom: 20,
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+    checkbox: {
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+    checkboxIcon: {
+        fontSize: 24,
+        marginRight: 10
+    },
+    checkboxText: {
+        fontSize: 16,
+        color: COLORS.text,
+        fontWeight: '500'
     }
 });
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { COLORS } from '../../constants/colors';
 
 const CountdownTimer = ({ targetTime, nextPrayerName }) => {
     const [timeLeft, setTimeLeft] = useState('');
@@ -14,10 +15,6 @@ const CountdownTimer = ({ targetTime, nextPrayerName }) => {
             let target = new Date();
             target.setHours(hours, minutes, 0, 0);
 
-            // If target time (e.g. 05:47) is less than now (e.g. 22:00), 
-            // it means the target matches tomorrow's time (assuming we are counting down to it).
-            // However, we rely on the parent ensuring 'targetTime' is truly the NEXT prayer.
-            // If we blindly add 1 day when target < now, it works for the "next prayer is tomorrow" case.
             if (target <= now) {
                 target.setDate(target.getDate() + 1);
             }
@@ -25,8 +22,6 @@ const CountdownTimer = ({ targetTime, nextPrayerName }) => {
             let diff = target - now;
 
             if (diff < 0) {
-                // Should have been caught by target <= now logic ideally, but just in case
-                // loop or just 00:00:00
                 setTimeLeft('00:00:00');
             } else {
                 const h = Math.floor(diff / (1000 * 60 * 60));
@@ -47,39 +42,55 @@ const CountdownTimer = ({ targetTime, nextPrayerName }) => {
             <Text style={styles.label}>SONRAKİ NAMAZ</Text>
             <Text style={styles.name}>{nextPrayerName}</Text>
             <Text style={styles.time}>{targetTime}</Text>
-            <Text style={styles.countdown}>⏰ {timeLeft}</Text>
+            <View style={styles.timerBox}>
+                <Text style={styles.countdown}>{timeLeft}</Text>
+            </View>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#263238',
-        padding: 20,
-        borderRadius: 15,
+        backgroundColor: COLORS.dark, // Olive
+        padding: 25,
+        borderRadius: 20,
         alignItems: 'center',
-        marginVertical: 20
+        marginVertical: 20,
+        shadowColor: COLORS.dark,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 10,
+        elevation: 5
     },
     label: {
-        color: '#cfd8dc',
+        color: COLORS.accent, // Lemon
         fontSize: 14,
-        marginBottom: 5
+        marginBottom: 5,
+        letterSpacing: 2,
+        fontWeight: '600'
     },
     name: {
-        color: '#fff',
-        fontSize: 24,
+        color: COLORS.white,
+        fontSize: 32,
         fontWeight: 'bold',
-        marginBottom: 5
+        marginBottom: 0
     },
     time: {
-        color: '#fff',
+        color: COLORS.white + 'CC', // With opacity
         fontSize: 18,
-        marginBottom: 10
+        marginBottom: 15
+    },
+    timerBox: {
+        backgroundColor: COLORS.white + '20',
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+        borderRadius: 12
     },
     countdown: {
-        color: '#ffeb3b',
-        fontSize: 22,
-        fontWeight: 'bold'
+        color: COLORS.accent, // Lemon
+        fontSize: 28,
+        fontWeight: 'bold',
+        fontVariant: ['tabular-nums']
     }
 });
 

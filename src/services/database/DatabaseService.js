@@ -86,6 +86,19 @@ export const initDB = async () => {
         ('language', 'tr');
     `);
     console.log('Database initialized successfully');
+
+    // MIGRATIONS
+    try {
+      const result = await db.getAllAsync("PRAGMA table_info(prayers)");
+      const hasCongregation = result.some(col => col.name === 'is_congregation');
+      if (!hasCongregation) {
+        console.log('Migrating: Adding is_congregation to prayers');
+        await db.execAsync("ALTER TABLE prayers ADD COLUMN is_congregation INTEGER DEFAULT 0;");
+      }
+    } catch (e) {
+      console.error('Migration failed:', e);
+    }
+
   } catch (error) {
     console.error('Database initialization failed:', error);
     throw error;
@@ -103,11 +116,11 @@ export const runQuery = async (query, params = []) => {
 };
 
 export const runRun = async (query, params = []) => {
-    const db = await getDBConnection();
-    try {
-        return await db.runAsync(query, params);
-    } catch (error) {
-      console.error('Run failed:', query, error);
-      throw error;
-    }
+  const db = await getDBConnection();
+  try {
+    return await db.runAsync(query, params);
+  } catch (error) {
+    console.error('Run failed:', query, error);
+    throw error;
+  }
 }

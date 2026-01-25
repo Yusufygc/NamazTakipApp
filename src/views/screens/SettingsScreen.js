@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { View, Text, Switch, StyleSheet } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { runQuery, runRun } from '../../services/database/DatabaseService';
+import { COLORS } from '../../constants/colors';
 
 export default function SettingsScreen() {
     const [notificationsEnabled, setNotificationsEnabled] = useState(true);
@@ -44,8 +45,8 @@ export default function SettingsScreen() {
             <View style={styles.row}>
                 <Text style={styles.label}>Bildirimler</Text>
                 <Switch
-                    trackColor={{ false: "#767577", true: "#81b0ff" }}
-                    thumbColor={notificationsEnabled ? "#f5dd4b" : "#f4f3f4"}
+                    trackColor={{ false: "#767577", true: COLORS.primary }}
+                    thumbColor={notificationsEnabled ? COLORS.accent : "#f4f3f4"}
                     ios_backgroundColor="#3e3e3e"
                     onValueChange={toggleSwitch}
                     value={notificationsEnabled}
@@ -68,14 +69,14 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: COLORS.background, // Off-white
         padding: 20
     },
     header: {
         fontSize: 24,
         fontWeight: 'bold',
         marginBottom: 30,
-        color: '#333'
+        color: COLORS.primary // Sage
     },
     row: {
         flexDirection: 'row',
@@ -83,22 +84,22 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingVertical: 15,
         borderBottomWidth: 1,
-        borderBottomColor: '#eee'
+        borderBottomColor: COLORS.dark + '20' // Olive with low opacity
     },
     label: {
         fontSize: 18,
-        color: '#333'
+        color: COLORS.text
     },
     value: {
         fontSize: 16,
-        color: '#666'
+        color: COLORS.textLight
     },
     info: {
         marginTop: 50,
         alignItems: 'center'
     },
     infoText: {
-        color: '#999',
+        color: COLORS.textLight,
         marginBottom: 5
     }
 });

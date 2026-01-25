@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { BarChart } from 'react-native-chart-kit';
 import { getWeeklyStats } from '../../controllers/PrayerController';
+import { COLORS } from '../../constants/colors';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -40,17 +41,17 @@ export default function WeeklyStats() {
                     yAxisLabel=""
                     yAxisSuffix=" vakit"
                     chartConfig={{
-                        backgroundColor: '#fff',
-                        backgroundGradientFrom: '#fff',
-                        backgroundGradientTo: '#fff',
+                        backgroundColor: COLORS.white,
+                        backgroundGradientFrom: COLORS.white,
+                        backgroundGradientTo: COLORS.white,
                         decimalPlaces: 0,
-                        color: (opacity = 1) => `rgba(33, 150, 243, ${opacity})`,
-                        labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                        color: (opacity = 1) => COLORS.primary, // Sage
+                        labelColor: (opacity = 1) => COLORS.textLight,
                     }}
                     style={styles.chart}
                 />
             ) : (
-                <Text>Veri yükleniyor...</Text>
+                <Text style={{ color: COLORS.textLight }}>Veri yükleniyor...</Text>
             )}
         </View>
     );
@@ -59,14 +60,15 @@ export default function WeeklyStats() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: COLORS.background,
         alignItems: 'center',
         padding: 20
     },
     title: {
         fontSize: 20,
         fontWeight: 'bold',
-        marginBottom: 20
+        marginBottom: 20,
+        color: COLORS.primary
     },
     chart: {
         marginVertical: 8,

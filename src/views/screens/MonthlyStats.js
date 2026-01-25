@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { LineChart } from 'react-native-chart-kit';
 import { getMonthlyStats } from '../../controllers/PrayerController';
+import { COLORS } from '../../constants/colors';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -39,23 +40,23 @@ export default function MonthlyStats() {
                     yAxisLabel=""
                     yAxisSuffix=""
                     chartConfig={{
-                        backgroundColor: '#ffffff',
-                        backgroundGradientFrom: '#ffffff',
-                        backgroundGradientTo: '#ffffff',
+                        backgroundColor: COLORS.white,
+                        backgroundGradientFrom: COLORS.white,
+                        backgroundGradientTo: COLORS.white,
                         decimalPlaces: 0,
-                        color: (opacity = 1) => `rgba(76, 175, 80, ${opacity})`,
-                        labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                        color: (opacity = 1) => COLORS.secondary, // Lime
+                        labelColor: (opacity = 1) => COLORS.textLight,
                         propsForDots: {
                             r: "3",
                             strokeWidth: "2",
-                            stroke: "#4caf50"
+                            stroke: COLORS.secondary
                         }
                     }}
                     bezier
                     style={styles.chart}
                 />
             ) : (
-                <Text>Veri yükleniyor...</Text>
+                <Text style={{ color: COLORS.textLight }}>Veri yükleniyor...</Text>
             )}
         </View>
     );
@@ -64,14 +65,15 @@ export default function MonthlyStats() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: COLORS.background,
         alignItems: 'center',
         padding: 20
     },
     title: {
         fontSize: 20,
         fontWeight: 'bold',
-        marginBottom: 20
+        marginBottom: 20,
+        color: COLORS.secondary
     },
     chart: {
         marginVertical: 8,

@@ -8,6 +8,7 @@ import PrayerCard from '../components/PrayerCard';
 import CountdownTimer from '../components/CountdownTimer';
 import ConfirmationDialog from '../components/ConfirmationDialog';
 import { runRun, runQuery } from '../../services/database/DatabaseService';
+import { COLORS } from '../../constants/colors';
 
 export default function HomeScreen({ navigation }) {
     const [loading, setLoading] = useState(true);
@@ -31,6 +32,13 @@ export default function HomeScreen({ navigation }) {
 
             // 3. Get Status from DB
             const dbStatus = await getTodaysPrayersStatus(today);
+
+            // 4. Get today's qaza prayers to check missed status
+            const qazaToday = await runQuery(
+                `SELECT prayer_name FROM qaza_prayers WHERE missed_date = ? AND is_compensated = 0`,
+                [today]
+            );
+            const missedPrayers = qazaToday.map(q => q.prayer_name);
 
             // Merge times and status
             // We expect 5 prayers.
@@ -66,17 +74,17 @@ export default function HomeScreen({ navigation }) {
 
             const uiPrayers = [];
             // Sabah
-            uiPrayers.push(createPrayerObj('Sabah', apiMapping['Sabah'], dbStatus));
+            uiPrayers.push(createPrayerObj('Sabah', apiMapping['Sabah'], dbStatus, missedPrayers));
             // Gunes (Display only)
-            uiPrayers.push({ name: 'Güneş', time: apiMapping['Güneş'], isPerformed: false, isDisplayOnly: true });
+            uiPrayers.push({ name: 'Güneş', time: apiMapping['Güneş'], isPerformed: false, isMissed: false, isDisplayOnly: true });
             // Ogle
-            uiPrayers.push(createPrayerObj('Öğle', apiMapping['Öğle'], dbStatus));
+            uiPrayers.push(createPrayerObj('Öğle', apiMapping['Öğle'], dbStatus, missedPrayers));
             // Ikindi
-            uiPrayers.push(createPrayerObj('İkindi', apiMapping['İkindi'], dbStatus));
+            uiPrayers.push(createPrayerObj('İkindi', apiMapping['İkindi'], dbStatus, missedPrayers));
             // Aksam
-            uiPrayers.push(createPrayerObj('Akşam', apiMapping['Akşam'], dbStatus));
+            uiPrayers.push(createPrayerObj('Akşam', apiMapping['Akşam'], dbStatus, missedPrayers));
             // Yatsi
-            uiPrayers.push(createPrayerObj('Yatsı', apiMapping['Yatsı'], dbStatus));
+            uiPrayers.push(createPrayerObj('Yatsı', apiMapping['Yatsı'], dbStatus, missedPrayers));
 
             setPrayers(uiPrayers);
             calculateNextPrayer(uiPrayers);
@@ -90,13 +98,14 @@ export default function HomeScreen({ navigation }) {
         }
     };
 
-    const createPrayerObj = (name, time, dbStatus) => {
+    const createPrayerObj = (name, time, dbStatus, missedPrayers = []) => {
         const status = dbStatus.find(p => p.prayer_name === name);
         return {
             id: status?.id,
             name: name,
             time: time,
             isPerformed: !!status?.is_performed,
+            isMissed: missedPrayers.includes(name),
             isDisplayOnly: false
         };
     };
@@ -146,14 +155,14 @@ export default function HomeScreen({ navigation }) {
         setDialogVisible(true);
     };
 
-    const handleConfirm = async () => {
+    const handleConfirm = async (isCongregation) => {
         if (!selectedPrayer) return;
         try {
             const today = getTodayDateFormatted();
-            // 1. Mark as performed
+            // 1. Mark as performed with congregation status
             await runRun(
-                'UPDATE prayers SET is_performed = 1 WHERE id = ?',
-                [selectedPrayer.id]
+                'UPDATE prayers SET is_performed = 1, is_congregation = ? WHERE id = ?',
+                [isCongregation ? 1 : 0, selectedPrayer.id]
             );
 
             // 2. Remove from qaza_prayers if exists (Undo missed)
@@ -223,6 +232,7 @@ export default function HomeScreen({ navigation }) {
                         name={p.name}
                         time={p.time}
                         isPerformed={p.isPerformed}
+                        isMissed={p.isMissed}
                         isNext={nextPrayer?.name === p.name}
                         onPress={() => handlePrayerPress(p)}
                     />
@@ -241,10 +251,13 @@ export default function HomeScreen({ navigation }) {
     );
 }
 
+
+// ... (render logic remains, updating styles at bottom)
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: COLORS.background, // Off-white
         padding: 20
     },
     header: {
@@ -254,14 +267,15 @@ const styles = StyleSheet.create({
     location: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#333'
+        color: COLORS.text // Text color
     },
     sectionTitle: {
         fontSize: 14,
-        color: '#757575',
+        color: COLORS.textLight, // Lighter text
         marginBottom: 10,
         marginTop: 10,
-        fontWeight: '600'
+        fontWeight: '600',
+        letterSpacing: 1
     },
     list: {
         marginBottom: 50

@@ -43,49 +43,61 @@ export default function ComparisonStats() {
     );
 }
 
+import { COLORS } from '../../constants/colors';
+
+// ... (logic)
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: COLORS.background,
         padding: 20,
         alignItems: 'center'
     },
     title: {
         fontSize: 22,
         fontWeight: 'bold',
-        marginBottom: 30
+        marginBottom: 30,
+        color: COLORS.primary
     },
     card: {
         width: '100%',
-        backgroundColor: '#f5f5f5',
+        backgroundColor: COLORS.white,
         padding: 20,
         borderRadius: 15,
         marginBottom: 15,
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center'
+        alignItems: 'center',
+        shadowColor: COLORS.dark,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 2
     },
     label: {
         fontSize: 18,
-        color: '#555'
+        color: COLORS.text
     },
     value: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: '#333'
+        color: COLORS.primary
     },
     better: {
-        backgroundColor: '#e8f5e9',
+        backgroundColor: COLORS.secondary + '20', // Light Lime
         borderWidth: 1,
-        borderColor: '#4caf50'
+        borderColor: COLORS.secondary
     },
     worse: {
-        backgroundColor: '#ffebee',
+        backgroundColor: '#ffebee', // Keep red indication? Or use accent?
+        // Let's keep red for worse performance to be clear
         borderWidth: 1,
         borderColor: '#ef5350'
     },
     diffValue: {
         fontSize: 20,
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        color: COLORS.text
     }
 });
