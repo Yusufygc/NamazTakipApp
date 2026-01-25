@@ -107,11 +107,50 @@ export default function QazaListScreen() {
 
     const loadQaza = async () => {
         try {
-            // Fetch uncompensated qaza prayers
-            const result = await runQuery(
-                `SELECT * FROM qaza_prayers WHERE is_compensated = 0 ORDER BY missed_date DESC, id DESC`
+            const today = getTodayDateFormatted();
+
+            // 1. Fetch explicit qaza prayers (manually marked as missed)
+            const explicitQaza = await runQuery(
+                `SELECT id, prayer_name, missed_date, notes, 'qaza' as source 
+                 FROM qaza_prayers 
+                 WHERE is_compensated = 0 
+                 ORDER BY missed_date DESC, id DESC`
             );
-            setQazaList(result);
+
+            // 2. Fetch unperformed prayers from past days (auto-detected missed prayers)
+            // These are prayers that were never marked as performed and the day has passed
+            const autoQaza = await runQuery(
+                `SELECT id, prayer_name, date as missed_date, 'Otomatik tespit' as notes, 'auto' as source 
+                 FROM prayers 
+                 WHERE is_performed = 0 
+                 AND date < ? 
+                 AND prayer_name != 'Güneş'
+                 ORDER BY date DESC, id DESC`,
+                [today]
+            );
+
+            // 3. Merge and deduplicate (prefer explicit qaza entries)
+            const mergedMap = new Map();
+
+            // Add explicit qaza first (higher priority)
+            explicitQaza.forEach(item => {
+                const key = `${item.missed_date}_${item.prayer_name}`;
+                mergedMap.set(key, item);
+            });
+
+            // Add auto-detected only if not already in explicit qaza
+            autoQaza.forEach(item => {
+                const key = `${item.missed_date}_${item.prayer_name}`;
+                if (!mergedMap.has(key)) {
+                    mergedMap.set(key, item);
+                }
+            });
+
+            // Convert back to array and sort by date (newest first)
+            const mergedList = Array.from(mergedMap.values())
+                .sort((a, b) => b.missed_date.localeCompare(a.missed_date));
+
+            setQazaList(mergedList);
             setLoading(false);
         } catch (e) {
             console.error(e);
@@ -136,13 +175,17 @@ export default function QazaListScreen() {
                     onPress: async () => {
                         try {
                             const today = getTodayDateFormatted();
-                            // 1. Mark as compensated in qaza_prayers
-                            await runRun(
-                                `UPDATE qaza_prayers SET is_compensated = 1, compensated_at = ? WHERE id = ?`,
-                                [today, item.id]
-                            );
 
-                            // 2. Update original prayer record if exists
+                            if (item.source === 'qaza') {
+                                // Source is qaza_prayers table
+                                // 1. Mark as compensated in qaza_prayers
+                                await runRun(
+                                    `UPDATE qaza_prayers SET is_compensated = 1, compensated_at = ? WHERE id = ?`,
+                                    [today, item.id]
+                                );
+                            }
+
+                            // 2. Always update the prayers table (works for both sources)
                             await runRun(
                                 `UPDATE prayers SET is_performed = 1 WHERE date = ? AND prayer_name = ?`,
                                 [item.missed_date, item.prayer_name]
