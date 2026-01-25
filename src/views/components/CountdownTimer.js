@@ -1,9 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { COLORS } from '../../constants/colors';
 
-const CountdownTimer = ({ targetTime, nextPrayerName }) => {
+const CountdownTimer = ({ targetTime, nextPrayerName, onPrayerTimeReached }) => {
     const [timeLeft, setTimeLeft] = useState('');
+    const hasTriggeredRef = useRef(false);
+
+    useEffect(() => {
+        // Reset trigger flag when targetTime changes
+        hasTriggeredRef.current = false;
+    }, [targetTime]);
 
     useEffect(() => {
         if (!targetTime) return;
@@ -15,6 +21,22 @@ const CountdownTimer = ({ targetTime, nextPrayerName }) => {
             let target = new Date();
             target.setHours(hours, minutes, 0, 0);
 
+            // Check if target time has passed (within the same minute window)
+            const nowTime = now.getHours() * 60 + now.getMinutes();
+            const targetTimeMinutes = hours * 60 + minutes;
+
+            // If target time just passed and we haven't triggered yet
+            if (nowTime >= targetTimeMinutes && !hasTriggeredRef.current) {
+                hasTriggeredRef.current = true;
+                // Call callback after a short delay to allow the current prayer time to settle
+                if (onPrayerTimeReached) {
+                    setTimeout(() => {
+                        onPrayerTimeReached();
+                    }, 2000); // 2 second delay to ensure smooth transition
+                }
+            }
+
+            // Calculate time difference for display
             if (target <= now) {
                 target.setDate(target.getDate() + 1);
             }
@@ -35,7 +57,7 @@ const CountdownTimer = ({ targetTime, nextPrayerName }) => {
         }, 1000);
 
         return () => clearInterval(interval);
-    }, [targetTime]);
+    }, [targetTime, onPrayerTimeReached]);
 
     return (
         <View style={styles.container}>
@@ -95,3 +117,4 @@ const styles = StyleSheet.create({
 });
 
 export default CountdownTimer;
+

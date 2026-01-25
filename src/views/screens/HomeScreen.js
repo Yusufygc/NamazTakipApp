@@ -221,6 +221,7 @@ export default function HomeScreen({ navigation }) {
                 <CountdownTimer
                     targetTime={nextPrayer.time}
                     nextPrayerName={nextPrayer.name}
+                    onPrayerTimeReached={() => loadData()}
                 />
             )}
 
