@@ -1,0 +1,46 @@
+import { StatusBar } from 'expo-status-bar';
+import { StyleSheet, Text, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { initDB } from './src/services/database/DatabaseService';
+import RootNavigator from './src/views/navigation/RootNavigator';
+import 'react-native-gesture-handler'; // Required for Drawer
+
+export default function App() {
+    const [dbInitialized, setDbInitialized] = useState(false);
+
+    useEffect(() => {
+        const setup = async () => {
+            try {
+                await initDB();
+                setDbInitialized(true);
+            } catch (e) {
+                console.error('DB Init Error:', e);
+            }
+        };
+        setup();
+    }, []);
+
+    if (!dbInitialized) {
+        return (
+            <View style={styles.container}>
+                <Text>Loading...</Text>
+            </View>
+        );
+    }
+
+    return (
+        <>
+            <RootNavigator />
+            <StatusBar style="auto" />
+        </>
+    );
+}
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#fff',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+});
