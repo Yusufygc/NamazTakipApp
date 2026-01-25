@@ -2,6 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import { useEffect, useState } from 'react';
 import { initDB } from './src/services/database/DatabaseService';
+import { registerForPushNotificationsAsync } from './src/services/notifications/NotificationService';
 import RootNavigator from './src/views/navigation/RootNavigator';
 import 'react-native-gesture-handler'; // Required for Drawer
 
@@ -12,6 +13,8 @@ export default function App() {
         const setup = async () => {
             try {
                 await initDB();
+                // Request notification permissions
+                await registerForPushNotificationsAsync();
                 setDbInitialized(true);
             } catch (e) {
                 console.error('DB Init Error:', e);

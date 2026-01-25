@@ -8,6 +8,7 @@ import PrayerCard from '../components/PrayerCard';
 import CountdownTimer from '../components/CountdownTimer';
 import ConfirmationDialog from '../components/ConfirmationDialog';
 import { runRun, runQuery } from '../../services/database/DatabaseService';
+import { scheduleDailyNotifications, registerForPushNotificationsAsync } from '../../services/notifications/NotificationService';
 import { COLORS } from '../../constants/colors';
 
 export default function HomeScreen({ navigation }) {
@@ -88,6 +89,10 @@ export default function HomeScreen({ navigation }) {
 
             setPrayers(uiPrayers);
             calculateNextPrayer(uiPrayers);
+
+            // Schedule notifications for prayer times
+            await scheduleDailyNotifications(uiPrayers);
+
             setLoading(false);
             setRefreshing(false);
         } catch (error) {
