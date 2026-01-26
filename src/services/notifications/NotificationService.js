@@ -3,7 +3,8 @@ import { Platform } from 'react-native';
 
 Notifications.setNotificationHandler({
     handleNotification: async () => ({
-        shouldShowAlert: true,
+        shouldShowBanner: true,
+        shouldShowList: true,
         shouldPlaySound: true,
         shouldSetBadge: false,
     }),
@@ -47,6 +48,7 @@ export const scheduleDailyNotifications = async (prayers) => {
     await Notifications.cancelAllScheduledNotificationsAsync();
 
     const now = new Date();
+    console.log('[Notifications] Scheduling notifications, current time:', now.toLocaleTimeString());
 
     for (let i = 0; i < prayers.length; i++) {
         const prayer = prayers[i];
@@ -69,6 +71,8 @@ export const scheduleDailyNotifications = async (prayers) => {
                 notificationBody = `${prayer.name} namazı vakti girdi.`;
             }
 
+            console.log(`[Notifications] Scheduling ADHAN for ${prayer.name} at ${hours}:${minutes}`);
+
             await Notifications.scheduleNotificationAsync({
                 content: {
                     title: `${prayer.name} Vakti 🕌`,
@@ -81,17 +85,15 @@ export const scheduleDailyNotifications = async (prayers) => {
                     },
                 },
                 trigger: {
-                    type: 'daily',
-                    hour: hours,
-                    minute: minutes,
-                    repeats: false, // Just for today
+                    type: 'date',
+                    date: triggerDate,
                 },
             });
 
             // 2. Hatırlatma (15 dk sonra) - Güncel namazı hatırlat
             const reminderDate = new Date(triggerDate.getTime() + 15 * 60000);
-            const rHours = reminderDate.getHours();
-            const rMinutes = reminderDate.getMinutes();
+
+            console.log(`[Notifications] Scheduling REMINDER for ${prayer.name} at ${reminderDate.toLocaleTimeString()}`);
 
             await Notifications.scheduleNotificationAsync({
                 content: {
@@ -100,13 +102,18 @@ export const scheduleDailyNotifications = async (prayers) => {
                     data: { prayerName: prayer.name, type: 'REMINDER' },
                 },
                 trigger: {
-                    type: 'daily',
-                    hour: rHours,
-                    minute: rMinutes,
-                    repeats: false,
+                    type: 'date',
+                    date: reminderDate,
                 },
             });
         }
     }
+
+    // Log scheduled notifications for debugging
+    const scheduled = await Notifications.getAllScheduledNotificationsAsync();
+    console.log(`[Notifications] Total scheduled: ${scheduled.length}`);
+    scheduled.forEach((n) => {
+        console.log(`[Notifications] - ${n.content.title} at ${new Date(n.trigger.value).toLocaleTimeString()}`);
+    });
 };
 
