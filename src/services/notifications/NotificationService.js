@@ -81,6 +81,7 @@ export const scheduleDailyNotifications = async (prayers) => {
                     },
                 },
                 trigger: {
+                    type: 'daily',
                     hour: hours,
                     minute: minutes,
                     repeats: false, // Just for today
@@ -99,6 +100,7 @@ export const scheduleDailyNotifications = async (prayers) => {
                     data: { prayerName: prayer.name, type: 'REMINDER' },
                 },
                 trigger: {
+                    type: 'daily',
                     hour: rHours,
                     minute: rMinutes,
                     repeats: false,
