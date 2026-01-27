@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert, LayoutAnimation, Platform, UIManager } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert, LayoutAnimation, Platform, UIManager, ImageBackground } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { runQuery, runRun } from '../../services/database/DatabaseService';
 import { getTodayDateFormatted } from '../../utils/dateHelpers';
@@ -219,39 +219,48 @@ export default function QazaListScreen() {
     );
 
     return (
-        <View style={styles.container}>
-            {/* Summary Header */}
-            {totalKazaCount > 0 && (
-                <View style={styles.summaryHeader}>
-                    <Text style={styles.summaryText}>
-                        Toplam <Text style={styles.summaryCount}>{totalKazaCount}</Text> kaza namazınız bulunmaktadır
-                    </Text>
-                </View>
-            )}
+        <ImageBackground
+            source={require('../../../assets/images/Arkaplan.jpg')}
+            style={styles.backgroundImage}
+            imageStyle={{ opacity: 0.2 }}
+        >
+            <View style={styles.container}>
+                {/* Summary Header */}
+                {totalKazaCount > 0 && (
+                    <View style={styles.summaryHeader}>
+                        <Text style={styles.summaryText}>
+                            Toplam <Text style={styles.summaryCount}>{totalKazaCount}</Text> kaza namazınız bulunmaktadır
+                        </Text>
+                    </View>
+                )}
 
-            {qazaList.length === 0 ? (
-                <View style={styles.empty}>
-                    <Text style={styles.emptyIcon}>🤲</Text>
-                    <Text style={styles.emptyText}>Kaza borcunuz bulunmuyor</Text>
-                    <Text style={styles.emptySubtext}>Tüm namazlarınızı vaktinde kılıyorsunuz</Text>
-                </View>
-            ) : (
-                <FlatList
-                    data={groupedQaza}
-                    renderItem={renderDayCard}
-                    keyExtractor={item => item.date}
-                    contentContainerStyle={styles.list}
-                    showsVerticalScrollIndicator={false}
-                />
-            )}
-        </View>
+                {qazaList.length === 0 ? (
+                    <View style={styles.empty}>
+                        <Text style={styles.emptyIcon}>🤲</Text>
+                        <Text style={styles.emptyText}>Kaza borcunuz bulunmuyor</Text>
+                        <Text style={styles.emptySubtext}>Tüm namazlarınızı vaktinde kılıyorsunuz</Text>
+                    </View>
+                ) : (
+                    <FlatList
+                        data={groupedQaza}
+                        renderItem={renderDayCard}
+                        keyExtractor={item => item.date}
+                        contentContainerStyle={styles.list}
+                        showsVerticalScrollIndicator={false}
+                    />
+                )}
+            </View>
+        </ImageBackground>
     );
 }
 
 const styles = StyleSheet.create({
+    backgroundImage: {
+        flex: 1,
+    },
     container: {
         flex: 1,
-        backgroundColor: COLORS.background,
+        backgroundColor: 'transparent',
         padding: 12
     },
     summaryHeader: {
