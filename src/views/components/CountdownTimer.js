@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
         borderRadius: 12
     },
     countdown: {
-        color: COLORS.accent, // Lemon
+        color: COLORS.white, // Lemon
         fontSize: 28,
         fontWeight: 'bold',
         fontVariant: ['tabular-nums']
