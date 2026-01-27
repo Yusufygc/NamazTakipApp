@@ -159,3 +159,70 @@ export const getComparisonStats = async () => {
         return { currentWeek: 0, prevWeek: 0 };
     }
 };
+
+// Get heatmap data for a specific month
+// Returns array of { date, performedCount } for each day
+export const getHeatmapData = async (year, month) => {
+    try {
+        // Database stores dates as DD-MM-YYYY format
+        // So we need to search for dates ending with -MM-YYYY
+        const monthStr = `${String(month).padStart(2, '0')}-${year}`;
+        console.log('[Heatmap Query] Looking for dates like: %-' + monthStr);
+
+        const result = await runQuery(`
+            SELECT 
+                date,
+                SUM(CASE WHEN is_performed = 1 THEN 1 ELSE 0 END) as performedCount,
+                COUNT(*) as totalCount
+            FROM prayers
+            WHERE date LIKE ?
+            AND prayer_name != 'Güneş'
+            GROUP BY date
+            ORDER BY date ASC
+        `, [`%-${monthStr}`]);
+
+        console.log('[Heatmap Query] Result count:', result.length);
+
+        return result;
+    } catch (error) {
+        console.error('Error getting heatmap data:', error);
+        return [];
+    }
+};
+
+// Get radar chart data - performance by prayer name
+// Returns { Sabah: 85, Öğle: 90, İkindi: 75, Akşam: 95, Yatsı: 80 } as percentages
+export const getRadarChartData = async (days = 30) => {
+    try {
+        const result = await runQuery(`
+            SELECT 
+                prayer_name,
+                COUNT(*) as total,
+                SUM(CASE WHEN is_performed = 1 THEN 1 ELSE 0 END) as performed
+            FROM prayers
+            WHERE prayer_name IN ('Sabah', 'Öğle', 'İkindi', 'Akşam', 'Yatsı')
+            GROUP BY prayer_name
+        `);
+
+        // Convert to percentages
+        const data = {
+            Sabah: 0,
+            Öğle: 0,
+            İkindi: 0,
+            Akşam: 0,
+            Yatsı: 0
+        };
+
+        result.forEach(item => {
+            if (item.total > 0) {
+                data[item.prayer_name] = Math.round((item.performed / item.total) * 100);
+            }
+        });
+
+        console.log('[RadarChart] Data:', JSON.stringify(data));
+        return data;
+    } catch (error) {
+        console.error('Error getting radar chart data:', error);
+        return { Sabah: 0, Öğle: 0, İkindi: 0, Akşam: 0, Yatsı: 0 };
+    }
+};
