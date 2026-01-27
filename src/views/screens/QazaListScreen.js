@@ -63,7 +63,7 @@ const DayCard = ({ date, prayers, kazaCount, onCompensate, expandedDate, setExpa
                 activeOpacity={0.7}
             >
                 <View style={styles.dateContainer}>
-                    <Text style={styles.calendarIcon}>📅</Text>
+                    {/*<Text style={styles.calendarIcon}>📅</Text> */}
                     <Text style={styles.dateText}>{formatDateForDisplay(date)}</Text>
                 </View>
                 <View style={styles.badgeContainer}>
