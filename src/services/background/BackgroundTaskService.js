@@ -1,63 +1,52 @@
-import * as BackgroundFetch from 'expo-background-fetch';
+import * as BackgroundTask from 'expo-background-task';
 import * as TaskManager from 'expo-task-manager';
 import { getLocation } from '../../controllers/LocationController';
 import { scheduleMultiDayNotifications } from '../notifications/NotificationService';
 
-const BACKGROUND_PRAYER_FETCH = 'BACKGROUND_PRAYER_FETCH';
+const BACKGROUND_PRAYER_TASK = 'BACKGROUND_PRAYER_TASK';
 
 /**
  * Arka plan görevi tanımı.
- * Sistem tarafından periyodik olarak çağrılır (~her 12-24 saatte bir).
+ * Sistem tarafından periyodik olarak çağrılır.
  * Konum alır → sonraki 3 gün için namaz vakitlerini çeker → bildirimleri planlar.
  */
-TaskManager.defineTask(BACKGROUND_PRAYER_FETCH, async () => {
+TaskManager.defineTask(BACKGROUND_PRAYER_TASK, async () => {
     try {
-        console.log('[BackgroundTask] Prayer fetch started');
+        console.log('[BackgroundTask] Prayer task started');
 
-        // Konum al
         const location = await getLocation();
         console.log('[BackgroundTask] Location:', location.city, location.country);
 
-        // 3 günlük bildirimleri planla
         await scheduleMultiDayNotifications(location);
 
-        console.log('[BackgroundTask] Prayer fetch completed successfully');
-        return BackgroundFetch.BackgroundFetchResult.NewData;
+        console.log('[BackgroundTask] Prayer task completed successfully');
+        return BackgroundTask.BackgroundTaskResult.Success;
     } catch (error) {
-        console.error('[BackgroundTask] Prayer fetch failed:', error);
-        return BackgroundFetch.BackgroundFetchResult.Failed;
+        console.error('[BackgroundTask] Prayer task failed:', error);
+        return BackgroundTask.BackgroundTaskResult.Failed;
     }
 });
 
 /**
  * Arka plan görevini kaydeder.
  * App.js'de uygulama başlangıcında çağrılmalıdır.
- * 
- * minimumInterval: 43200 saniye = 12 saat
- * Sistem bu değeri minimum olarak kabul eder, gerçek çalışma sıklığı
- * iOS/Android'in pil optimizasyon politikalarına bağlıdır.
  */
 export const registerBackgroundTask = async () => {
     try {
-        const isRegistered = await TaskManager.isTaskRegisteredAsync(BACKGROUND_PRAYER_FETCH);
+        const isRegistered = await TaskManager.isTaskRegisteredAsync(BACKGROUND_PRAYER_TASK);
 
         if (!isRegistered) {
-            await BackgroundFetch.registerTaskAsync(BACKGROUND_PRAYER_FETCH, {
-                minimumInterval: 12 * 60 * 60, // 12 saat (saniye cinsinden)
-                stopOnTerminate: false, // Uygulama kapatılsa bile devam et
-                startOnBoot: true, // Cihaz yeniden başlatıldığında çalış
-            });
-            console.log('[BackgroundTask] Registered BACKGROUND_PRAYER_FETCH');
+            await BackgroundTask.registerTaskAsync(BACKGROUND_PRAYER_TASK);
+            console.log('[BackgroundTask] Registered BACKGROUND_PRAYER_TASK');
         } else {
-            console.log('[BackgroundTask] BACKGROUND_PRAYER_FETCH already registered');
+            console.log('[BackgroundTask] BACKGROUND_PRAYER_TASK already registered');
         }
 
-        // Mevcut durumu logla
-        const status = await BackgroundFetch.getStatusAsync();
+        const status = await BackgroundTask.getStatusAsync();
         const statusMap = {
-            [BackgroundFetch.BackgroundFetchStatus.Restricted]: 'Restricted',
-            [BackgroundFetch.BackgroundFetchStatus.Denied]: 'Denied',
-            [BackgroundFetch.BackgroundFetchStatus.Available]: 'Available',
+            [BackgroundTask.BackgroundTaskStatus.Restricted]: 'Restricted',
+            [BackgroundTask.BackgroundTaskStatus.Denied]: 'Denied',
+            [BackgroundTask.BackgroundTaskStatus.Available]: 'Available',
         };
         console.log('[BackgroundTask] Status:', statusMap[status] || 'Unknown');
 
@@ -67,14 +56,14 @@ export const registerBackgroundTask = async () => {
 };
 
 /**
- * Arka plan görevini kaldırır (gerekirse).
+ * Arka plan görevini kaldırır.
  */
 export const unregisterBackgroundTask = async () => {
     try {
-        const isRegistered = await TaskManager.isTaskRegisteredAsync(BACKGROUND_PRAYER_FETCH);
+        const isRegistered = await TaskManager.isTaskRegisteredAsync(BACKGROUND_PRAYER_TASK);
         if (isRegistered) {
-            await TaskManager.unregisterTaskAsync(BACKGROUND_PRAYER_FETCH);
-            console.log('[BackgroundTask] Unregistered BACKGROUND_PRAYER_FETCH');
+            await BackgroundTask.unregisterTaskAsync(BACKGROUND_PRAYER_TASK);
+            console.log('[BackgroundTask] Unregistered BACKGROUND_PRAYER_TASK');
         }
     } catch (error) {
         console.error('[BackgroundTask] Unregistration failed:', error);

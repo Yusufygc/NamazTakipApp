@@ -1,5 +1,5 @@
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
-import { View, Text, ImageBackground, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Platform, StatusBar } from 'react-native';
 import HomeScreen from '../screens/HomeScreen';
 import QazaListScreen from '../screens/QazaListScreen';
 import SettingsScreen from '../screens/SettingsScreen';
@@ -10,39 +10,42 @@ import AboutScreen from '../screens/AboutScreen';
 
 const Drawer = createDrawerNavigator();
 
-// Custom Drawer Content with Ayasofya background
+const STATUSBAR_HEIGHT = Platform.OS === 'android' ? (StatusBar.currentHeight || 24) : 44;
+
 function CustomDrawerContent(props) {
     const { colors } = useTheme();
     const styles = getStyles(colors);
 
     return (
-        <ImageBackground
-            source={require('../../../assets/images/Ayasofya.png')}
-            style={styles.backgroundImage}
-            imageStyle={{ opacity: 0.25 }}
-        >
-            {/* Header Section */}
-            <View style={styles.headerContainer}>
+        <View style={styles.container}>
+            {/* Header */}
+            <View style={styles.header}>
                 <Text style={styles.headerTitle}>Namaz Takip</Text>
-                <Text style={styles.headerSubtitle}>🕌</Text>
+                <Text style={styles.headerEmoji}>🕌</Text>
             </View>
 
-            {/* Drawer Items */}
-            <DrawerContentScrollView {...props} contentContainerStyle={styles.drawerContent}>
+            {/* Menu Items */}
+            <DrawerContentScrollView {...props} contentContainerStyle={styles.scrollContent}>
                 <DrawerItemList {...props} />
             </DrawerContentScrollView>
-        </ImageBackground>
+
+            {/* Footer */}
+            <View style={styles.footer}>
+                <Text style={styles.footerText}>v1.0.0</Text>
+            </View>
+        </View>
     );
 }
 
 const getStyles = (colors) => StyleSheet.create({
-    backgroundImage: {
+    container: {
         flex: 1,
+        backgroundColor: colors.background,
     },
-    headerContainer: {
+    header: {
         backgroundColor: colors.primary,
-        paddingTop: 50,
-        paddingBottom: 20,
+        paddingTop: STATUSBAR_HEIGHT + 12,
+        paddingBottom: 18,
         paddingHorizontal: 20,
         flexDirection: 'row',
         alignItems: 'center',
@@ -50,14 +53,24 @@ const getStyles = (colors) => StyleSheet.create({
     },
     headerTitle: {
         color: colors.white,
-        fontSize: 24,
+        fontSize: 22,
         fontWeight: 'bold',
     },
-    headerSubtitle: {
+    headerEmoji: {
         fontSize: 28,
     },
-    drawerContent: {
-        paddingTop: 10,
+    scrollContent: {
+        paddingTop: 8,
+    },
+    footer: {
+        padding: 16,
+        borderTopWidth: 1,
+        borderTopColor: colors.primary + '20',
+        alignItems: 'center',
+    },
+    footerText: {
+        color: colors.textLight,
+        fontSize: 12,
     },
 });
 
@@ -71,16 +84,29 @@ export default function DrawerNavigator() {
             screenOptions={{
                 headerStyle: {
                     backgroundColor: colors.primary,
+                    elevation: 4,
+                    shadowOpacity: 0.3,
                 },
                 headerTintColor: colors.white,
                 headerTitleStyle: {
                     fontWeight: 'bold',
                 },
-                drawerActiveTintColor: colors.background,
-                drawerActiveBackgroundColor: colors.primary + '99',
+                drawerActiveTintColor: colors.white,
+                drawerActiveBackgroundColor: colors.primary,
                 drawerInactiveTintColor: colors.text,
                 drawerStyle: {
-                    backgroundColor: 'transparent',
+                    backgroundColor: colors.background,
+                    width: 280,
+                },
+                drawerLabelStyle: {
+                    fontSize: 15,
+                    fontWeight: '500',
+                    marginLeft: -10,
+                },
+                drawerItemStyle: {
+                    borderRadius: 8,
+                    marginHorizontal: 8,
+                    marginVertical: 2,
                 },
             }}
         >
