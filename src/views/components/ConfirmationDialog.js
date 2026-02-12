@@ -1,14 +1,17 @@
 import React from 'react';
 import { Modal, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { COLORS } from '../../constants/colors';
+import { useTheme } from '../../context/ThemeContext';
 
 const ConfirmationDialog = ({ visible, prayerName, onClose, onConfirm, onMissed, onLater }) => {
     const [isCongregation, setIsCongregation] = React.useState(false);
+    const { colors } = useTheme();
 
-    // Reset state when visible changes (if necessary, but modal unmounts usually reset? No, visible prop controls. Better to use useEffect)
+    // Reset state when visible changes
     React.useEffect(() => {
         if (visible) setIsCongregation(false);
     }, [visible]);
+
+    const styles = getStyles(colors);
 
     return (
         <Modal
@@ -51,7 +54,7 @@ const ConfirmationDialog = ({ visible, prayerName, onClose, onConfirm, onMissed,
     );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (colors) => StyleSheet.create({
     overlay: {
         flex: 1,
         backgroundColor: 'rgba(0,0,0,0.5)',
@@ -59,7 +62,7 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     dialog: {
-        backgroundColor: COLORS.white,
+        backgroundColor: colors.white,
         width: '85%',
         borderRadius: 20,
         padding: 20,
@@ -76,7 +79,7 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 16,
-        color: COLORS.textLight,
+        color: colors.textLight,
         fontWeight: '600',
         marginBottom: 5
     },
@@ -84,7 +87,7 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
         marginBottom: 25,
-        color: COLORS.text
+        color: colors.text
     },
     buttonRow: {
         flexDirection: 'row',
@@ -100,28 +103,24 @@ const styles = StyleSheet.create({
         marginHorizontal: 5
     },
     confirmButton: {
-        backgroundColor: COLORS.secondary, // Lime
+        backgroundColor: colors.secondary, // Lime
         borderWidth: 0, // No border for cleaner look
     },
     missedButton: {
-        backgroundColor: '#FFEBEE', // Keep red tint for negative action but softer? Or use maybe COLORS.accent?
-        // Let's stick to conventional red for missed/danger but soften it.
-        // Or user asked for specific palette. 
-        // Let's use COLORS.white with red border?
-        backgroundColor: COLORS.white,
+        backgroundColor: colors.white,
         borderWidth: 2,
         borderColor: '#ef5350'
     },
     buttonText: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: COLORS.text
+        color: colors.text
     },
     laterButton: {
         padding: 10
     },
     laterText: {
-        color: COLORS.textLight,
+        color: colors.textLight,
         textDecorationLine: 'underline'
     },
     checkboxContainer: {
@@ -139,7 +138,7 @@ const styles = StyleSheet.create({
     },
     checkboxText: {
         fontSize: 16,
-        color: COLORS.text,
+        color: colors.text,
         fontWeight: '500'
     }
 });

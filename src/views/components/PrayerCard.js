@@ -1,8 +1,11 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { COLORS } from '../../constants/colors';
+import { useTheme } from '../../context/ThemeContext';
 
 const PrayerCard = ({ name, time, isPerformed, isMissed, isNext, isDisplayOnly, onPress }) => {
+    const { colors } = useTheme();
+    const styles = getStyles(colors);
+
     return (
         <TouchableOpacity
             style={[
@@ -41,13 +44,13 @@ const PrayerCard = ({ name, time, isPerformed, isMissed, isNext, isDisplayOnly, 
     );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (colors) => StyleSheet.create({
     container: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         padding: 20,
         marginVertical: 8,
-        backgroundColor: COLORS.white,
+        backgroundColor: colors.white,
         borderRadius: 16,
         alignItems: 'center',
         shadowColor: "#000",
@@ -60,7 +63,7 @@ const styles = StyleSheet.create({
         elevation: 2,
     },
     displayOnlyContainer: {
-        backgroundColor: COLORS.white,
+        backgroundColor: colors.white,
         borderLeftWidth: 5,
         borderLeftColor: '#FFCC00', // Sun color
         opacity: 0.9,
@@ -68,18 +71,18 @@ const styles = StyleSheet.create({
     },
     // ... other styles
     nextContainer: {
-        backgroundColor: COLORS.primary, // Sage
+        backgroundColor: colors.primary, // Sage
         borderLeftWidth: 5,
-        borderLeftColor: COLORS.dark
+        borderLeftColor: colors.dark
     },
     performedContainer: {
-        backgroundColor: COLORS.secondary + '40', // Lime with opacity
-        borderColor: COLORS.secondary,
+        backgroundColor: colors.secondary + '40', // Lime with opacity
+        borderColor: colors.secondary,
         borderWidth: 1
     },
     missedContainer: {
-        backgroundColor: COLORS.danger + '25', // Red with opacity
-        borderColor: COLORS.danger,
+        backgroundColor: colors.danger + '25', // Red with opacity
+        borderColor: colors.danger,
         borderWidth: 1
     },
     info: {
@@ -91,18 +94,18 @@ const styles = StyleSheet.create({
     name: {
         fontSize: 18,
         fontWeight: '600',
-        color: COLORS.text
+        color: colors.text
     },
     time: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: COLORS.text
+        color: colors.text
     },
     nextText: {
-        color: COLORS.white
+        color: colors.white
     },
     missedText: {
-        color: COLORS.danger
+        color: colors.danger
     },
     status: {
         width: 40,
@@ -117,7 +120,7 @@ const styles = StyleSheet.create({
         height: 30,
         borderRadius: 15,
         borderWidth: 2,
-        borderColor: COLORS.textLight,
+        borderColor: colors.textLight,
         alignItems: 'center',
         justifyContent: 'center'
     },
@@ -125,7 +128,7 @@ const styles = StyleSheet.create({
         width: 30,
         height: 30,
         borderRadius: 15,
-        backgroundColor: COLORS.secondary,
+        backgroundColor: colors.secondary,
         alignItems: 'center',
         justifyContent: 'center'
     },
@@ -133,21 +136,21 @@ const styles = StyleSheet.create({
         width: 30,
         height: 30,
         borderRadius: 15,
-        backgroundColor: COLORS.danger,
+        backgroundColor: colors.danger,
         alignItems: 'center',
         justifyContent: 'center'
     },
     nextCircle: {
-        borderColor: COLORS.white,
-        backgroundColor: COLORS.white + '30'
+        borderColor: colors.white,
+        backgroundColor: colors.white + '30'
     },
     checkmark: {
-        color: COLORS.dark,
+        color: colors.dark,
         fontSize: 16,
         fontWeight: 'bold'
     },
     missedMark: {
-        color: COLORS.white,
+        color: colors.white,
         fontSize: 16,
         fontWeight: 'bold'
     },
@@ -157,4 +160,3 @@ const styles = StyleSheet.create({
 });
 
 export default PrayerCard;
-

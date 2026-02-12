@@ -4,13 +4,16 @@ import HomeScreen from '../screens/HomeScreen';
 import QazaListScreen from '../screens/QazaListScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import TabNavigator from './TabNavigator';
-import { COLORS } from '../../constants/colors';
+import { useTheme } from '../../context/ThemeContext';
 import GamificationScreen from '../screens/GamificationScreen';
 
 const Drawer = createDrawerNavigator();
 
 // Custom Drawer Content with Ayasofya background
 function CustomDrawerContent(props) {
+    const { colors } = useTheme();
+    const styles = getStyles(colors);
+
     return (
         <ImageBackground
             source={require('../../../assets/images/Ayasofya.png')}
@@ -31,12 +34,12 @@ function CustomDrawerContent(props) {
     );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (colors) => StyleSheet.create({
     backgroundImage: {
         flex: 1,
     },
     headerContainer: {
-        backgroundColor: COLORS.primary,
+        backgroundColor: colors.primary,
         paddingTop: 50,
         paddingBottom: 20,
         paddingHorizontal: 20,
@@ -45,7 +48,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     headerTitle: {
-        color: COLORS.white,
+        color: colors.white,
         fontSize: 24,
         fontWeight: 'bold',
     },
@@ -58,21 +61,23 @@ const styles = StyleSheet.create({
 });
 
 export default function DrawerNavigator() {
+    const { colors } = useTheme();
+
     return (
         <Drawer.Navigator
             initialRouteName="Home"
             drawerContent={(props) => <CustomDrawerContent {...props} />}
             screenOptions={{
                 headerStyle: {
-                    backgroundColor: COLORS.primary,
+                    backgroundColor: colors.primary,
                 },
-                headerTintColor: COLORS.white,
+                headerTintColor: colors.white,
                 headerTitleStyle: {
                     fontWeight: 'bold',
                 },
-                drawerActiveTintColor: COLORS.background,
-                drawerActiveBackgroundColor: 'rgba(165, 200, 158, 0.6)',
-                drawerInactiveTintColor: COLORS.text,
+                drawerActiveTintColor: colors.background,
+                drawerActiveBackgroundColor: colors.primary + '99',
+                drawerInactiveTintColor: colors.text,
                 drawerStyle: {
                     backgroundColor: 'transparent',
                 },

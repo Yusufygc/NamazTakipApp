@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import Svg, { Polygon, Line, Circle, Text as SvgText, G } from 'react-native-svg';
 import { getRadarChartData } from '../../controllers/PrayerController';
-import { COLORS } from '../../constants/colors';
+import { useTheme } from '../../context/ThemeContext';
 
 const screenWidth = Dimensions.get('window').width;
 const SIZE = screenWidth - 40; // Daha geniş alan
@@ -49,6 +49,7 @@ export default function PrayerRadarChart() {
         Yatsı: 0
     });
     const [loading, setLoading] = useState(true);
+    const { colors } = useTheme();
 
     useFocusEffect(
         useCallback(() => {
@@ -65,6 +66,7 @@ export default function PrayerRadarChart() {
 
     // Grid levels: 20%, 40%, 60%, 80%, 100%
     const gridLevels = [20, 40, 60, 80, 100];
+    const styles = getStyles(colors);
 
     return (
         <View style={styles.container}>
@@ -79,7 +81,7 @@ export default function PrayerRadarChart() {
                             key={level}
                             points={getGridPolygonPoints(level)}
                             fill="none"
-                            stroke={COLORS.textLight}
+                            stroke={colors.textLight}
                             strokeWidth="0.5"
                             strokeOpacity={0.3}
                         />
@@ -95,7 +97,7 @@ export default function PrayerRadarChart() {
                                 y1={CENTER}
                                 x2={end.x}
                                 y2={end.y}
-                                stroke={COLORS.textLight}
+                                stroke={colors.textLight}
                                 strokeWidth="0.5"
                                 strokeOpacity={0.3}
                             />
@@ -105,9 +107,9 @@ export default function PrayerRadarChart() {
                     {/* Data polygon */}
                     <Polygon
                         points={getPolygonPoints(data)}
-                        fill={COLORS.primary}
+                        fill={colors.primary}
                         fillOpacity={0.4}
-                        stroke={COLORS.primary}
+                        stroke={colors.primary}
                         strokeWidth="2"
                     />
 
@@ -122,8 +124,8 @@ export default function PrayerRadarChart() {
                                     cx={point.x}
                                     cy={point.y}
                                     r="6"
-                                    fill={COLORS.primary}
-                                    stroke={COLORS.white}
+                                    fill={colors.primary}
+                                    stroke={colors.white}
                                     strokeWidth="2"
                                 />
                             </G>
@@ -147,7 +149,7 @@ export default function PrayerRadarChart() {
                                     y={point.y + yOffset}
                                     fontSize="14"
                                     fontWeight="600"
-                                    fill={COLORS.text}
+                                    fill={colors.text}
                                     textAnchor="middle"
                                 >
                                     {prayer}
@@ -216,30 +218,30 @@ const getInsight = (data) => {
     return `En güçlü vakitiniz: ${max[0]} (%${max[1]}). Devam edin!`;
 };
 
-const styles = StyleSheet.create({
+const getStyles = (colors) => StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: COLORS.background,
+        backgroundColor: colors.background,
         padding: 16,
         alignItems: 'center',
     },
     title: {
         fontSize: 22,
         fontWeight: 'bold',
-        color: COLORS.primary,
+        color: colors.primary,
         marginBottom: 4,
     },
     subtitle: {
         fontSize: 14,
-        color: COLORS.textLight,
+        color: colors.textLight,
         marginBottom: 16,
     },
     chartContainer: {
-        backgroundColor: COLORS.white,
+        backgroundColor: colors.white,
         borderRadius: 16,
         padding: 16,
         elevation: 3,
-        shadowColor: COLORS.dark,
+        shadowColor: colors.dark,
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
@@ -262,10 +264,10 @@ const styles = StyleSheet.create({
     },
     legendText: {
         fontSize: 12,
-        color: COLORS.textLight,
+        color: colors.textLight,
     },
     insightCard: {
-        backgroundColor: COLORS.accent,
+        backgroundColor: colors.accent,
         borderRadius: 12,
         padding: 16,
         marginTop: 16,
@@ -274,16 +276,16 @@ const styles = StyleSheet.create({
     insightTitle: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: COLORS.text,
+        color: colors.text,
         marginBottom: 8,
     },
     insightText: {
         fontSize: 14,
-        color: COLORS.text,
+        color: colors.text,
         lineHeight: 20,
     },
     loadingText: {
         marginTop: 16,
-        color: COLORS.textLight,
+        color: colors.textLight,
     },
 });

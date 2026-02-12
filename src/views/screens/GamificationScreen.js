@@ -1,12 +1,13 @@
 import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, RefreshControl, Dimensions, TouchableOpacity } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { COLORS } from '../../constants/colors';
+import { useTheme } from '../../context/ThemeContext';
 import { getAchievements } from '../../controllers/GamificationController';
 
 const { width } = Dimensions.get('window');
 
-const AchievementCard = ({ item }) => {
+const AchievementCard = ({ item, colors }) => {
+    const styles = getStyles(colors);
     return (
         <View style={[styles.card, !item.isUnlocked && styles.lockedCard]}>
             <View style={styles.iconContainer}>
@@ -32,20 +33,10 @@ export default function GamificationScreen() {
         bestStreak: 0
     });
     const [refreshing, setRefreshing] = useState(false);
+    const { colors } = useTheme();
 
     const loadData = async () => {
         const achievements = await getAchievements();
-        // Extract streak info from achievements payload or separate call? 
-        // Our controller returns achievements which logic internally calls getStreakStats.
-        // But we didn't expose streak counts directly in return of getAchievements. 
-        // Let's rely on what getAchievements returns or update controller.
-        // Wait, getAchievements in controller implementation returned an array of achievements, but we also calculated streaks inside it.
-        // We probably should have exposed the stats too.
-        // For now, let's look at what we have. 
-        // Actually, to get raw streak numbers for the "Streak Card", we might need to modify the controller or just deduce from "First Week" achievement progress?
-        // No, that's hacky. I should export getStreakStats from controller and call it.
-
-        // I will assume I can import getStreakStats too.
         const { getStreakStats } = require('../../controllers/GamificationController');
         const streakData = await getStreakStats();
 
@@ -62,6 +53,8 @@ export default function GamificationScreen() {
             loadData();
         }, [])
     );
+
+    const styles = getStyles(colors);
 
     return (
         <ScrollView
@@ -88,17 +81,17 @@ export default function GamificationScreen() {
             <Text style={styles.sectionTitle}>ROZETLER</Text>
             <View style={styles.grid}>
                 {stats.achievements.map((item, index) => (
-                    <AchievementCard key={item.id} item={item} />
+                    <AchievementCard key={item.id} item={item} colors={colors} />
                 ))}
             </View>
         </ScrollView>
     );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (colors) => StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: COLORS.background,
+        backgroundColor: colors.background,
         padding: 20
     },
     header: {
@@ -108,17 +101,17 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: COLORS.primary
+        color: colors.primary
     },
     streakContainer: {
-        backgroundColor: COLORS.white,
+        backgroundColor: colors.white,
         borderRadius: 20,
         padding: 20,
         flexDirection: 'row',
         alignItems: 'center',
         marginBottom: 30,
         elevation: 5,
-        shadowColor: COLORS.primary,
+        shadowColor: colors.primary,
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.2,
         shadowRadius: 10,
@@ -140,7 +133,7 @@ const styles = StyleSheet.create({
     },
     streakTitle: {
         fontSize: 14,
-        color: COLORS.textLight,
+        color: colors.textLight,
         marginBottom: 5,
         letterSpacing: 1,
         fontWeight: '600'
@@ -148,24 +141,24 @@ const styles = StyleSheet.create({
     streakCount: {
         fontSize: 32,
         fontWeight: 'bold',
-        color: COLORS.text,
+        color: colors.text,
         marginBottom: 5
     },
     streakSub: {
         fontSize: 14,
-        color: COLORS.textLight
+        color: colors.textLight
     },
     sectionTitle: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: COLORS.text,
+        color: colors.text,
         marginBottom: 15
     },
     grid: {
         paddingBottom: 40
     },
     card: {
-        backgroundColor: COLORS.white,
+        backgroundColor: colors.white,
         borderRadius: 16,
         padding: 15,
         marginBottom: 15,
@@ -178,14 +171,14 @@ const styles = StyleSheet.create({
         shadowRadius: 4
     },
     lockedCard: {
-        backgroundColor: '#F5F5F5',
+        backgroundColor: colors.background,
         opacity: 0.8
     },
     iconContainer: {
         width: 50,
         height: 50,
         borderRadius: 25,
-        backgroundColor: COLORS.background,
+        backgroundColor: colors.background,
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 15
@@ -199,12 +192,12 @@ const styles = StyleSheet.create({
     cardTitle: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: COLORS.text,
+        color: colors.text,
         marginBottom: 2
     },
     cardDescription: {
         fontSize: 12,
-        color: COLORS.textLight,
+        color: colors.textLight,
         marginBottom: 8
     },
     progressBarContainer: {
@@ -216,12 +209,12 @@ const styles = StyleSheet.create({
     },
     progressBar: {
         height: '100%',
-        backgroundColor: COLORS.secondary, // Lime green
+        backgroundColor: colors.secondary, // Lime green
         borderRadius: 3
     },
     progressText: {
         fontSize: 10,
-        color: COLORS.textLight,
+        color: colors.textLight,
         textAlign: 'right'
     },
     checkMark: {

@@ -9,7 +9,7 @@ import CountdownTimer from '../components/CountdownTimer';
 import ConfirmationDialog from '../components/ConfirmationDialog';
 import { runRun, runQuery } from '../../services/database/DatabaseService';
 import { scheduleDailyNotifications, registerForPushNotificationsAsync } from '../../services/notifications/NotificationService';
-import { COLORS } from '../../constants/colors';
+import { useTheme } from '../../context/ThemeContext';
 
 export default function HomeScreen({ navigation }) {
     const [loading, setLoading] = useState(true);
@@ -19,6 +19,7 @@ export default function HomeScreen({ navigation }) {
     const [dialogVisible, setDialogVisible] = useState(false);
     const [selectedPrayer, setSelectedPrayer] = useState(null);
     const [refreshing, setRefreshing] = useState(false);
+    const { colors } = useTheme();
 
     const loadData = async (force = false) => {
         try {
@@ -213,6 +214,8 @@ export default function HomeScreen({ navigation }) {
         }
     };
 
+    const styles = getStyles(colors);
+
     return (
         <ScrollView
             style={styles.container}
@@ -261,10 +264,10 @@ export default function HomeScreen({ navigation }) {
 
 // ... (render logic remains, updating styles at bottom)
 
-const styles = StyleSheet.create({
+const getStyles = (colors) => StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: COLORS.background, // Off-white
+        backgroundColor: colors.background, // Off-white
         padding: 15 // Reduced padding
     },
     header: {
@@ -274,12 +277,12 @@ const styles = StyleSheet.create({
     location: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: COLORS.text,
+        color: colors.text,
         marginBottom: 5
     },
     sectionTitle: {
         fontSize: 13,
-        color: COLORS.textLight, // Lighter text
+        color: colors.textLight, // Lighter text
         marginBottom: 8,
         marginTop: 5,
         fontWeight: '600',

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { initDB } from './src/services/database/DatabaseService';
 import { registerForPushNotificationsAsync } from './src/services/notifications/NotificationService';
 import RootNavigator from './src/views/navigation/RootNavigator';
+import { ThemeProvider } from './src/context/ThemeContext';
 import 'react-native-gesture-handler'; // Required for Drawer
 
 export default function App() {
@@ -32,10 +33,10 @@ export default function App() {
     }
 
     return (
-        <>
+        <ThemeProvider>
             <RootNavigator />
             <StatusBar style="auto" />
-        </>
+        </ThemeProvider>
     );
 }
 

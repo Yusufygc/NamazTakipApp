@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { getHeatmapData } from '../../controllers/PrayerController';
-import { COLORS } from '../../constants/colors';
+import { useTheme } from '../../context/ThemeContext';
 
 const screenWidth = Dimensions.get('window').width;
 const CELL_SIZE = (screenWidth - 80) / 7; // 7 days per row
@@ -33,6 +33,7 @@ export default function PrayerHeatmap() {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [heatmapData, setHeatmapData] = useState({});
     const [loading, setLoading] = useState(true);
+    const { colors } = useTheme();
 
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth() + 1; // 1-12
@@ -120,6 +121,7 @@ export default function PrayerHeatmap() {
 
     const weeks = generateCalendarGrid();
     const isCurrentMonth = year === new Date().getFullYear() && month === new Date().getMonth() + 1;
+    const styles = getStyles(colors);
 
     return (
         <View style={styles.container}>
@@ -211,10 +213,10 @@ export default function PrayerHeatmap() {
     );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (colors) => StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: COLORS.background,
+        backgroundColor: colors.background,
         padding: 16,
     },
     header: {
@@ -226,24 +228,24 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: COLORS.primary,
+        color: colors.primary,
     },
     navButton: {
         padding: 12,
-        backgroundColor: COLORS.primary,
+        backgroundColor: colors.primary,
         borderRadius: 8,
     },
     navButtonDisabled: {
-        backgroundColor: COLORS.textLight,
+        backgroundColor: colors.textLight,
         opacity: 0.5,
     },
     navButtonText: {
-        color: COLORS.white,
+        color: colors.white,
         fontSize: 16,
         fontWeight: 'bold',
     },
     navButtonTextDisabled: {
-        color: COLORS.background,
+        color: colors.background,
     },
     dayLabels: {
         flexDirection: 'row',
@@ -256,14 +258,14 @@ const styles = StyleSheet.create({
     dayLabelText: {
         fontSize: 12,
         fontWeight: '600',
-        color: COLORS.textLight,
+        color: colors.textLight,
     },
     calendarGrid: {
-        backgroundColor: COLORS.white,
+        backgroundColor: colors.white,
         borderRadius: 12,
         padding: 8,
         elevation: 2,
-        shadowColor: COLORS.dark,
+        shadowColor: colors.dark,
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
@@ -281,7 +283,7 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: COLORS.background,
+        backgroundColor: colors.background,
     },
     noDataCell: {
         backgroundColor: '#E0E0E0',
@@ -292,10 +294,10 @@ const styles = StyleSheet.create({
     dayNumber: {
         fontSize: 12,
         fontWeight: '600',
-        color: COLORS.text,
+        color: colors.text,
     },
     dayNumberWithData: {
-        color: COLORS.white,
+        color: colors.white,
     },
     countText: {
         fontSize: 8,
@@ -320,11 +322,11 @@ const styles = StyleSheet.create({
     },
     legendText: {
         fontSize: 12,
-        color: COLORS.textLight,
+        color: colors.textLight,
     },
     loadingText: {
         textAlign: 'center',
-        color: COLORS.textLight,
+        color: colors.textLight,
         marginTop: 16,
     },
 });

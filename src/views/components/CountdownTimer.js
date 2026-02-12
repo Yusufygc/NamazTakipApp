@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { COLORS } from '../../constants/colors';
+import { useTheme } from '../../context/ThemeContext';
 
 const CountdownTimer = ({ targetTime, nextPrayerName, onPrayerTimeReached }) => {
     const [timeLeft, setTimeLeft] = useState('');
     const hasTriggeredRef = useRef(false);
+    const { colors } = useTheme();
 
     useEffect(() => {
         // Reset trigger flag when targetTime changes
@@ -59,6 +60,8 @@ const CountdownTimer = ({ targetTime, nextPrayerName, onPrayerTimeReached }) => 
         return () => clearInterval(interval);
     }, [targetTime, onPrayerTimeReached]);
 
+    const styles = getStyles(colors);
+
     return (
         <View style={styles.container}>
             <Text style={styles.label}>SONRAKİ NAMAZ</Text>
@@ -75,34 +78,34 @@ const CountdownTimer = ({ targetTime, nextPrayerName, onPrayerTimeReached }) => 
     );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (colors) => StyleSheet.create({
     container: {
-        backgroundColor: COLORS.dark, // Olive
+        backgroundColor: colors.dark, // Olive
         padding: 20, // Reduced padding
         borderRadius: 20,
         alignItems: 'center',
         marginVertical: 15, // Reduced margin
-        shadowColor: COLORS.dark,
+        shadowColor: colors.dark,
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 10,
         elevation: 5
     },
     label: {
-        color: COLORS.accent, // Lemon
+        color: colors.accent, // Lemon
         fontSize: 12, // Reduced font size
         marginBottom: 5,
         letterSpacing: 2,
         fontWeight: '600'
     },
     name: {
-        color: COLORS.white,
+        color: colors.white,
         fontSize: 28, // Slightly reduced
         fontWeight: 'bold',
         marginBottom: 0
     },
     time: {
-        color: COLORS.white + 'CC', // With opacity
+        color: colors.white + 'CC', // With opacity
         fontSize: 16,
         marginBottom: 10 // Reduced margin
     },
@@ -111,20 +114,20 @@ const styles = StyleSheet.create({
         marginTop: 5
     },
     remainingLabel: {
-        color: COLORS.white + '90',
+        color: colors.white + '90',
         fontSize: 12,
         marginBottom: 5,
         textTransform: 'uppercase',
         letterSpacing: 1
     },
     timerBox: {
-        backgroundColor: COLORS.white + '20',
+        backgroundColor: colors.white + '20',
         paddingHorizontal: 20,
         paddingVertical: 8, // Reduced padding
         borderRadius: 12
     },
     countdown: {
-        color: COLORS.white, // Lemon
+        color: colors.white, // Lemon
         fontSize: 24, // Slightly reduced
         fontWeight: 'bold',
         fontVariant: ['tabular-nums']
@@ -132,4 +135,3 @@ const styles = StyleSheet.create({
 });
 
 export default CountdownTimer;
-

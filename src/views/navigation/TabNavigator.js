@@ -2,26 +2,28 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import ComparisonStats from '../screens/ComparisonStats';
 import PrayerHeatmap from '../components/PrayerHeatmap';
 import PrayerRadarChart from '../components/PrayerRadarChart';
-import { COLORS } from '../../constants/colors';
+import { useTheme } from '../../context/ThemeContext';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const Tab = createBottomTabNavigator();
 
 export default function TabNavigator() {
+    const { colors } = useTheme();
+
     return (
         <Tab.Navigator
             screenOptions={{
                 headerShown: false,
-                tabBarActiveTintColor: COLORS.primary,
-                tabBarInactiveTintColor: COLORS.textLight,
+                tabBarActiveTintColor: colors.primary,
+                tabBarInactiveTintColor: colors.textLight,
                 tabBarStyle: {
-                    backgroundColor: COLORS.white,
-                    borderTopColor: COLORS.background
+                    backgroundColor: colors.white,
+                    borderTopColor: colors.background
                 }
             }}
         >
-            <Tab.Screen 
-                name="Performans" 
+            <Tab.Screen
+                name="Performans"
                 component={PrayerRadarChart}
                 options={{
                     tabBarIcon: ({ color, size }) => (
@@ -29,8 +31,8 @@ export default function TabNavigator() {
                     ),
                 }}
             />
-            <Tab.Screen 
-                name="Isı Haritası" 
+            <Tab.Screen
+                name="Isı Haritası"
                 component={PrayerHeatmap}
                 options={{
                     tabBarIcon: ({ color, size }) => (
@@ -38,8 +40,8 @@ export default function TabNavigator() {
                     ),
                 }}
             />
-            <Tab.Screen 
-                name="Karşılaştırma" 
+            <Tab.Screen
+                name="Karşılaştırma"
                 component={ComparisonStats}
                 options={{
                     tabBarIcon: ({ color, size }) => (

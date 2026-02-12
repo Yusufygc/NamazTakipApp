@@ -3,7 +3,7 @@ import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert, LayoutAnimat
 import { useFocusEffect } from '@react-navigation/native';
 import { runQuery, runRun } from '../../services/database/DatabaseService';
 import { getTodayDateFormatted } from '../../utils/dateHelpers';
-import { COLORS } from '../../constants/colors';
+import { useTheme } from '../../context/ThemeContext';
 
 // Enable LayoutAnimation for Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -46,8 +46,9 @@ const formatDateForDisplay = (dateStr) => {
 };
 
 // DayCard Component - Expandable card for each day
-const DayCard = ({ date, prayers, kazaCount, onCompensate, expandedDate, setExpandedDate }) => {
+const DayCard = ({ date, prayers, kazaCount, onCompensate, expandedDate, setExpandedDate, colors }) => {
     const isExpanded = expandedDate === date;
+    const styles = getStyles(colors);
 
     const toggleExpand = () => {
         LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -63,7 +64,6 @@ const DayCard = ({ date, prayers, kazaCount, onCompensate, expandedDate, setExpa
                 activeOpacity={0.7}
             >
                 <View style={styles.dateContainer}>
-                    {/*<Text style={styles.calendarIcon}>📅</Text> */}
                     <Text style={styles.dateText}>{formatDateForDisplay(date)}</Text>
                 </View>
                 <View style={styles.badgeContainer}>
@@ -104,6 +104,7 @@ export default function QazaListScreen() {
     const [qazaList, setQazaList] = useState([]);
     const [loading, setLoading] = useState(true);
     const [expandedDate, setExpandedDate] = useState(null);
+    const { colors } = useTheme();
 
     const loadQaza = async () => {
         try {
@@ -118,7 +119,6 @@ export default function QazaListScreen() {
             );
 
             // 2. Fetch unperformed prayers from past days (auto-detected missed prayers)
-            // These are prayers that were never marked as performed and the day has passed
             const autoQaza = await runQuery(
                 `SELECT id, prayer_name, date as missed_date, 'Otomatik tespit' as notes, 'auto' as source 
                  FROM prayers 
@@ -178,7 +178,6 @@ export default function QazaListScreen() {
 
                             if (item.source === 'qaza') {
                                 // Source is qaza_prayers table
-                                // 1. Mark as compensated in qaza_prayers
                                 await runRun(
                                     `UPDATE qaza_prayers SET is_compensated = 1, compensated_at = ? WHERE id = ?`,
                                     [today, item.id]
@@ -207,6 +206,8 @@ export default function QazaListScreen() {
     // Calculate total kaza count
     const totalKazaCount = qazaList.length;
 
+    const styles = getStyles(colors);
+
     const renderDayCard = ({ item }) => (
         <DayCard
             date={item.date}
@@ -215,6 +216,7 @@ export default function QazaListScreen() {
             onCompensate={handleCompensate}
             expandedDate={expandedDate}
             setExpandedDate={setExpandedDate}
+            colors={colors}
         />
     );
 
@@ -254,7 +256,7 @@ export default function QazaListScreen() {
     );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (colors) => StyleSheet.create({
     backgroundImage: {
         flex: 1,
     },
@@ -264,7 +266,7 @@ const styles = StyleSheet.create({
         padding: 12
     },
     summaryHeader: {
-        backgroundColor: COLORS.accent,
+        backgroundColor: colors.accent,
         padding: 12,
         borderRadius: 10,
         marginBottom: 12,
@@ -272,22 +274,22 @@ const styles = StyleSheet.create({
     },
     summaryText: {
         fontSize: 14,
-        color: COLORS.text
+        color: colors.text
     },
     summaryCount: {
         fontWeight: 'bold',
-        color: COLORS.danger,
+        color: colors.danger,
         fontSize: 16
     },
     list: {
         paddingBottom: 20
     },
     dayCard: {
-        backgroundColor: COLORS.white,
+        backgroundColor: colors.white,
         borderRadius: 12,
         marginBottom: 10,
         elevation: 3,
-        shadowColor: COLORS.dark,
+        shadowColor: colors.dark,
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.15,
         shadowRadius: 5,
@@ -298,10 +300,10 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         padding: 16,
-        backgroundColor: COLORS.white
+        backgroundColor: colors.white
     },
     dayCardHeaderExpanded: {
-        backgroundColor: COLORS.primary,
+        backgroundColor: colors.primary,
         borderBottomWidth: 1,
         borderBottomColor: 'rgba(0,0,0,0.05)'
     },
@@ -317,31 +319,31 @@ const styles = StyleSheet.create({
     dateText: {
         fontSize: 16,
         fontWeight: '600',
-        color: COLORS.text
+        color: colors.text
     },
     badgeContainer: {
         flexDirection: 'row',
         alignItems: 'center'
     },
     kazaBadge: {
-        backgroundColor: COLORS.danger,
+        backgroundColor: colors.danger,
         paddingHorizontal: 10,
         paddingVertical: 5,
         borderRadius: 15,
         marginRight: 8
     },
     kazaBadgeText: {
-        color: COLORS.white,
+        color: colors.white,
         fontSize: 12,
         fontWeight: 'bold'
     },
     expandIcon: {
         fontSize: 12,
-        color: COLORS.textLight
+        color: colors.textLight
     },
     prayerListContainer: {
         padding: 12,
-        backgroundColor: '#FAFAFA'
+        backgroundColor: colors.background
     },
     prayerItem: {
         flexDirection: 'row',
@@ -364,22 +366,22 @@ const styles = StyleSheet.create({
     prayerName: {
         fontSize: 16,
         fontWeight: '500',
-        color: COLORS.text
+        color: colors.text
     },
     prayerNotes: {
         fontSize: 12,
-        color: COLORS.textLight,
+        color: colors.textLight,
         marginLeft: 8,
         fontStyle: 'italic'
     },
     compensateButton: {
-        backgroundColor: COLORS.primary,
+        backgroundColor: colors.primary,
         paddingVertical: 8,
         paddingHorizontal: 16,
         borderRadius: 20
     },
     compensateButtonText: {
-        color: COLORS.white,
+        color: colors.white,
         fontWeight: 'bold',
         fontSize: 13
     },
@@ -395,12 +397,12 @@ const styles = StyleSheet.create({
     emptyText: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: COLORS.text,
+        color: colors.text,
         marginBottom: 8
     },
     emptySubtext: {
         fontSize: 14,
-        color: COLORS.textLight,
+        color: colors.textLight,
         textAlign: 'center'
     }
 });

@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, Dimensions, TouchableOpacity } from
 import { useFocusEffect } from '@react-navigation/native';
 import { BarChart, LineChart } from 'react-native-chart-kit';
 import { getComparisonStats, getWeeklyStats, getMonthlyStats } from '../../controllers/PrayerController';
-import { COLORS } from '../../constants/colors';
+import { useTheme } from '../../context/ThemeContext';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const screenWidth = Dimensions.get('window').width;
@@ -13,6 +13,7 @@ export default function ComparisonStats() {
     const [weeklyData, setWeeklyData] = useState(null);
     const [monthlyData, setMonthlyData] = useState(null);
     const [viewMode, setViewMode] = useState('weekly'); // 'weekly' or 'monthly'
+    const { colors } = useTheme();
 
     useFocusEffect(
         useCallback(() => {
@@ -46,6 +47,21 @@ export default function ComparisonStats() {
     const diff = stats.currentWeek - stats.prevWeek;
     const isBetter = diff >= 0;
 
+    const chartConfig = {
+        backgroundColor: colors.white,
+        backgroundGradientFrom: colors.white,
+        backgroundGradientTo: colors.white,
+        decimalPlaces: 0,
+        color: (opacity = 1) => colors.primary,
+        labelColor: (opacity = 1) => colors.textLight,
+        propsForDots: {
+            r: "4",
+            strokeWidth: "2",
+            stroke: colors.secondary
+        },
+        barPercentage: 0.7,
+    };
+
     const renderChart = () => {
         if (viewMode === 'weekly' && weeklyData) {
             return (
@@ -77,6 +93,8 @@ export default function ComparisonStats() {
         return <Text style={styles.noDataText}>Veri bulunamadı.</Text>;
     };
 
+    const styles = getStyles(colors);
+
     return (
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
             <Text style={styles.title}>İstatistikler & Karşılaştırma</Text>
@@ -86,12 +104,12 @@ export default function ComparisonStats() {
                 <View style={styles.statCard}>
                     <Text style={styles.statLabel}>Bu Hafta</Text>
                     <Text style={styles.statValue}>{stats.currentWeek}</Text>
-                    <MaterialCommunityIcons name="calendar-week" size={24} color={COLORS.primary} style={styles.icon} />
+                    <MaterialCommunityIcons name="calendar-week" size={24} color={colors.primary} style={styles.icon} />
                 </View>
                 <View style={styles.statCard}>
                     <Text style={styles.statLabel}>Geçen Hafta</Text>
                     <Text style={styles.statValue}>{stats.prevWeek}</Text>
-                    <MaterialCommunityIcons name="calendar-clock" size={24} color={COLORS.textLight} style={styles.icon} />
+                    <MaterialCommunityIcons name="calendar-clock" size={24} color={colors.textLight} style={styles.icon} />
                 </View>
             </View>
 
@@ -107,9 +125,9 @@ export default function ComparisonStats() {
                     <MaterialCommunityIcons
                         name={isBetter ? "trending-up" : "trending-down"}
                         size={32}
-                        color={isBetter ? COLORS.secondary : '#ef5350'}
+                        color={isBetter ? colors.secondary : '#ef5350'}
                     />
-                    <Text style={[styles.diffText, { color: isBetter ? COLORS.secondary : '#ef5350' }]}>
+                    <Text style={[styles.diffText, { color: isBetter ? colors.secondary : '#ef5350' }]}>
                         {isBetter ? 'Yükselişte' : 'Düşüşte'}
                     </Text>
                 </View>
@@ -142,25 +160,10 @@ export default function ComparisonStats() {
     );
 }
 
-const chartConfig = {
-    backgroundColor: COLORS.white,
-    backgroundGradientFrom: COLORS.white,
-    backgroundGradientTo: COLORS.white,
-    decimalPlaces: 0,
-    color: (opacity = 1) => COLORS.primary,
-    labelColor: (opacity = 1) => COLORS.textLight,
-    propsForDots: {
-        r: "4",
-        strokeWidth: "2",
-        stroke: COLORS.secondary
-    },
-    barPercentage: 0.7,
-};
-
-const styles = StyleSheet.create({
+const getStyles = (colors) => StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: COLORS.background,
+        backgroundColor: colors.background,
     },
     contentContainer: {
         padding: 20,
@@ -170,7 +173,7 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
         marginBottom: 20,
-        color: COLORS.primary,
+        color: colors.primary,
         textAlign: 'center',
     },
     statsRow: {
@@ -180,7 +183,7 @@ const styles = StyleSheet.create({
     },
     statCard: {
         flex: 1,
-        backgroundColor: COLORS.white,
+        backgroundColor: colors.white,
         padding: 15,
         borderRadius: 15,
         marginHorizontal: 5,
@@ -193,20 +196,20 @@ const styles = StyleSheet.create({
     },
     statLabel: {
         fontSize: 14,
-        color: COLORS.textLight,
+        color: colors.textLight,
         marginBottom: 5,
     },
     statValue: {
         fontSize: 28,
         fontWeight: 'bold',
-        color: COLORS.primary,
+        color: colors.primary,
     },
     icon: {
         marginTop: 10,
         opacity: 0.8,
     },
     diffCard: {
-        backgroundColor: COLORS.white,
+        backgroundColor: colors.white,
         padding: 20,
         borderRadius: 15,
         marginBottom: 25,
@@ -221,19 +224,19 @@ const styles = StyleSheet.create({
         borderLeftWidth: 5,
     },
     betterParams: {
-        borderLeftColor: COLORS.secondary,
+        borderLeftColor: colors.secondary,
     },
     worseParams: {
         borderLeftColor: '#ef5350',
     },
     diffLabel: {
         fontSize: 16,
-        color: COLORS.textLight,
+        color: colors.textLight,
     },
     diffValue: {
         fontSize: 32,
         fontWeight: 'bold',
-        color: COLORS.text,
+        color: colors.text,
     },
     diffIconContainer: {
         alignItems: 'center',
@@ -244,12 +247,12 @@ const styles = StyleSheet.create({
     },
     toggleContainer: {
         flexDirection: 'row',
-        backgroundColor: COLORS.white,
+        backgroundColor: colors.white,
         borderRadius: 12,
         padding: 4,
         marginBottom: 20,
         borderWidth: 1,
-        borderColor: '#eee',
+        borderColor: colors.dark + '20',
     },
     toggleButton: {
         flex: 1,
@@ -258,18 +261,18 @@ const styles = StyleSheet.create({
         borderRadius: 8,
     },
     activeToggle: {
-        backgroundColor: COLORS.primary,
+        backgroundColor: colors.primary,
     },
     toggleText: {
         fontSize: 16,
         fontWeight: '600',
-        color: COLORS.textLight,
+        color: colors.textLight,
     },
     activeToggleText: {
-        color: COLORS.white,
+        color: colors.white,
     },
     chartContainer: {
-        backgroundColor: COLORS.white,
+        backgroundColor: colors.white,
         borderRadius: 20,
         padding: 15,
         alignItems: 'center',
@@ -278,7 +281,7 @@ const styles = StyleSheet.create({
     chartTitle: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: COLORS.text,
+        color: colors.text,
         marginBottom: 15,
         alignSelf: 'flex-start',
         marginLeft: 10,
@@ -289,7 +292,7 @@ const styles = StyleSheet.create({
     },
     noDataText: {
         textAlign: 'center',
-        color: COLORS.textLight,
+        color: colors.textLight,
         marginVertical: 20,
     }
 });
