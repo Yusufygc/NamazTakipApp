@@ -64,8 +64,12 @@ const CountdownTimer = ({ targetTime, nextPrayerName, onPrayerTimeReached }) => 
             <Text style={styles.label}>SONRAKİ NAMAZ</Text>
             <Text style={styles.name}>{nextPrayerName}</Text>
             <Text style={styles.time}>{targetTime}</Text>
-            <View style={styles.timerBox}>
-                <Text style={styles.countdown}>{timeLeft}</Text>
+
+            <View style={styles.timerContainer}>
+                <Text style={styles.remainingLabel}>Kalan Süre</Text>
+                <View style={styles.timerBox}>
+                    <Text style={styles.countdown}>{timeLeft}</Text>
+                </View>
             </View>
         </View>
     );
@@ -74,10 +78,10 @@ const CountdownTimer = ({ targetTime, nextPrayerName, onPrayerTimeReached }) => 
 const styles = StyleSheet.create({
     container: {
         backgroundColor: COLORS.dark, // Olive
-        padding: 25,
+        padding: 20, // Reduced padding
         borderRadius: 20,
         alignItems: 'center',
-        marginVertical: 20,
+        marginVertical: 15, // Reduced margin
         shadowColor: COLORS.dark,
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
@@ -86,31 +90,42 @@ const styles = StyleSheet.create({
     },
     label: {
         color: COLORS.accent, // Lemon
-        fontSize: 14,
+        fontSize: 12, // Reduced font size
         marginBottom: 5,
         letterSpacing: 2,
         fontWeight: '600'
     },
     name: {
         color: COLORS.white,
-        fontSize: 32,
+        fontSize: 28, // Slightly reduced
         fontWeight: 'bold',
         marginBottom: 0
     },
     time: {
         color: COLORS.white + 'CC', // With opacity
-        fontSize: 18,
-        marginBottom: 15
+        fontSize: 16,
+        marginBottom: 10 // Reduced margin
+    },
+    timerContainer: {
+        alignItems: 'center',
+        marginTop: 5
+    },
+    remainingLabel: {
+        color: COLORS.white + '90',
+        fontSize: 12,
+        marginBottom: 5,
+        textTransform: 'uppercase',
+        letterSpacing: 1
     },
     timerBox: {
         backgroundColor: COLORS.white + '20',
         paddingHorizontal: 20,
-        paddingVertical: 10,
+        paddingVertical: 8, // Reduced padding
         borderRadius: 12
     },
     countdown: {
         color: COLORS.white, // Lemon
-        fontSize: 28,
+        fontSize: 24, // Slightly reduced
         fontWeight: 'bold',
         fontVariant: ['tabular-nums']
     }

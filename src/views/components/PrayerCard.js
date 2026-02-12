@@ -2,24 +2,28 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { COLORS } from '../../constants/colors';
 
-const PrayerCard = ({ name, time, isPerformed, isMissed, isNext, onPress }) => {
+const PrayerCard = ({ name, time, isPerformed, isMissed, isNext, isDisplayOnly, onPress }) => {
     return (
         <TouchableOpacity
             style={[
                 styles.container,
                 isNext && styles.nextContainer,
                 isPerformed && styles.performedContainer,
-                isMissed && styles.missedContainer
+                isMissed && styles.missedContainer,
+                isDisplayOnly && styles.displayOnlyContainer
             ]}
-            onPress={onPress}
-            activeOpacity={0.7}
+            onPress={isDisplayOnly ? null : onPress}
+            activeOpacity={isDisplayOnly ? 1 : 0.7}
         >
             <View style={styles.info}>
                 <Text style={[styles.name, isNext && styles.nextText, isMissed && styles.missedText]}>{name}</Text>
                 <Text style={[styles.time, isNext && styles.nextText, isMissed && styles.missedText]}>{time}</Text>
             </View>
             <View style={styles.status}>
-                {isPerformed ? (
+                {isDisplayOnly ? (
+                    // No checkbox for display only (e.g., Sun)
+                    <Text style={styles.sunIcon}>☀️</Text>
+                ) : isPerformed ? (
                     <View style={styles.checkedCircle}>
                         <Text style={styles.checkmark}>✓</Text>
                     </View>
@@ -55,6 +59,14 @@ const styles = StyleSheet.create({
         shadowRadius: 3.84,
         elevation: 2,
     },
+    displayOnlyContainer: {
+        backgroundColor: COLORS.white,
+        borderLeftWidth: 5,
+        borderLeftColor: '#FFCC00', // Sun color
+        opacity: 0.9,
+        paddingVertical: 15 // Slightly smaller padding for non-interactive
+    },
+    // ... other styles
     nextContainer: {
         backgroundColor: COLORS.primary, // Sage
         borderLeftWidth: 5,
@@ -96,6 +108,9 @@ const styles = StyleSheet.create({
         width: 40,
         alignItems: 'center',
         justifyContent: 'center'
+    },
+    sunIcon: {
+        fontSize: 24,
     },
     circle: {
         width: 30,

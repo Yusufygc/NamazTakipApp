@@ -202,7 +202,7 @@ export default function HomeScreen({ navigation }) {
             if (existing.length === 0) {
                 await runRun(
                     `INSERT INTO qaza_prayers (prayer_name, missed_date, notes) VALUES (?, ?, ?)`,
-                    [selectedPrayer.name, today, 'Marked from Home']
+                    [selectedPrayer.name, today, '']
                 );
             }
 
@@ -240,6 +240,7 @@ export default function HomeScreen({ navigation }) {
                         isPerformed={p.isPerformed}
                         isMissed={p.isMissed}
                         isNext={nextPrayer?.name === p.name}
+                        isDisplayOnly={p.isDisplayOnly}
                         onPress={() => handlePrayerPress(p)}
                     />
                 ))}
@@ -264,26 +265,27 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: COLORS.background, // Off-white
-        padding: 20
+        padding: 15 // Reduced padding
     },
     header: {
         alignItems: 'center',
-        marginVertical: 10
+        marginVertical: 5 // Reduced margin
     },
     location: {
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: 'bold',
-        color: COLORS.text // Text color
+        color: COLORS.text,
+        marginBottom: 5
     },
     sectionTitle: {
-        fontSize: 14,
+        fontSize: 13,
         color: COLORS.textLight, // Lighter text
-        marginBottom: 10,
-        marginTop: 10,
+        marginBottom: 8,
+        marginTop: 5,
         fontWeight: '600',
         letterSpacing: 1
     },
     list: {
-        marginBottom: 50
+        marginBottom: 20
     }
 });

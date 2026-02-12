@@ -82,7 +82,7 @@ const DayCard = ({ date, prayers, kazaCount, onCompensate, expandedDate, setExpa
                             <View style={styles.prayerInfo}>
                                 <Text style={styles.missedIcon}>❌</Text>
                                 <Text style={styles.prayerName}>{prayer.prayer_name}</Text>
-                                {prayer.notes && (
+                                {prayer.notes && prayer.notes !== 'Marked from Home' && (
                                     <Text style={styles.prayerNotes}>({prayer.notes})</Text>
                                 )}
                             </View>
