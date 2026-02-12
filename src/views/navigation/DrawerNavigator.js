@@ -6,6 +6,7 @@ import SettingsScreen from '../screens/SettingsScreen';
 import TabNavigator from './TabNavigator';
 import { useTheme } from '../../context/ThemeContext';
 import GamificationScreen from '../screens/GamificationScreen';
+import AboutScreen from '../screens/AboutScreen';
 
 const Drawer = createDrawerNavigator();
 
@@ -88,6 +89,7 @@ export default function DrawerNavigator() {
             <Drawer.Screen name="QazaPrayers" component={QazaListScreen} options={{ title: 'Kaza Namazları' }} />
             <Drawer.Screen name="Statistics" component={TabNavigator} options={{ title: 'İstatistikler' }} />
             <Drawer.Screen name="Settings" component={SettingsScreen} options={{ title: 'Ayarlar' }} />
+            <Drawer.Screen name="About" component={AboutScreen} options={{ title: 'Hakkında' }} />
         </Drawer.Navigator>
     );
 }
