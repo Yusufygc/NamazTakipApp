@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert, LayoutAnimation, Platform, UIManager, ImageBackground } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { runQuery, runRun } from '../../services/database/DatabaseService';
-import { getTodayDateFormatted } from '../../utils/dateHelpers';
+import { getPrayerDateFormatted } from '../../utils/dateHelpers';
 import { useTheme } from '../../context/ThemeContext';
 
 // Enable LayoutAnimation for Android
@@ -108,7 +108,7 @@ export default function QazaListScreen() {
 
     const loadQaza = async () => {
         try {
-            const today = getTodayDateFormatted();
+            const today = getPrayerDateFormatted();
 
             // 1. Fetch explicit qaza prayers (manually marked as missed)
             const explicitQaza = await runQuery(
@@ -174,7 +174,7 @@ export default function QazaListScreen() {
                     text: 'Evet, Kıldım',
                     onPress: async () => {
                         try {
-                            const today = getTodayDateFormatted();
+                            const today = getPrayerDateFormatted();
 
                             if (item.source === 'qaza') {
                                 // Source is qaza_prayers table

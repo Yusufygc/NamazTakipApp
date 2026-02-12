@@ -3,12 +3,12 @@ import { View, Text, StyleSheet, ScrollView, Alert, RefreshControl } from 'react
 import { useFocusEffect } from '@react-navigation/native';
 import { getPrayerTimes, getTodaysPrayersStatus } from '../../controllers/PrayerController';
 import { getLocation } from '../../controllers/LocationController';
-import { getTodayDateFormatted, formatDateForAPI } from '../../utils/dateHelpers';
+import { getPrayerDateFormatted, formatDateForAPI } from '../../utils/dateHelpers';
 import PrayerCard from '../components/PrayerCard';
 import CountdownTimer from '../components/CountdownTimer';
 import ConfirmationDialog from '../components/ConfirmationDialog';
 import { runRun, runQuery } from '../../services/database/DatabaseService';
-import { scheduleDailyNotifications, registerForPushNotificationsAsync } from '../../services/notifications/NotificationService';
+import { scheduleDailyNotifications, scheduleMultiDayNotifications, registerForPushNotificationsAsync } from '../../services/notifications/NotificationService';
 import { useTheme } from '../../context/ThemeContext';
 
 export default function HomeScreen({ navigation }) {
@@ -23,7 +23,7 @@ export default function HomeScreen({ navigation }) {
 
     const loadData = async (force = false) => {
         try {
-            const today = getTodayDateFormatted();
+            const today = getPrayerDateFormatted();
 
             // 1. Get Location
             const loc = await getLocation();
@@ -91,8 +91,10 @@ export default function HomeScreen({ navigation }) {
             setPrayers(uiPrayers);
             calculateNextPrayer(uiPrayers);
 
-            // Schedule notifications for prayer times
+            // Schedule notifications for today + next 2 days
             await scheduleDailyNotifications(uiPrayers);
+            // Also schedule multi-day notifications in background
+            scheduleMultiDayNotifications(loc).catch(err => console.error('[Notifications] Multi-day failed:', err));
 
             setLoading(false);
             setRefreshing(false);
@@ -164,7 +166,7 @@ export default function HomeScreen({ navigation }) {
     const handleConfirm = async (isCongregation) => {
         if (!selectedPrayer) return;
         try {
-            const today = getTodayDateFormatted();
+            const today = getPrayerDateFormatted();
             // 1. Mark as performed with congregation status
             await runRun(
                 'UPDATE prayers SET is_performed = 1, is_congregation = ? WHERE id = ?',
@@ -194,7 +196,7 @@ export default function HomeScreen({ navigation }) {
             );
 
             // 2. Add to qaza_prayers if not exists
-            const today = getTodayDateFormatted();
+            const today = getPrayerDateFormatted();
             const existing = await runQuery(
                 `SELECT id FROM qaza_prayers WHERE prayer_name = ? AND missed_date = ?`,
                 [selectedPrayer.name, today]
