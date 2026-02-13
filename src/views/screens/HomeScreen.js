@@ -85,7 +85,7 @@ export default function HomeScreen({ navigation }) {
             // 4. Bildirimleri planla (ilk yükleme veya force refresh'te)
             if (!notificationsScheduled.current || force) {
                 notificationsScheduled.current = true;
-                scheduleDailyNotifications(uiPrayers).catch(err => console.error('[Notifications]', err));
+                // scheduleDailyNotifications removed to prevent duplicates
                 scheduleMultiDayNotifications(loc).catch(err => console.error('[Notifications] Multi-day:', err));
             }
 
