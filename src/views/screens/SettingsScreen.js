@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { View, Text, Switch, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { runQuery, runRun } from '../../services/database/DatabaseService';
@@ -40,7 +40,7 @@ export default function SettingsScreen() {
         );
     };
 
-    const styles = getStyles(colors);
+    const styles = useMemo(() => getStyles(colors), [colors]);
 
     return (
         <ScrollView style={styles.container}>

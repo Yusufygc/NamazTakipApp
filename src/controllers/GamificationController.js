@@ -1,4 +1,5 @@
 import { runQuery } from '../services/database/DatabaseService';
+import { getPrayerDateFormatted } from '../utils/dateHelpers';
 
 export const getStreakStats = async () => {
     try {
@@ -26,27 +27,39 @@ export const getStreakStats = async () => {
             return { currentStreak: 0, bestStreak: 0, totalFullDays: 0 };
         }
 
+        // Helper: DD-MM-YYYY string'i Date objesine çevir
+        const parseDate = (dateStr) => {
+            const [day, month, year] = dateStr.split('-').map(Number);
+            return new Date(year, month - 1, day);
+        };
+
         // Setup for streak calculation
-        const today = new Date().toISOString().split('T')[0];
-        const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+        const today = getPrayerDateFormatted(); // DD-MM-YYYY
+        const todayDate = parseDate(today);
+        const yesterdayDate = new Date(todayDate);
+        yesterdayDate.setDate(yesterdayDate.getDate() - 1);
 
         // 1. Calculate Current Streak
         // Check if the most recent full day is today or yesterday
         const lastFullDay = dates[0];
 
-        if (lastFullDay === today || lastFullDay === yesterday) {
-            currentStreak = 1;
-            // Iterate backwards
-            for (let i = 0; i < dates.length - 1; i++) {
-                const d1 = new Date(dates[i]);
-                const d2 = new Date(dates[i + 1]);
-                const diffTime = Math.abs(d1 - d2);
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        if (dates.length > 0) {
+            const lastFullDate = parseDate(dates[0]);
 
-                if (diffDays === 1) {
-                    currentStreak++;
-                } else {
-                    break;
+            // Son tam gün bugün veya dün mü?
+            const diffToToday = Math.round((todayDate - lastFullDate) / (1000 * 60 * 60 * 24));
+            if (diffToToday <= 1) {
+                currentStreak = 1;
+                for (let i = 0; i < dates.length - 1; i++) {
+                    const d1 = parseDate(dates[i]);
+                    const d2 = parseDate(dates[i + 1]);
+                    const diffDays = Math.round((d1 - d2) / (1000 * 60 * 60 * 24));
+
+                    if (diffDays === 1) {
+                        currentStreak++;
+                    } else {
+                        break;
+                    }
                 }
             }
         }
@@ -56,10 +69,9 @@ export const getStreakStats = async () => {
         let maxStreak = 1;
 
         for (let i = 0; i < dates.length - 1; i++) {
-            const d1 = new Date(dates[i]);
-            const d2 = new Date(dates[i + 1]);
-            const diffTime = Math.abs(d1 - d2);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            const d1 = parseDate(dates[i]);
+            const d2 = parseDate(dates[i + 1]);
+            const diffDays = Math.round((d1 - d2) / (1000 * 60 * 60 * 24));
 
             if (diffDays === 1) {
                 tempStreak++;

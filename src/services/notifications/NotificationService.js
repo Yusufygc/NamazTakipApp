@@ -14,7 +14,6 @@ Notifications.setNotificationHandler({
 });
 
 export const registerForPushNotificationsAsync = async () => {
-    let token;
     const { status: existingStatus } = await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
     if (existingStatus !== 'granted') {
@@ -22,7 +21,7 @@ export const registerForPushNotificationsAsync = async () => {
         finalStatus = status;
     }
     if (finalStatus !== 'granted') {
-        console.log('Failed to get push token for push notification!');
+        console.log('Failed to get push notification permission!');
         return;
     }
     return finalStatus;
@@ -46,8 +45,17 @@ const getPreviousPrayerName = (currentPrayerName) => {
  * HomeScreen'den bugünkü prayers dizisi ile çağrılır.
  */
 export const scheduleDailyNotifications = async (prayers) => {
-    // Cancel all existing to avoid duplicates
-    await Notifications.cancelAllScheduledNotificationsAsync();
+    // Bildirim ayarını kontrol et
+    const settings = await runQuery(
+        "SELECT setting_value FROM app_settings WHERE setting_key = 'notification_enabled'"
+    );
+    if (settings.length > 0 && settings[0].setting_value === '0') {
+        console.log('[Notifications] Disabled by user — skipping');
+        await Notifications.cancelAllScheduledNotificationsAsync();
+        return;
+    }
+
+    // Not: cancelAll burada yapılmaz — scheduleMultiDayNotifications zaten hem bugünü hem gelecek günleri kapsar.
 
     const now = new Date();
     console.log('[Notifications] Scheduling notifications, current time:', now.toLocaleTimeString());
@@ -109,12 +117,8 @@ export const scheduleDailyNotifications = async (prayers) => {
         }
     }
 
-    // Log scheduled notifications for debugging
     const scheduled = await Notifications.getAllScheduledNotificationsAsync();
-    console.log(`[Notifications] Total scheduled: ${scheduled.length}`);
-    scheduled.forEach((n) => {
-        console.log(`[Notifications] - ${n.content.title} at ${new Date(n.trigger.value).toLocaleTimeString()}`);
-    });
+    console.log(`[Notifications] Today scheduled: ${scheduled.length}`);
 };
 
 /**
@@ -126,7 +130,17 @@ export const scheduleDailyNotifications = async (prayers) => {
  */
 export const scheduleMultiDayNotifications = async (location) => {
     try {
-        // Önce tüm mevcut bildirimleri temizle
+        // Bildirim ayarını kontrol et
+        const settings = await runQuery(
+            "SELECT setting_value FROM app_settings WHERE setting_key = 'notification_enabled'"
+        );
+        if (settings.length > 0 && settings[0].setting_value === '0') {
+            console.log('[Notifications] Disabled by user — skipping multi-day');
+            await Notifications.cancelAllScheduledNotificationsAsync();
+            return;
+        }
+
+        // Tüm mevcut bildirimleri temizle (tek nokta)
         await Notifications.cancelAllScheduledNotificationsAsync();
 
         const dates = getNextDaysFormatted(3); // Bugün + 2 gün sonrası

@@ -1,5 +1,6 @@
 import { getPrayerTimesByCoordinates } from '../services/api/PrayerTimesAPI';
 import { runQuery, runRun } from '../services/database/DatabaseService';
+import { format, subDays } from 'date-fns';
 
 export const getPrayerTimes = async (date, city, country, latitude, longitude, forceUpdate = false) => {
     try {
@@ -133,22 +134,28 @@ export const getMonthlyStats = async () => {
 
 export const getComparisonStats = async () => {
     try {
-        // Current week (last 7 days)
-        const currentWeek = await runQuery(`
-        SELECT COUNT(*) as count 
-        FROM prayers 
-        WHERE is_performed = 1 
-        AND date >= date('now', '-7 days')
-      `);
+        const now = new Date();
 
-        // Previous week (7-14 days ago)
-        const prevWeek = await runQuery(`
-        SELECT COUNT(*) as count 
-        FROM prayers 
-        WHERE is_performed = 1 
-        AND date < date('now', '-7 days')
-        AND date >= date('now', '-14 days')
-      `);
+        // Son 7 gün tarihlerini DD-MM-YYYY formatında oluştur
+        const currentWeekDates = [];
+        const prevWeekDates = [];
+        for (let i = 0; i < 7; i++) {
+            currentWeekDates.push(format(subDays(now, i), 'dd-MM-yyyy'));
+            prevWeekDates.push(format(subDays(now, 7 + i), 'dd-MM-yyyy'));
+        }
+
+        const currentPlaceholders = currentWeekDates.map(() => '?').join(',');
+        const prevPlaceholders = prevWeekDates.map(() => '?').join(',');
+
+        const currentWeek = await runQuery(
+            `SELECT COUNT(*) as count FROM prayers WHERE is_performed = 1 AND date IN (${currentPlaceholders})`,
+            currentWeekDates
+        );
+
+        const prevWeek = await runQuery(
+            `SELECT COUNT(*) as count FROM prayers WHERE is_performed = 1 AND date IN (${prevPlaceholders})`,
+            prevWeekDates
+        );
 
         return {
             currentWeek: currentWeek[0]?.count || 0,
@@ -194,6 +201,14 @@ export const getHeatmapData = async (year, month) => {
 // Returns { Sabah: 85, Öğle: 90, İkindi: 75, Akşam: 95, Yatsı: 80 } as percentages
 export const getRadarChartData = async (days = 30) => {
     try {
+        // Son N gün için tarihleri oluştur
+        const now = new Date();
+        const datesToCheck = [];
+        for (let i = 0; i < days; i++) {
+            datesToCheck.push(format(subDays(now, i), 'dd-MM-yyyy'));
+        }
+        const placeholders = datesToCheck.map(() => '?').join(',');
+
         const result = await runQuery(`
             SELECT 
                 prayer_name,
@@ -201,10 +216,10 @@ export const getRadarChartData = async (days = 30) => {
                 SUM(CASE WHEN is_performed = 1 THEN 1 ELSE 0 END) as performed
             FROM prayers
             WHERE prayer_name IN ('Sabah', 'Öğle', 'İkindi', 'Akşam', 'Yatsı')
+            AND date IN (${placeholders})
             GROUP BY prayer_name
-        `);
+        `, datesToCheck);
 
-        // Convert to percentages
         const data = {
             Sabah: 0,
             Öğle: 0,
@@ -219,7 +234,6 @@ export const getRadarChartData = async (days = 30) => {
             }
         });
 
-        console.log('[RadarChart] Data:', JSON.stringify(data));
         return data;
     } catch (error) {
         console.error('Error getting radar chart data:', error);

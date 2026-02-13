@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { BarChart, LineChart } from 'react-native-chart-kit';
@@ -93,7 +93,7 @@ export default function ComparisonStats() {
         return <Text style={styles.noDataText}>Veri bulunamadı.</Text>;
     };
 
-    const styles = getStyles(colors);
+    const styles = useMemo(() => getStyles(colors), [colors]);
 
     return (
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>

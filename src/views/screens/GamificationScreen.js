@@ -1,8 +1,8 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView, RefreshControl, Dimensions, TouchableOpacity } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '../../context/ThemeContext';
-import { getAchievements } from '../../controllers/GamificationController';
+import { getAchievements, getStreakStats } from '../../controllers/GamificationController';
 
 const { width } = Dimensions.get('window');
 
@@ -36,9 +36,10 @@ export default function GamificationScreen() {
     const { colors } = useTheme();
 
     const loadData = async () => {
-        const achievements = await getAchievements();
-        const { getStreakStats } = require('../../controllers/GamificationController');
-        const streakData = await getStreakStats();
+        const [achievements, streakData] = await Promise.all([
+            getAchievements(),
+            getStreakStats()
+        ]);
 
         setStats({
             achievements,
@@ -54,7 +55,7 @@ export default function GamificationScreen() {
         }, [])
     );
 
-    const styles = getStyles(colors);
+    const styles = useMemo(() => getStyles(colors), [colors]);
 
     return (
         <ScrollView

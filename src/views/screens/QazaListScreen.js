@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert, LayoutAnimation, Platform, UIManager, ImageBackground } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { runQuery, runRun } from '../../services/database/DatabaseService';
@@ -37,9 +37,10 @@ const formatDateForDisplay = (dateStr) => {
     ];
     const parts = dateStr.split('-');
     if (parts.length === 3) {
-        const day = parseInt(parts[2], 10);
+        // DB format: DD-MM-YYYY
+        const day = parseInt(parts[0], 10);
         const month = months[parseInt(parts[1], 10) - 1];
-        const year = parts[0];
+        const year = parts[2];
         return `${day} ${month} ${year}`;
     }
     return dateStr;
@@ -206,7 +207,7 @@ export default function QazaListScreen() {
     // Calculate total kaza count
     const totalKazaCount = qazaList.length;
 
-    const styles = getStyles(colors);
+    const styles = useMemo(() => getStyles(colors), [colors]);
 
     const renderDayCard = ({ item }) => (
         <DayCard

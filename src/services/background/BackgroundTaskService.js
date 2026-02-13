@@ -33,6 +33,19 @@ TaskManager.defineTask(BACKGROUND_PRAYER_TASK, async () => {
  */
 export const registerBackgroundTask = async () => {
     try {
+        // Önce durumu kontrol et — Expo Go'da Restricted döner
+        const status = await BackgroundTask.getStatusAsync();
+
+        if (status === BackgroundTask.BackgroundTaskStatus.Restricted) {
+            console.log('[BackgroundTask] Skipped — not available (Expo Go or restricted)');
+            return;
+        }
+
+        if (status === BackgroundTask.BackgroundTaskStatus.Denied) {
+            console.log('[BackgroundTask] Skipped — background task permission denied');
+            return;
+        }
+
         const isRegistered = await TaskManager.isTaskRegisteredAsync(BACKGROUND_PRAYER_TASK);
 
         if (!isRegistered) {
@@ -42,16 +55,11 @@ export const registerBackgroundTask = async () => {
             console.log('[BackgroundTask] BACKGROUND_PRAYER_TASK already registered');
         }
 
-        const status = await BackgroundTask.getStatusAsync();
-        const statusMap = {
-            [BackgroundTask.BackgroundTaskStatus.Restricted]: 'Restricted',
-            [BackgroundTask.BackgroundTaskStatus.Denied]: 'Denied',
-            [BackgroundTask.BackgroundTaskStatus.Available]: 'Available',
-        };
-        console.log('[BackgroundTask] Status:', statusMap[status] || 'Unknown');
+        console.log('[BackgroundTask] Status: Available');
 
     } catch (error) {
-        console.error('[BackgroundTask] Registration failed:', error);
+        // Expo Go'da bu hata bekleniyor, sessizce geç
+        console.log('[BackgroundTask] Not available in this environment');
     }
 };
 
