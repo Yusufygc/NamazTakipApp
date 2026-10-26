@@ -1,4 +1,5 @@
 import 'application/namaz_backend_impl.dart';
+import 'domain/dhikr.dart';
 import 'domain/models.dart';
 import 'domain/notification_plan.dart';
 import 'domain/prayer.dart';
@@ -50,6 +51,7 @@ abstract interface class NamazBackend {
   Future<void> setCalcMethod(CalcMethod method);
   Future<void> useManualLocation(AppLocation location);
   Future<void> useAutoLocation();
+  Future<void> setGeminiApiKey(String? apiKey);
 
   /// Elle seçilebilecek şehirler.
   List<AppLocation> get cities;
@@ -100,6 +102,19 @@ abstract interface class NamazBackend {
   Future<Map<PrayerType, int>> radar(int days);
 
   Future<GamificationData> gamification();
+
+  // ---- Zikir & Sosyal Medya Yakalayıcı -------------------------------------------
+
+  Future<List<DhikrItem>> dhikrItems();
+  Future<DhikrItem> saveDhikr(DhikrDraft draft);
+  Future<void> updateDhikr(DhikrItem item);
+  Future<DhikrItem?> incrementDhikr(int id, {int step = 1});
+  Future<DhikrItem?> resetDhikr(int id);
+  Future<void> deleteDhikr(int id);
+  Future<DhikrDraft> analyzeSharedContent(String textOrUrl);
+  Stream<String> get sharedTexts;
+  Future<String?> takeInitialSharedText();
+  Future<bool> openExternalUrl(String url);
 
   // ---- Bildirimler ---------------------------------------------------------------
 

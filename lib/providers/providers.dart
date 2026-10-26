@@ -50,6 +50,11 @@ class SettingsNotifier extends Notifier<AppSettings> {
     await _backend.useAutoLocation();
     reload();
   }
+
+  Future<void> setGeminiApiKey(String? apiKey) async {
+    await _backend.setGeminiApiKey(apiKey);
+    reload();
+  }
 }
 
 final settingsProvider =
@@ -194,6 +199,60 @@ class QazaNotifier extends AsyncNotifier<List<QazaItem>> {
 
 final qazaProvider = AsyncNotifierProvider.autoDispose<QazaNotifier, List<QazaItem>>(
     QazaNotifier.new);
+
+// ---- Zikir & Sosyal Medya Yakalayıcı -------------------------------------------
+
+class DhikrNotifier extends AsyncNotifier<List<DhikrItem>> {
+  NamazBackend get _backend => ref.read(backendProvider);
+
+  @override
+  Future<List<DhikrItem>> build() => _backend.dhikrItems();
+
+  Future<DhikrItem> saveDraft(DhikrDraft draft) async {
+    final saved = await _backend.saveDhikr(draft);
+    state = AsyncData(await _backend.dhikrItems());
+    return saved;
+  }
+
+  Future<void> updateItem(DhikrItem item) async {
+    await _backend.updateDhikr(item);
+    state = AsyncData(await _backend.dhikrItems());
+  }
+
+  Future<DhikrItem?> increment(int id, {int step = 1}) async {
+    final updated = await _backend.incrementDhikr(id, step: step);
+    state = AsyncData(await _backend.dhikrItems());
+    return updated;
+  }
+
+  Future<DhikrItem?> resetCount(int id) async {
+    final updated = await _backend.resetDhikr(id);
+    state = AsyncData(await _backend.dhikrItems());
+    return updated;
+  }
+
+  Future<void> toggleFavorite(DhikrItem item) async {
+    await _backend.updateDhikr(item.copyWith(isFavorite: !item.isFavorite));
+    state = AsyncData(await _backend.dhikrItems());
+  }
+
+  Future<void> delete(int id) async {
+    await _backend.deleteDhikr(id);
+    state = AsyncData(await _backend.dhikrItems());
+  }
+
+  Future<DhikrDraft> analyzeShared(String textOrUrl) =>
+      _backend.analyzeSharedContent(textOrUrl);
+
+  Future<bool> openUrl(String url) => _backend.openExternalUrl(url);
+
+  Stream<String> get sharedTexts => _backend.sharedTexts;
+
+  Future<String?> takeInitialSharedText() => _backend.takeInitialSharedText();
+}
+
+final dhikrProvider =
+    AsyncNotifierProvider<DhikrNotifier, List<DhikrItem>>(DhikrNotifier.new);
 
 // ---- İstatistik ------------------------------------------------------------------
 

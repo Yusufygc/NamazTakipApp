@@ -210,6 +210,33 @@ class SettingsScreen extends ConsumerWidget {
             ],
           ),
         ),
+        section(SettingsStrings.sectionDhikrAi),
+        Card(
+          color: p.card,
+          child: ListTile(
+            leading: Container(
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(
+                color: p.primary.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(AppIcons.key, color: p.primary, size: 20),
+            ),
+            title: const Text(
+              SettingsStrings.geminiKeyTitle,
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
+            subtitle: Text(
+              s.hasGeminiApiKey
+                  ? SettingsStrings.geminiKeyConfigured
+                  : SettingsStrings.geminiKeyNotConfigured,
+              style: TextStyle(fontSize: 12.5, color: p.textLight),
+            ),
+            trailing: Icon(AppIcons.chevronRight, color: p.textLight),
+            onTap: () => _showGeminiKeyDialog(context, notifier),
+          ),
+        ),
         section(SettingsStrings.sectionTheme),
         Column(
           children: [
@@ -235,6 +262,59 @@ class SettingsScreen extends ConsumerWidget {
   void _pickCity(BuildContext context) => Navigator.of(context).push(
         MaterialPageRoute<void>(builder: (_) => const CityPickerScreen()),
       );
+
+  Future<void> _showGeminiKeyDialog(
+    BuildContext context,
+    SettingsNotifier notifier,
+  ) async {
+    final controller = TextEditingController();
+    final action = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text(SettingsStrings.geminiDialogTitle),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextField(
+              controller: controller,
+              obscureText: true,
+              decoration: const InputDecoration(
+                hintText: SettingsStrings.geminiDialogHint,
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              SettingsStrings.geminiDialogHelper,
+              style: TextStyle(fontSize: 12),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop('clear'),
+            child: const Text(SettingsStrings.geminiClear),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text(CommonStrings.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(controller.text.trim()),
+            child: const Text(SettingsStrings.geminiSave),
+          ),
+        ],
+      ),
+    );
+    controller.dispose();
+    if (action == null) return;
+    if (action == 'clear') {
+      await notifier.setGeminiApiKey(null);
+    } else {
+      await notifier.setGeminiApiKey(action);
+    }
+  }
 }
 
 class _ThemeCard extends StatelessWidget {

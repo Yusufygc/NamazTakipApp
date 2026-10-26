@@ -1,16 +1,21 @@
 # Namaz Takip
 
-Günlük namazları takip eden, kaza namazlarını otomatik listeleyen Flutter uygulaması (Android ve iOS).
+Günlük namazları takip eden, kaza namazlarını otomatik listeleyen ve sosyal medyadan (Instagram vb.) paylaşılan zikir/esma videolarını yakalayıp akıllı tesbihat sunan Flutter uygulaması (Android ve iOS).
 
 ## Özellikler
 
 - Konuma göre namaz vakitleri, cihazda hesaplanır (`adhan_dart`, varsayılan Diyanet yöntemi). İnternet gerekmez.
-- Vakte dokunarak kıldım (tek başına / cemaatle) veya kılmadım işaretleme.
+- Güneşin doğuşu vaktinde kerahat/işrak sınırına karşı **1.5 dakika (90 saniye)** erken ihtiyat payı uygulanır.
+- Vakte dokunarak kıldım (tek başına / cemaatle) veya kılmadım işaretleme; namaz kılındığında vakte uygun tesbihat önerisi.
+- **Zikir & Esma Defteri + Instagram Paylaşım Yakalayıcı:**
+  - Instagram, TikTok veya YouTube Shorts'ta karşılaşılan dini videolar **"Paylaş -> Namaz Takip (Zikir Yakala)"** ile doğrudan uygulamaya gönderilebilir.
+  - Video bağlantısı ve açıklamasından Esmaül Hüsna / zikir adı, Arapça metni, okunuşu, fazileti, hedef sayısı (`100 defa`, `308 kere`, `41 kez`) ve tavsiye edilen namaz vakti otomatik çıkarılır (isteğe bağlı Gemini AI desteği ile).
+  - Kullanıcı zikirleri gruplayabilir (`Esmaül Hüsna`, `Sabah & Akşam`, `Rızık & Bereket`, `Şifa & Huzur`, `Namaz Tesbihatı`, `Genel Zikirler` veya özel grup), arayabilir, düzenleyebilir, silebilir ve dokunmatik **Selçuklu Zikirmatik** ile titreşimli olarak çekebilir.
 - İşaretlenmeyen geçmiş günler kaza listesine otomatik düşer; vakit vakit kaza edilebilir.
 - Ezan vaktinde "önceki namazı kıldın mı?" bildirimi ve ezandan sonra hatırlatma.
 - Süreç: performans radarı, aylık ısı haritası, haftalık/aylık karşılaştırma.
 - Seri ve rozetler.
-- 5 tema, elle şehir seçimi (81 il), hesaplama yöntemi ve hatırlatma süresi ayarı.
+- 5 İslami sanat teması (`Selçuklu Zümrüdü`, `Gece Kubbesi`, `İznik Çinisi`, `Bordo & Gül`, `Tezhip Altını`), elle şehir seçimi (81 il), hesaplama yöntemi ve hatırlatma süresi ayarı.
 
 ## Çalıştırma
 
@@ -26,6 +31,7 @@ Test ve analiz:
 ```bash
 flutter analyze
 flutter test
+cd packages/namaz_backend && flutter test
 ```
 
 Debug APK:
@@ -38,15 +44,18 @@ flutter build apk --debug
 
 ```
 lib/
-  core/        saf mantık: tarih, seri, rozet, tema, vakit modelleri
+  core/        tema, biçimlendirme, merkezi ikon ve metin sistemi
     icons/     merkezi ikon sistemi (AppIcons)
     strings/   modüler merkezi metin sistemi
-  data/        SQLite (sqflite), repository'ler, il listesi
-  services/    vakit hesabı, konum, bildirim, arka plan görevi
   providers/   Riverpod durum yönetimi
-  ui/          ekranlar ve widget'lar
-test/          birim testleri
-assets/icon/   uygulama ikonu kaynakları
+  ui/          ekranlar ve Selçuklu/Osmanlı desenli widget'lar
+packages/
+  namaz_backend/
+    lib/src/
+      domain/      saf Dart modelleri, vakit hesabı, zikir/esma kazıyıcı (dhikr_extractor)
+      data/        SQLite (prayers ve dhikrs tabloları), SharedPreferences
+      platform/    konum, bildirim ve sosyal medya paylaşım (ShareService) kanalları
+      application/ NamazBackend uygulaması ve bildirim zamanlayıcı
 ```
 
 ## İkon ve metin sistemi
@@ -54,18 +63,8 @@ assets/icon/   uygulama ikonu kaynakları
 - **İkonlar:** `lib/core/icons/app_icons.dart`. Ekranlarda emoji veya `Icons.xxx` kullanılmaz,
   anlamsal ad üzerinden `AppIcons.xxx` kullanılır (ör. `AppIcons.navQaza`).
 - **Metinler:** `lib/core/strings/`. Her modül kendi dosyasındadır (`home_strings.dart`,
-  `qaza_strings.dart`, `settings_strings.dart` ...); ekranlar yalnızca `strings.dart`'ı içe aktarır.
+  `dhikr_strings.dart`, `qaza_strings.dart`, `settings_strings.dart` ...); ekranlar yalnızca `strings.dart`'ı içe aktarır.
   Yeni metni ilgili modüle ekleyin; ekranlara sabit metin yazmayın.
 - `test/central_system_test.dart` bu kuralları denetler: `lib/` içinde emoji, `app_icons.dart`
   dışında `Icons.xxx` ve `lib/ui/` içinde Türkçe sabit metin bulunursa test başarısız olur.
 - Büyük harfe çevirme için `turkishUpper` (`İkindi` → `İKİNDİ`), arama için `foldTurkish` kullanın.
-
-## Notlar
-
-- Tarihler veritabanında `yyyy-MM-dd` olarak saklanır.
-- Bildirim kimlikleri `yyyymmdd*10 + vakit*2 + tür` ile sabit üretilir; yeniden planlama çift bildirim oluşturmaz.
-- iOS en fazla 64 bekleyen bildirim tuttuğu için iOS'ta 6 günlük pencere planlanır.
-- Launcher ikonları `assets/icon/` kaynaklarından üretilir: `dart run flutter_launcher_icons`.
-  Üretim sonrası `ios/Runner.xcodeproj/project.pbxproj` içindeki `ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS`
-  değerinin `YES` kaldığını kontrol edin (araç bunu `AppIcon` yapabiliyor).
-- iOS yapılandırması yazıldı ancak henüz bir Mac üzerinde derlenmedi.

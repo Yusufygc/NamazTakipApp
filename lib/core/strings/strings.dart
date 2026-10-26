@@ -7,6 +7,7 @@ library;
 export 'about_strings.dart';
 export 'common_strings.dart';
 export 'date_strings.dart';
+export 'dhikr_strings.dart';
 export 'gamification_strings.dart';
 export 'home_strings.dart';
 export 'location_strings.dart';

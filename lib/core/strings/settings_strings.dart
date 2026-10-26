@@ -21,6 +21,20 @@ abstract final class SettingsStrings {
   // Tema
   static const sectionTheme = 'Tema';
 
+  // Zikir & Yapay Zeka Kazıma
+  static const sectionDhikrAi = 'Sosyal Medya Zikir Kazıma (Gemini AI)';
+  static const geminiKeyTitle = 'Gemini API Anahtarı (İsteğe Bağlı)';
+  static const geminiKeyConfigured =
+      'Tanımlı • Instagram videoları yapay zeka ile analiz edilir';
+  static const geminiKeyNotConfigured =
+      'Tanımlı değil • Yerleşik Esmaül Hüsna ve akıllı metin kazıyıcı aktif';
+  static const geminiDialogTitle = 'Gemini API Anahtarı';
+  static const geminiDialogHint = 'AIzaSy... anahtarınızı yapıştırın';
+  static const geminiDialogHelper =
+      'Boş bırakırsanız uygulama yerleşik Esmaül Hüsna sözlüğü ve OpenGraph kazıyıcı ile ücretsiz çalışır.';
+  static const geminiSave = 'Kaydet';
+  static const geminiClear = 'Temizle';
+
   static String themeSemantics(String name) => 'Tema: $name';
 
   static String themeName(String key) {

@@ -4,7 +4,7 @@ Gezinme alt gezinme çubuğu (`NavigationBar`) iledir. Kod: `lib/ui/`.
 
 ## Kabuk (`app_shell.dart`)
 
-`AppShell` tek bir `Scaffold` ve Material 3 `NavigationBar` (alt çubuk) kullanır. Seçili ekran `selectedDestinationProvider` ile tutulur; gövde, seçili hedefin `builder`'ı ile değiştirilir. Ekran değiştirirken eski ekran yok edilir; autoDispose sağlayıcılar bu sayede her girişte taze veri okur: [[durum-yonetimi]]. Üst barda (`AppBar`) 8 köşeli Selçuklu madalyonu (`SeljukMedallion`) içinde `AppIcons.app`, ekran başlığı, ana ekrandayken tıklanabilir şehir kapsülü (`ActionChip`) ve sağ üstte `AboutScreen`'i açan bilgi düğmesi (`AppIcons.navAbout`) yer alır. Kaza sekmesi, bekleyen kaza namazı varsa sayısını rozet (`Badge`) olarak gösterir.
+`AppShell` tek bir `Scaffold` ve Material 3 `NavigationBar` (alt çubuk) kullanır. Seçili ekran `selectedDestinationProvider` ile tutulur; gövde, seçili hedefin `builder`'ı ile değiştirilir. Ekran değiştirirken eski ekran yok edilir; autoDispose sağlayıcılar bu sayede her girişte taze veri okur: [[durum-yonetimi]]. Üst barda (`AppBar`) 8 köşeli Selçuklu madalyonu (`SeljukMedallion`) içinde `AppIcons.app`, ekran başlığı, ana ekrandayken tıklanabilir şehir kapsülü (`ActionChip`), `DhikrScreen`'i açan **Zikirler** kapsülü (`AppIcons.navDhikr`) ve sağ üstte `AboutScreen`'i açan bilgi düğmesi (`AppIcons.navAbout`) yer alır. Kaza sekmesi, bekleyen kaza namazı varsa sayısını rozet (`Badge`) olarak gösterir.
 
 | # | Sekme (`tab*`) | Ekran Başlığı | Dosya | Ana sağlayıcılar |
 |---|---|---|---|---|
@@ -13,16 +13,21 @@ Gezinme alt gezinme çubuğu (`NavigationBar`) iledir. Kod: `lib/ui/`.
 | 2 | Süreç | Süreç | `screens/stats_screen.dart` (`widgets/stats_heatmap_tab.dart`, `widgets/stats_comparison_tab.dart`) | `radarProvider`, `monthCountsProvider`, `weekComparisonProvider`, `dailyCountsProvider` |
 | 3 | Rozetler | Rozetler & Seri | `screens/gamification_screen.dart` | `gamificationProvider` |
 | 4 | Ayarlar | Ayarlar | `screens/settings_screen.dart` | `settingsProvider` |
+| — | (Üst bar) | Zikir ve Esma Defteri | `screens/dhikr_screen.dart` (`widgets/dhikr_card.dart`, `widgets/dhikr_counter_sheet.dart`, `widgets/dhikr_editor_sheet.dart`) | `dhikrProvider` |
 | — | (Üst bar) | Hakkında | `screens/about_screen.dart` | — |
 | — | (Ek ekran) | Şehir Seç | `screens/city_picker_screen.dart` | `settingsProvider`, `citiesProvider` |
 
 ## Ana ekran
 
-Yukarıdan aşağıya: uyarı kartları (`CorruptedDatabaseCard`, `NotificationHealthCard`), Mihrap kemeri ve Selçuklu yıldızı motifli [[takip-gunu-ve-sayac]] geri sayım Hero kartı (`CountdownCard` — sıradaki vakit rozeti, hedef saat, büyük tabular sayaç, iki vakit arası ilerleme çubuğu, tarih ve `X / 5 Vakit Eda Edildi` özeti), "BUGÜNÜN NAMAZLARI • tarih" başlığı ve sol kenarında dikey zaman çizelgesi (timeline) bulunan vakit kartları (`PrayerCard`: Sabah, Güneş, Öğle, İkindi, Akşam, Yatsı). Konum yoksa kartların yerine Selçuklu madalyonlu konum isteme kartı çıkar: [[konum]]. Bir karta dokunmak `SeljukMedallion` başlıklı işaretleme diyaloğunu açar: [[namaz-isaretleme]]. Bildirimden gelen sorular da bu ekranda açılır: [[bildirimler]]. Uygulama ön plana dönünce takip günü, konum ve kayıtlar tazelenir (`didChangeAppLifecycleState`).
+Yukarıdan aşağıya: uyarı kartları (`CorruptedDatabaseCard`, `NotificationHealthCard`), Mihrap kemeri ve Selçuklu yıldızı motifli [[takip-gunu-ve-sayac]] geri sayım Hero kartı (`CountdownCard` — sıradaki vakit rozeti, hedef saat, büyük tabular sayaç, iki vakit arası ilerleme çubuğu, tarih ve `X / 5 Vakit Eda Edildi` özeti), "BUGÜNÜN NAMAZLARI • tarih" başlığı ve sol kenarında dikey zaman çizelgesi (timeline) bulunan vakit kartları (`PrayerCard`: Sabah, Güneş, Öğle, İkindi, Akşam, Yatsı). Konum yoksa kartların yerine Selçuklu madalyonlu konum isteme kartı çıkar: [[konum]]. Bir karta dokunmak `SeljukMedallion` başlıklı işaretleme diyaloğunu açar: [[namaz-isaretleme]]. Namaz "Kıldım" olarak işaretlendiğinde o vakte uygun tesbihatı (`showDhikrCounterSheet`) başlatan bildirim çubuğu gösterilir. Bildirimden gelen sorular da bu ekranda açılır: [[bildirimler]]. Uygulama ön plana dönünce takip günü, konum ve kayıtlar tazelenir (`didChangeAppLifecycleState`).
 
-Widget'lar: `PrayerCard` (zaman çizelgeli vakit kartı), `CountdownCard` (mihrap hero sayaç kartı), `MihrabArchBackdrop` ve `SeljukMedallion` (`islamic_pattern.dart` — `CustomPainter` tabanlı İslami geometrik motifler), `showPrayerDialog` (diyalog), `CorruptedDatabaseCard` (bozuk veritabanı uyarısı), `NotificationHealthCard` (tam zamanlı alarm izni uyarısı) → `lib/ui/widgets/`.
+Widget'lar: `PrayerCard` (zaman çizelgeli vakit kartı), `CountdownCard` (mihrap hero sayaç kartı), `MihrabArchBackdrop` ve `SeljukMedallion` (`islamic_pattern.dart` — `CustomPainter` tabanlı İslami geometrik motifler), `showPrayerDialog` (diyalog), `DhikrCard`, `DhikrCounterSheet`, `DhikrEditorSheet`, `CorruptedDatabaseCard` (bozuk veritabanı uyarısı), `NotificationHealthCard` (tam zamanlı alarm izni uyarısı) → `lib/ui/widgets/`.
 
 **Başlatma hata ekranı:** `StartupErrorApp` (`lib/ui/startup_error_app.dart`), `NamazBackend.create` hata verirse normal uygulama yerine gösterilir: mesaj, ayrıntı ve tek düğme "Tekrar dene". Verileri silen bir eylem sunmaz. Emülatörde veritabanı yolu klasör yapılarak doğrulandı: hata sürerken ekran kalır, sorun giderilip "Tekrar dene"ye basılınca normal açılır.
+
+## Zikir ve Esma Defteri (`dhikr_screen.dart`)
+
+Üst bardaki **Zikirler** düğmesiyle veya sosyal medyadan (`Paylaş -> Namaz Takip / Zikir Yakala`) içerik gönderildiğinde açılır. Üstte Instagram/sosyal medya kazıma kartı, Türkçe duyarlı (`foldTurkish`) arama çubuğu, grup filtre çipleri (`Tümü`, `Favoriler`, `Esmaül Hüsna`, `Sabah & Akşam`, `Rızık & Bereket`, `Şifa & Huzur`, `Namaz Tesbihatı`, `Genel Zikirler` ve özel gruplar) ve `DhikrCard` listesi bulunur. Her karttan dokunmatik Selçuklu **Zikirmatik** (`DhikrCounterSheet`) açılabilir, kaynak video bağlantısı ziyaret edilebilir, zikir düzenlenebilir (`DhikrEditorSheet`) veya silinebilir.
 
 ## Rozetler & Seri
 
@@ -38,7 +43,7 @@ Gün kartları, genişleyince vakit satırları ve "Kaza Et": [[kaza-sistemi]].
 
 ## Ayarlar
 
-Bölümler: Bildirimler (anahtar, hatırlatma süresi), Konum ve Vakitler (otomatik/elle radyo, kullanılan konum, hesaplama yöntemi), Tema (beş tema kartı), altbilgi (sürüm ve geliştirici). Ayar anahtarları: [[ayarlar-ve-kalicilik]], tema: [[tema-sistemi]].
+Bölümler: Bildirimler (anahtar, hatırlatma süresi), Konum ve Vakitler (otomatik/elle radyo, kullanılan konum, hesaplama yöntemi), Sosyal Medya Zikir Kazıma (isteğe bağlı Gemini API anahtarı), Tema (beş tema kartı), altbilgi (sürüm ve geliştirici). Ayar anahtarları: [[ayarlar-ve-kalicilik]], tema: [[tema-sistemi]].
 
 ## Hakkında
 

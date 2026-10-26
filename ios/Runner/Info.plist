@@ -24,6 +24,25 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.namaztakip.app.share</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>namaztakip</string>
+			</array>
+		</dict>
+	</array>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>https</string>
+		<string>http</string>
+		<string>instagram</string>
+	</array>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Namaz vakitlerini bulunduğunuz yere göre hesaplamak için konumunuza ihtiyacımız var.</string>
 	<key>UIBackgroundModes</key>

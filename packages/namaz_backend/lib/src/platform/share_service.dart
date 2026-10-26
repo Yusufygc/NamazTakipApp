@@ -1,0 +1,277 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+
+import '../domain/dhikr.dart';
+import '../domain/dhikr_extractor.dart';
+import '../domain/prayer.dart';
+
+/// Sosyal medya (Instagram, TikTok, YouTube Shorts vb.) paylaşım niyetlerini
+/// (Intent.ACTION_SEND) dinleyen, paylaşılan bağlantıların meta açıklamalarını
+/// kazıyan ve isteğe bağlı Gemini AI ile zenginleştiren platform servisi.
+class ShareService {
+  ShareService._();
+
+  static final ShareService instance = ShareService._();
+
+  static const MethodChannel _channel =
+      MethodChannel('com.namaztakip.app/share');
+
+  final StreamController<String> _sharedController =
+      StreamController<String>.broadcast();
+
+  bool _initialized = false;
+
+  /// Uygulama açıkken gelen paylaşımlar.
+  Stream<String> get sharedTexts => _sharedController.stream;
+
+  void init() {
+    if (_initialized) return;
+    _initialized = true;
+    _channel.setMethodCallHandler((call) async {
+      if (call.method == 'onSharedText') {
+        final text = (call.arguments as String?)?.trim();
+        if (text != null && text.isNotEmpty) {
+          _sharedController.add(text);
+        }
+      }
+    });
+  }
+
+  /// Uygulama kapalıyken "Paylaş -> Namaz Takip" ile başlatıldıysa ilk metni alır.
+  Future<String?> takeInitialSharedText() async {
+    try {
+      final text = await _channel.invokeMethod<String>('takeInitialSharedText');
+      final trimmed = text?.trim();
+      return (trimmed == null || trimmed.isEmpty) ? null : trimmed;
+    } catch (e) {
+      debugPrint('[ShareService] takeInitialSharedText hata: $e');
+      return null;
+    }
+  }
+
+  /// Kaynak video bağlantısını dış tarayıcıda veya Instagram uygulamasında açar.
+  Future<bool> openExternalUrl(String url) async {
+    try {
+      final ok =
+          await _channel.invokeMethod<bool>('openUrl', {'url': url.trim()});
+      return ok ?? false;
+    } catch (e) {
+      debugPrint('[ShareService] openExternalUrl hata: $e');
+      return false;
+    }
+  }
+
+  /// Paylaşılan metni veya bağlantıyı kazıyıp [DhikrDraft] üretir.
+  Future<DhikrDraft> analyzeSharedContent(
+    String rawTextOrUrl, {
+    String? geminiApiKey,
+  }) async {
+    final url = extractFirstUrl(rawTextOrUrl);
+    var combinedText = rawTextOrUrl.trim();
+
+    if (url != null) {
+      final scrapedCaption = await _scrapeOpenGraphCaption(url);
+      if (scrapedCaption != null && scrapedCaption.isNotEmpty) {
+        combinedText = '$combinedText\n$scrapedCaption';
+      }
+    }
+
+    final localDraft = extractDhikrDraft(combinedText, sourceUrl: url);
+
+    if (geminiApiKey != null && geminiApiKey.trim().isNotEmpty) {
+      final aiDraft = await _analyzeWithGemini(
+        combinedText: combinedText,
+        sourceUrl: url,
+        apiKey: geminiApiKey.trim(),
+        fallback: localDraft,
+      );
+      if (aiDraft != null) return aiDraft;
+    }
+
+    return localDraft;
+  }
+
+  Future<String?> _scrapeOpenGraphCaption(String url) async {
+    HttpClient? client;
+    try {
+      final uri = Uri.parse(url);
+      client = HttpClient()
+        ..connectionTimeout = const Duration(seconds: 5)
+        ..userAgent =
+            'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Mobile Safari/537.36';
+      final request = await client.getUrl(uri);
+      request.followRedirects = true;
+      request.maxRedirects = 4;
+      final response =
+          await request.close().timeout(const Duration(seconds: 6));
+      if (response.statusCode < 200 || response.statusCode >= 400) {
+        return null;
+      }
+      // İlk 120 KB meta etiketleri için yeterlidir.
+      final bytes = <int>[];
+      await for (final chunk in response) {
+        bytes.addAll(chunk);
+        if (bytes.length >= 120 * 1024) break;
+      }
+      final html = utf8.decode(bytes, allowMalformed: true);
+      final parts = <String>[];
+
+      for (final prop in ['og:description', 'og:title', 'description']) {
+        final content = _extractMetaContent(html, prop);
+        if (content != null && content.isNotEmpty) {
+          parts.add(_decodeHtmlEntities(content));
+        }
+      }
+      return parts.join(' — ').trim();
+    } catch (e) {
+      debugPrint('[ShareService] URL kazıma bilgi: $e');
+      return null;
+    } finally {
+      client?.close(force: true);
+    }
+  }
+
+  String? _extractMetaContent(String html, String propertyOrName) {
+    final patterns = [
+      RegExp(
+        '<meta[^>]+(?:property|name)=["\']$propertyOrName["\'][^>]+content=["\']([^"\']+)["\']',
+        caseSensitive: false,
+      ),
+      RegExp(
+        '<meta[^>]+content=["\']([^"\']+)["\'][^>]+(?:property|name)=["\']$propertyOrName["\']',
+        caseSensitive: false,
+      ),
+    ];
+    for (final p in patterns) {
+      final m = p.firstMatch(html);
+      if (m != null) return m.group(1)?.trim();
+    }
+    return null;
+  }
+
+  String _decodeHtmlEntities(String input) {
+    var out = input
+        .replaceAll('&quot;', '"')
+        .replaceAll('&#34;', '"')
+        .replaceAll('&apos;', "'")
+        .replaceAll('&#39;', "'")
+        .replaceAll('&amp;', '&')
+        .replaceAll('&lt;', '<')
+        .replaceAll('&gt;', '>')
+        .replaceAll('&nbsp;', ' ');
+
+    out = out.replaceAllMapped(RegExp(r'&#x([0-9a-fA-F]+);'), (m) {
+      final code = int.tryParse(m.group(1)!, radix: 16);
+      return code != null ? String.fromCharCode(code) : m.group(0)!;
+    });
+    out = out.replaceAllMapped(RegExp(r'&#(\d+);'), (m) {
+      final code = int.tryParse(m.group(1)!);
+      return code != null ? String.fromCharCode(code) : m.group(0)!;
+    });
+    return out;
+  }
+
+  Future<DhikrDraft?> _analyzeWithGemini({
+    required String combinedText,
+    required String? sourceUrl,
+    required String apiKey,
+    required DhikrDraft fallback,
+  }) async {
+    HttpClient? client;
+    try {
+      final endpoint = Uri.parse(
+        'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=$apiKey',
+      );
+      client = HttpClient()..connectionTimeout = const Duration(seconds: 7);
+      final req = await client.postUrl(endpoint);
+      req.headers.contentType = ContentType.json;
+
+      final prompt = '''
+Aşağıdaki sosyal medya (Instagram vb.) dini video açıklamasından zikir, esma veya tesbihat bilgisini çıkar ve YALNIZCA geçerli bir JSON nesnesi döndür:
+{
+  "title": "Zikrin veya Esmanın kısa Türkçe başlığı (örn. Yâ Rezzâk, Sübhanallahi ve Bihamdihi)",
+  "arabic": "Arapça yazılışı",
+  "transliteration": "Türkçe okunuşu",
+  "meaning": "Türkçe anlamı ve fazileti (1-2 cümle)",
+  "targetCount": 100,
+  "groupName": "Esmaül Hüsna | Sabah & Akşam | Rızık & Bereket | Şifa & Huzur | Namaz Tesbihatı | Genel Zikirler",
+  "prayerTime": "fajr | dhuhr | asr | maghrib | isha | null"
+}
+Metin:
+$combinedText
+''';
+
+      final payload = jsonEncode({
+        'contents': [
+          {
+            'parts': [
+              {'text': prompt},
+            ],
+          },
+        ],
+        'generationConfig': {
+          'responseMimeType': 'application/json',
+          'temperature': 0.2,
+        },
+      });
+      req.add(utf8.encode(payload));
+      final resp = await req.close().timeout(const Duration(seconds: 8));
+      if (resp.statusCode != 200) return null;
+
+      final body = await resp.transform(utf8.decoder).join();
+      final decoded = jsonDecode(body) as Map<String, dynamic>;
+      final candidates = decoded['candidates'] as List<dynamic>?;
+      if (candidates == null || candidates.isEmpty) return null;
+      final content =
+          (candidates.first as Map<String, dynamic>)['content'] as Map<String, dynamic>?;
+      final parts = content?['parts'] as List<dynamic>?;
+      if (parts == null || parts.isEmpty) return null;
+      final textJson = (parts.first as Map<String, dynamic>)['text'] as String?;
+      if (textJson == null || textJson.isEmpty) return null;
+
+      final item = jsonDecode(textJson) as Map<String, dynamic>;
+      final prayerStr = item['prayerTime'] as String?;
+      PrayerType? prayerTime = fallback.prayerTime;
+      if (prayerStr != null) {
+        for (final p in PrayerType.values) {
+          if (p.name == prayerStr) {
+            prayerTime = p;
+            break;
+          }
+        }
+      }
+      return DhikrDraft(
+        title: (item['title'] as String?)?.trim().isNotEmpty == true
+            ? (item['title'] as String).trim()
+            : fallback.title,
+        arabic: (item['arabic'] as String?)?.trim().isNotEmpty == true
+            ? (item['arabic'] as String).trim()
+            : fallback.arabic,
+        transliteration:
+            (item['transliteration'] as String?)?.trim().isNotEmpty == true
+                ? (item['transliteration'] as String).trim()
+                : fallback.transliteration,
+        meaning: (item['meaning'] as String?)?.trim().isNotEmpty == true
+            ? (item['meaning'] as String).trim()
+            : fallback.meaning,
+        targetCount: (item['targetCount'] as num?)?.toInt() ??
+            fallback.targetCount,
+        groupName: (item['groupName'] as String?)?.trim().isNotEmpty == true
+            ? (item['groupName'] as String).trim()
+            : fallback.groupName,
+        prayerTime: prayerTime,
+        sourceUrl: sourceUrl ?? fallback.sourceUrl,
+        rawCaption: fallback.rawCaption,
+      );
+    } catch (e) {
+      debugPrint('[ShareService] Gemini analiz bilgi: $e');
+      return null;
+    } finally {
+      client?.close(force: true);
+    }
+  }
+}

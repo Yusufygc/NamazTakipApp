@@ -7,6 +7,8 @@ library;
 
 export 'src/domain/achievements.dart';
 export 'src/domain/dates.dart';
+export 'src/domain/dhikr.dart';
+export 'src/domain/dhikr_extractor.dart';
 export 'src/domain/models.dart';
 export 'src/domain/notification_plan.dart' show NotificationTexts, PrayerPrompt;
 export 'src/domain/prayer.dart';

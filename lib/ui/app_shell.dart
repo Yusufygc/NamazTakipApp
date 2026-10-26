@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -7,11 +9,14 @@ import '../core/theme/app_theme.dart';
 import '../providers/providers.dart';
 import 'screens/about_screen.dart';
 import 'screens/city_picker_screen.dart';
+import 'screens/dhikr_screen.dart';
 import 'screens/gamification_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/qaza_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/stats_screen.dart';
+import 'widgets/dhikr_counter_sheet.dart';
+import 'widgets/dhikr_editor_sheet.dart';
 import 'widgets/islamic_pattern.dart';
 
 final selectedDestinationProvider =
@@ -78,11 +83,49 @@ final List<_Destination> _destinations = [
   ),
 ];
 
-class AppShell extends ConsumerWidget {
+class AppShell extends ConsumerStatefulWidget {
   const AppShell({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AppShell> createState() => _AppShellState();
+}
+
+class _AppShellState extends ConsumerState<AppShell> {
+  StreamSubscription<String>? _shareSub;
+
+  @override
+  void initState() {
+    super.initState();
+    final dhikrNotifier = ref.read(dhikrProvider.notifier);
+    _shareSub = dhikrNotifier.sharedTexts.listen(_handleSharedText);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final initialShared = await dhikrNotifier.takeInitialSharedText();
+      if (initialShared != null && initialShared.isNotEmpty && mounted) {
+        await _handleSharedText(initialShared);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _shareSub?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _handleSharedText(String sharedText) async {
+    if (!mounted) return;
+    final saved = await showDhikrEditorSheet(
+      context,
+      initialSharedText: sharedText,
+      startWithScraper: true,
+    );
+    if (saved != null && mounted) {
+      await showDhikrCounterSheet(context, saved);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final index = ref.watch(selectedDestinationProvider);
     final current = _destinations[index];
     final p = context.palette;
@@ -116,11 +159,14 @@ class AppShell extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.only(right: 4),
               child: ActionChip(
-                avatar: Icon(AppIcons.location, size: 16, color: p.primary),
+                visualDensity: VisualDensity.compact,
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                labelPadding: const EdgeInsets.only(right: 4),
+                avatar: Icon(AppIcons.location, size: 14, color: p.primary),
                 label: Text(
                   location.city,
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: 11.5,
                     fontWeight: FontWeight.w600,
                     color: p.text,
                   ),
@@ -137,7 +183,35 @@ class AppShell extends ConsumerWidget {
                 ),
               ),
             ),
+          Padding(
+            padding: const EdgeInsets.only(right: 2),
+            child: ActionChip(
+              visualDensity: VisualDensity.compact,
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              labelPadding: const EdgeInsets.only(right: 4),
+              avatar: Icon(AppIcons.navDhikr, size: 15, color: p.secondary),
+              label: Text(
+                DhikrStrings.topBarButton,
+                style: TextStyle(
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w700,
+                  color: p.text,
+                ),
+              ),
+              backgroundColor: p.card,
+              side: BorderSide(color: p.secondary.withValues(alpha: 0.45)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => const DhikrScreen(),
+                ),
+              ),
+            ),
+          ),
           IconButton(
+            visualDensity: VisualDensity.compact,
             tooltip: NavStrings.about,
             icon: Icon(AppIcons.navAbout, color: p.textLight),
             onPressed: () => Navigator.of(context).push(
@@ -149,7 +223,7 @@ class AppShell extends ConsumerWidget {
               ),
             ),
           ),
-          const SizedBox(width: 6),
+          const SizedBox(width: 4),
         ],
       ),
       body: current.builder(),
@@ -168,7 +242,8 @@ class AppShell extends ConsumerWidget {
           destinations: [
             for (var i = 0; i < _destinations.length; i++)
               NavigationDestination(
-                icon: _buildNavIcon(_destinations[i].icon, i == 1 ? qazaCount : 0, p),
+                icon:
+                    _buildNavIcon(_destinations[i].icon, i == 1 ? qazaCount : 0, p),
                 selectedIcon: _buildNavIcon(
                     _destinations[i].selectedIcon, i == 1 ? qazaCount : 0, p),
                 label: _destinations[i].tabLabel,

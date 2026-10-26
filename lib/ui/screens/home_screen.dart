@@ -12,6 +12,7 @@ import '../../core/theme/app_theme.dart';
 import '../../providers/providers.dart';
 import '../widgets/corrupted_database_card.dart';
 import '../widgets/countdown_card.dart';
+import '../widgets/dhikr_counter_sheet.dart';
 import '../widgets/islamic_pattern.dart';
 import '../widgets/notification_health_card.dart';
 import '../widgets/prayer_card.dart';
@@ -90,9 +91,37 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         prayer,
         congregation: result.congregation,
       );
+      if (mounted) _suggestPostPrayerDhikr(prayer);
     } else {
       await notifier.markMissed(date, prayer);
     }
+  }
+
+  void _suggestPostPrayerDhikr(PrayerType prayer) {
+    final dhikrs = ref.read(dhikrProvider).value;
+    if (dhikrs == null || dhikrs.isEmpty) return;
+    final match = dhikrs.firstWhere(
+      (d) => d.prayerTime == prayer,
+      orElse: () => dhikrs.firstWhere(
+        (d) => d.groupName == DhikrGroups.prayerTesbihat,
+        orElse: () => dhikrs.first,
+      ),
+    );
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.hideCurrentSnackBar();
+    messenger.showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 5),
+        content: Text(DhikrStrings.postPrayerPrompt(prayer.label, match.title)),
+        action: SnackBarAction(
+          label: DhikrStrings.postPrayerAction,
+          onPressed: () {
+            if (mounted) showDhikrCounterSheet(context, match);
+          },
+        ),
+      ),
+    );
   }
 
   @override

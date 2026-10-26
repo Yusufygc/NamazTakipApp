@@ -21,6 +21,7 @@ class SettingsRepository {
   static const _kLastLocation = 'last_location';
   static const _kInstallDate = 'install_date';
   static const _kCorruptedDbBackup = 'corrupted_db_backup';
+  static const _kGeminiApiKey = 'gemini_api_key';
 
   String get themeKey => _prefs.getString(_kTheme) ?? 'default';
   Future<void> setThemeKey(String v) => _prefs.setString(_kTheme, v);
@@ -87,4 +88,18 @@ class SettingsRepository {
   Future<void> setCorruptedDbBackup(String? path) => path == null
       ? _prefs.remove(_kCorruptedDbBackup)
       : _prefs.setString(_kCorruptedDbBackup, path);
+
+  /// Sosyal medya videoları/açıklamaları için isteğe bağlı Gemini API anahtarı.
+  String? get geminiApiKey {
+    final v = _prefs.getString(_kGeminiApiKey)?.trim();
+    return (v == null || v.isEmpty) ? null : v;
+  }
+
+  Future<void> setGeminiApiKey(String? key) {
+    final trimmed = key?.trim();
+    if (trimmed == null || trimmed.isEmpty) {
+      return _prefs.remove(_kGeminiApiKey);
+    }
+    return _prefs.setString(_kGeminiApiKey, trimmed);
+  }
 }

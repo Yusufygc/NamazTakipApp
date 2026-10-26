@@ -4,11 +4,13 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/app_database.dart';
+import '../data/dhikr_repository.dart';
 import '../data/prayer_repository.dart';
 import '../data/settings_repository.dart';
 import '../data/turkish_cities.dart';
 import '../domain/achievements.dart';
 import '../domain/dates.dart';
+import '../domain/dhikr.dart';
 import '../domain/models.dart';
 import '../domain/notification_plan.dart';
 import '../domain/prayer.dart';
@@ -17,6 +19,7 @@ import '../domain/streaks.dart';
 import '../namaz_backend.dart';
 import '../platform/location_service.dart';
 import '../platform/notification_service.dart';
+import '../platform/share_service.dart';
 import 'background_service.dart' show BackgroundService;
 import 'notification_scheduler.dart';
 
@@ -25,6 +28,7 @@ class NamazBackendImpl implements NamazBackend {
   NamazBackendImpl._({
     required SettingsRepository settings,
     required PrayerRepository prayers,
+    required this._dhikrs,
     required NotificationTexts texts,
   })  : _settings = settings,
         _prayers = prayers,
@@ -36,11 +40,13 @@ class NamazBackendImpl implements NamazBackend {
 
   final SettingsRepository _settings;
   final PrayerRepository _prayers;
+  final DhikrRepository _dhikrs;
   final NotificationScheduler _scheduler;
 
   final PrayerTimeService _timeService = const PrayerTimeService();
   final LocationService _location = const LocationService();
   final NotificationService _notifications = NotificationService.instance;
+  final ShareService _shareService = ShareService.instance;
 
   static Future<NamazBackendImpl> create(NamazBackendConfig config) async {
     final prefs = await SharedPreferences.getInstance();
@@ -51,7 +57,11 @@ class NamazBackendImpl implements NamazBackend {
       await settings.setCorruptedDbBackup(database.corruptedBackupPath);
     }
 
+    final dhikrs = DhikrRepository(database);
+    await dhikrs.seedDefaultsIfEmpty();
+
     await NotificationService.instance.init();
+    ShareService.instance.init();
 
     // Arka plan yenilemesi desteklenmeyen ortamda (ör. masaüstü) uygulamayı durdurmasın.
     try {
@@ -63,6 +73,7 @@ class NamazBackendImpl implements NamazBackend {
     return NamazBackendImpl._(
       settings: settings,
       prayers: PrayerRepository(database),
+      dhikrs: dhikrs,
       texts: config.notificationTexts,
     );
   }
@@ -80,6 +91,7 @@ class NamazBackendImpl implements NamazBackend {
         locationMode: _settings.locationMode,
         manualLocation: _settings.manualLocation,
         location: _settings.effectiveLocation,
+        hasGeminiApiKey: _settings.geminiApiKey != null,
       );
 
   /// Ayar değişince bildirimleri tazeler.
@@ -119,6 +131,10 @@ class NamazBackendImpl implements NamazBackend {
     await _settings.setLocationMode(LocationMode.auto);
     await _afterSettingsChange();
   }
+
+  @override
+  Future<void> setGeminiApiKey(String? apiKey) =>
+      _settings.setGeminiApiKey(apiKey);
 
   @override
   List<AppLocation> get cities => kTurkishCities;
@@ -238,6 +254,45 @@ class NamazBackendImpl implements NamazBackend {
       ),
     );
   }
+
+  // ---- Zikir & Sosyal Medya Yakalayıcı -------------------------------------------
+
+  @override
+  Future<List<DhikrItem>> dhikrItems() => _dhikrs.allItems();
+
+  @override
+  Future<DhikrItem> saveDhikr(DhikrDraft draft) => _dhikrs.insertDraft(draft);
+
+  @override
+  Future<void> updateDhikr(DhikrItem item) => _dhikrs.update(item);
+
+  @override
+  Future<DhikrItem?> incrementDhikr(int id, {int step = 1}) =>
+      _dhikrs.incrementCount(id, step: step);
+
+  @override
+  Future<DhikrItem?> resetDhikr(int id) => _dhikrs.resetCount(id);
+
+  @override
+  Future<void> deleteDhikr(int id) => _dhikrs.delete(id);
+
+  @override
+  Future<DhikrDraft> analyzeSharedContent(String textOrUrl) =>
+      _shareService.analyzeSharedContent(
+        textOrUrl,
+        geminiApiKey: _settings.geminiApiKey,
+      );
+
+  @override
+  Stream<String> get sharedTexts => _shareService.sharedTexts;
+
+  @override
+  Future<String?> takeInitialSharedText() =>
+      _shareService.takeInitialSharedText();
+
+  @override
+  Future<bool> openExternalUrl(String url) =>
+      _shareService.openExternalUrl(url);
 
   // ---- Bildirimler ---------------------------------------------------------------
 

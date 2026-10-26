@@ -26,6 +26,7 @@ abstract final class AppIcons {
   static const IconData navSettings = Icons.tune_outlined;
   static const IconData navSettingsSelected = Icons.tune;
   static const IconData navAbout = Icons.info_outline;
+  static const IconData navDhikr = Icons.auto_awesome_outlined;
 
   // ---- Vakit kartı ve ana ekran ------------------------------------------------
   static const IconData sunrise = Icons.wb_sunny_outlined;
@@ -102,6 +103,22 @@ abstract final class AppIcons {
         return Icons.wb_twilight;
     }
   }
+
+  // ---- Zikir & Tesbihat --------------------------------------------------------------
+  static const IconData dhikr = Icons.grain_rounded;
+  static const IconData share = Icons.ios_share_rounded;
+  static const IconData paste = Icons.content_paste_rounded;
+  static const IconData add = Icons.add_rounded;
+  static const IconData edit = Icons.edit_outlined;
+  static const IconData delete = Icons.delete_outline_rounded;
+  static const IconData favorite = Icons.bookmark_rounded;
+  static const IconData favoriteBorder = Icons.bookmark_border_rounded;
+  static const IconData externalLink = Icons.open_in_new_rounded;
+  static const IconData reset = Icons.restart_alt_rounded;
+  static const IconData sparkle = Icons.auto_awesome_rounded;
+  static const IconData folder = Icons.folder_outlined;
+  static const IconData key = Icons.vpn_key_outlined;
+  static const IconData touch = Icons.touch_app_rounded;
 
   // ---- Ayarlar -----------------------------------------------------------------------
   static const IconData congregation = Icons.groups;

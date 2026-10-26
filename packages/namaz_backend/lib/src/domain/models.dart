@@ -68,6 +68,7 @@ class AppSettings {
     required this.locationMode,
     required this.manualLocation,
     required this.location,
+    this.hasGeminiApiKey = false,
   });
 
   /// Arayüzün seçtiği temanın anahtarı. Backend için anlamsız bir metindir;
@@ -81,6 +82,9 @@ class AppSettings {
 
   /// Vakit hesabında kullanılan geçerli konum (yoksa null).
   final AppLocation? location;
+
+  /// Sosyal medya zikir kazıma için isteğe bağlı Gemini API anahtarı tanımlı mı.
+  final bool hasGeminiApiKey;
 }
 
 /// Bildirimlerin zamanında gelmesini etkileyen sistem durumu.

@@ -2,6 +2,9 @@
 
 Kronolojik kayıt; en yeni kayıt en üsttedir. Biçim: `## [YYYY-AA-GG] [İŞLEM_TİPİ] | Kısa Açıklama`. İşlem tipleri: INGEST, QUERY, UPDATE, DECISION, LINT, SETUP. Kurallar: [[wiki-kullanim]]. Harita: [[index]].
 
+## [2026-10-27] UPDATE | Sosyal medya (Instagram) zikir yakalayıcı, zikir defteri ve dokunmatik zikirmatik (`zikir` dalı)
+Android (`Intent.ACTION_SEND`) ve iOS (`ShareExtension` + `namaztakip://share` URL şeması ve `group.com.namaztakip.app`) paylaşım menüsü entegrasyonu kuruldu. Paylaşılan bağlantı ve video açıklamasından Esmaül Hüsna / zikir adı, Arapça metin, okunuş, fazilet, hedef sayı (`100 defa`, `308 kere`, `41 kez`) ve tavsiye edilen namaz vaktini çıkaran hibrit kazıyıcı (`dhikr_extractor.dart`, OpenGraph kazıyıcı ve isteğe bağlı Gemini AI desteği) eklendi. SQLite şeması sürüm 2'ye yükseltilerek `dhikrs` tablosu ve `DhikrRepository` oluşturuldu; üst bardan açılan `DhikrScreen`, dokunmatik Selçuklu `DhikrCounterSheet`, `DhikrEditorSheet` ve namaz kılındığında çıkan tesbihat önerisi eklendi (91 test başarılı). Sayfalar: [[ui-ekranlar]], [[durum-yonetimi]], [[veri-katmani]], [[test-stratejisi]].
+
 ## [2026-10-26] UPDATE | Güneş doğuş vaktine 1,5 dakikalık ihtiyat payı eklendi ve Vakitler ekranı tam ekrana sığdırıldı
 `PrayerTimeService.compute` içinde güneş doğuş vakti saniye hassasiyetiyle hesaplanıp `kSunriseCautionOffset` (90 saniye / 1,5 dk) öne çekildi (`domain_test.dart` ile doğrulandı; toplam 86 test). `HomeScreen` `LayoutBuilder` ve `Expanded` ile kaydırma gerektirmeden ekran yüksekliğini bire bir dolduracak biçimde düzenlendi. Sayfalar: [[namaz-vakitleri]], [[ui-ekranlar]], [[test-stratejisi]].
 
