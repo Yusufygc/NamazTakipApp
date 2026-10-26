@@ -2,6 +2,12 @@
 
 Kronolojik kayıt; en yeni kayıt en üsttedir. Biçim: `## [YYYY-AA-GG] [İŞLEM_TİPİ] | Kısa Açıklama`. İşlem tipleri: INGEST, QUERY, UPDATE, DECISION, LINT, SETUP. Kurallar: [[wiki-kullanim]]. Harita: [[index]].
 
+## [2026-10-26] UPDATE | Güneş doğuş vaktine 1,5 dakikalık ihtiyat payı eklendi ve Vakitler ekranı tam ekrana sığdırıldı
+`PrayerTimeService.compute` içinde güneş doğuş vakti saniye hassasiyetiyle hesaplanıp `kSunriseCautionOffset` (90 saniye / 1,5 dk) öne çekildi (`domain_test.dart` ile doğrulandı; toplam 86 test). `HomeScreen` `LayoutBuilder` ve `Expanded` ile kaydırma gerektirmeden ekran yüksekliğini bire bir dolduracak biçimde düzenlendi. Sayfalar: [[namaz-vakitleri]], [[ui-ekranlar]], [[test-stratejisi]].
+
+## [2026-10-26] UPDATE | `ui` dalında Modern Selçuklu / Osmanlı zarafetiyle tüm arayüz yenilendi
+Yan çekmece yerine 5 sekmeli Material 3 `NavigationBar` (*Vakitler*, *Kaza*, *Süreç*, *Rozetler*, *Ayarlar*) ve üst barda konum kapsülü + *Hakkında* kısayolu kuruldu. `CustomPainter` ile 8 köşeli Selçuklu yıldızı (*Rub el-Hizb*) ve mihrap kemeri çizen `MihrabArchBackdrop` ve `SeljukMedallion` bileşenleri (`lib/ui/widgets/islamic_pattern.dart`) eklendi. Ana ekranda Mihrap Hero geri sayım kartı (iki vakit arası ilerleme çubuğu ve günlük tamamlanma özetiyle) ve dikey zaman çizelgeli (timeline) vakit listesi oluşturuldu. Beş tema paleti İslami sanat tonlarıyla (*Selçuklu Zümrüdü*, *Gece Kubbesi*, *İznik Çinisi*, *Bordo & Gül*, *Tezhip Altını*) güncellendi; `stats_screen.dart` 500 satır sınırı altına indirilmek üzere modülerleştirildi ve `SettingsScreen` bölüm başlıklarında `turkishUpper` kullanıldı. Emülatörde tüm sekmeler ve temalar doğrulandı. Sayfalar: [[ui-ekranlar]], [[tema-sistemi]], [[ikon-sistemi]], [[durum-yonetimi]], [[bilinen-sorunlar]], [[emulator-test-notlari]].
+
 ## [2026-10-26] UPDATE | Geçmiş zamanlı ve hatalı bildirim öğeleri kalan planı durdurmaz
 `NotificationScheduler` ve `NotificationService.apply`, plan uygulanırken zamanı geçmişe düşen bildirimleri günlüğe yazıp atlar; tek bir öğenin zamanlanmasında hata oluşursa hatayı `debugPrint` ile günlüğe yazarak kalan bildirimleri planlamaya devam eder. `notification_scheduler_test.dart` içine sahte `NotificationGateway` ile iki yeni test eklendi ve mutasyon kontrolüyle doğrulandı. Testler: ön yüz 29, backend 56 (toplam 85), `flutter analyze` temiz. Sayfalar: [[bildirimler]], [[backend-paketi]], [[bilinen-sorunlar]], [[test-stratejisi]].
 

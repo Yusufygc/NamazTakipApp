@@ -85,6 +85,10 @@ final corruptedDbBackupProvider =
 
 // ---- Konum --------------------------------------------------------------------
 
+/// Türkiye'nin 81 ili (elle seçim için).
+final citiesProvider =
+    Provider<List<AppLocation>>((ref) => ref.read(backendProvider).cities);
+
 /// Konumu tazeler; hata durumunda [LocationException] ile UI'a bildirir.
 final locationRefreshProvider = FutureProvider<AppLocation?>((ref) async {
   final location = await ref.read(backendProvider).refreshLocation();
@@ -93,6 +97,10 @@ final locationRefreshProvider = FutureProvider<AppLocation?>((ref) async {
 });
 
 // ---- Vakitler ------------------------------------------------------------------
+
+/// Kaza ve ısı haritası takibinin başladığı gün.
+final trackingStartProvider =
+    Provider<DateTime>((ref) => ref.read(backendProvider).trackingStart);
 
 /// Takip günü (gün sınırı: min(04:00, Sabah vakti)). Uygulama açık kalırken gün
 /// değişimini yakalamak için [sync] düzenli çağrılır.

@@ -75,22 +75,42 @@ enum CalcMethod {
   }
 }
 
+/// Sabah namazının kerahet vaktine kalmaması için güneş doğuş vaktinden
+/// düşülen ek ihtiyat süresi (1,5 dakika = 90 saniye).
+const Duration kSunriseCautionOffset = Duration(seconds: 90);
+
 /// Vakitleri cihazda hesaplar; internet gerekmez.
 class PrayerTimeService {
   const PrayerTimeService();
 
   DayTimes compute(AppLocation location, DateTime day, CalcMethod method) {
     final date = dateOnly(day);
+    final coords = adhan.Coordinates(location.latitude, location.longitude);
+    final params = method.params;
     final times = adhan.PrayerTimes(
-      coordinates: adhan.Coordinates(location.latitude, location.longitude),
+      coordinates: coords,
       date: date,
-      calculationParameters: method.params,
+      calculationParameters: params,
       precision: false,
     );
+    final preciseTimes = adhan.PrayerTimes(
+      coordinates: coords,
+      date: date,
+      calculationParameters: params,
+      precision: true,
+    );
+    final cautiousSunrise =
+        preciseTimes.sunrise.toLocal().subtract(kSunriseCautionOffset);
     return DayTimes(
       date: date,
       fajr: times.fajr.toLocal(),
-      sunrise: times.sunrise.toLocal(),
+      sunrise: DateTime(
+        cautiousSunrise.year,
+        cautiousSunrise.month,
+        cautiousSunrise.day,
+        cautiousSunrise.hour,
+        cautiousSunrise.minute,
+      ),
       dhuhr: times.dhuhr.toLocal(),
       asr: times.asr.toLocal(),
       maghrib: times.maghrib.toLocal(),

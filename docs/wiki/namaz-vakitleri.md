@@ -8,7 +8,8 @@ Vakitler cihazda, internet kullanılmadan hesaplanır. Kod: `packages/namaz_back
 
 - Paket zamanları **UTC** `DateTime` olarak verir; servis `.toLocal()` ile cihaz saat dilimine çevirir. Bu yüzden vakitler cihazın saat dilimine göre görünür (emülatörde UTC iken vakitler 3 saat kaymış görünmüştü; saat dilimi İstanbul yapılınca doğru oldu: [[emulator-test-notlari]]).
 - Yalnızca tarih kısmı kullanılır; `compute` içinde gün `dateOnly` ile sadeleştirilir.
-- `precision: false` olduğundan zamanlar dakikaya yuvarlanır.
+- Beş farz vakit için `precision: false` olduğundan zamanlar dakikaya yuvarlanır.
+- **Güneş doğuşu ihtiyat payı (`kSunriseCautionOffset`):** Sabah namazının kerahet vaktine kalmaması için güneş doğuş vakti `precision: true` ile saniye hassasiyetinde hesaplanır, **1,5 dakika (90 saniye)** öne çekilir ve bulunduğu dakikaya indirgenir.
 
 ## Hesaplama yöntemleri
 

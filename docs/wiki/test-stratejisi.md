@@ -12,13 +12,13 @@ flutter test                                     # ön yüz testleri (kökte)
 (cd packages/namaz_backend && flutter test)      # backend testleri
 ```
 
-Durum (2026-10-26): `flutter analyze` temiz; ön yüz **29**, backend **56**, toplam **85 test geçiyor**.
+Durum (2026-10-26): `flutter analyze` temiz; ön yüz **29**, backend **57**, toplam **86 test geçiyor**.
 
 ## Test dosyaları
 
 | Dosya | Test | Kapsam |
 |---|---|---|
-| `packages/namaz_backend/test/domain_test.dart` | 20 | `prayerDay` (04:00 kuralı, ay başı), `dateKey`, seri hesabı, `nextPrayer`, İstanbul vakitlerinin makul olması |
+| `packages/namaz_backend/test/domain_test.dart` | 21 | `prayerDay` (04:00 kuralı, ay başı), `dateKey`, seri hesabı, `nextPrayer`, İstanbul vakitlerinin makul olması ve güneş doğuşu 1,5 dk ihtiyat payı |
 | `packages/namaz_backend/test/prayer_repository_test.dart` | 12 | Bellek içi SQLite: tekrar işaretleme, kaza türetme, kaza etme, `dailyCounts`, `fullDays`, `performedByPrayer`; geçici dizinde gerçek dosyalarla bozuk veritabanı yedekleme ve sıfırlama |
 | `packages/namaz_backend/test/notification_plan_test.dart` | 9 | Bildirim kimlikleri, çift bildirim yok, geçmiş vakit, önceki vakti sorma, hatırlatma süresi, payload, 81 il |
 | `packages/namaz_backend/test/notification_scheduler_test.dart` | 9 | Planlayıcı kuyruğu: konum yok, bildirim kapalı, tek çağrı, eşzamanlı çağrı örtüşmez, hızlı çağrılar birleşir, hata sonrası kilitlenmez, geçmişe düşen ve geçmiş zaman hatası fırlatan öğeler kalan planı durdurmaz (sahte `NotificationGateway`, bellek içi SQLite, sahte `SharedPreferences`) |

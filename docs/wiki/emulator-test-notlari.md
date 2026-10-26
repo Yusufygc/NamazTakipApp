@@ -2,6 +2,15 @@
 
 Elle yapılan testlerin kaydı ve bulunan hatalar. Yeni bir test turu eklendiğinde bu sayfanın başına tarihli bölüm eklenir. Test yöntemi ve komutlar: [[gelistirme-ortami]], kontrol listesi: [[test-stratejisi]].
 
+## Tur 5 — 2026-10-26, `ui` dalında Modern Selçuklu / Osmanlı UI-UX yenilemesi (aynı emülatör)
+
+| Alan | Sonuç |
+|---|---|
+| Alt gezinme çubuğu (`NavigationBar`) | Çekmece yerine 5 sekmeli alt çubuk (*Vakitler*, *Kaza*, *Süreç*, *Rozetler*, *Ayarlar*) ve üst barda `SeljukMedallion`, tıklanabilir şehir kapsülü (`İstanbul`) ve `Hakkında` düğmesi doğrulandı |
+| Mihrap Hero Sayaç Kartı & Zaman Çizelgesi | `MihrabArchBackdrop` kemer/yıldız suigranı, iki vakit arası ilerleme çubuğu, `0 / 5 Vakit Eda Edildi` kapsülü ve sol dikey zaman çizelgesi düğümleri (`PrayerCard`) doğrulandı |
+| Namaz işaretleme diyaloğu (`PrayerDialog`) | `SeljukMedallion` başlık ikonu, `Cemaatle kıldım` etkileşimli kartı ve yan yana `Kılmadım` / `Kıldım` düğmeleri doğrulandı |
+| Diğer ekranlar ve temalar | *Kaza*, *Süreç* (`stats_screen.dart` 3 alt dosyaya bölündü), *Rozetler* (`SeljukMedallion` rozet çerçeveleri) ve *Ayarlar* (`turkishUpper` bölüm başlıkları ve 5 İslami sanat teması: *Selçuklu Zümrüdü*, *Gece Kubbesi*, *İznik Çinisi*, *Bordo & Gül*, *Tezhip Altını*) ekran görüntüleriyle doğrulandı |
+
 ## Tur 4 — 2026-10-26, bozuk veritabanı yedekleme ve uyarı (aynı emülatör)
 
 | Alan | Sonuç |

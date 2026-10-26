@@ -5,16 +5,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:namaz_backend/namaz_backend.dart';
 
 import '../../core/format/time_format.dart';
+import '../../core/icons/app_icons.dart';
+import '../../core/strings/strings.dart';
 import '../../core/theme/app_theme.dart';
 import '../../providers/providers.dart';
-import '../../core/strings/strings.dart';
+import 'islamic_pattern.dart';
 
-/// Sıradaki vakte kalan süre. Saat tabanlıdır; sayfa yenilemeden Yatsı'dan
-/// sonra Sabah'a, gece yarısından sonra yeni güne kendiliğinden geçer.
+/// Mihrap kemeri ve Selçuklu yıldızı motifli ana geri sayım (Hero) kartı.
 class CountdownCard extends ConsumerStatefulWidget {
   const CountdownCard({super.key, this.onNextChanged});
 
-  /// Sıradaki vakit değiştiğinde (örn. ezan vakti girince) çağrılır.
   final ValueChanged<PrayerType?>? onNextChanged;
 
   @override
@@ -24,15 +24,14 @@ class CountdownCard extends ConsumerStatefulWidget {
 class _CountdownCardState extends ConsumerState<CountdownCard> {
   Timer? _timer;
   DateTime _now = DateTime.now();
-  PrayerType? _lastNext;
+  PrayerType? _lastNotified;
 
   @override
   void initState() {
     super.initState();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (!mounted) return;
       ref.read(trackingDayProvider.notifier).sync();
-      setState(() => _now = DateTime.now());
+      if (mounted) setState(() => _now = DateTime.now());
     });
   }
 
@@ -42,58 +41,246 @@ class _CountdownCardState extends ConsumerState<CountdownCard> {
     super.dispose();
   }
 
-  String _format(Duration d) {
-    String two(int n) => n.toString().padLeft(2, '0');
-    final h = d.inHours;
-    return '${two(h)}:${two(d.inMinutes % 60)}:${two(d.inSeconds % 60)}';
+  String _fmt(Duration d) {
+    final s = d.isNegative ? 0 : d.inSeconds;
+    final h = (s ~/ 3600).toString().padLeft(2, '0');
+    final m = ((s % 3600) ~/ 60).toString().padLeft(2, '0');
+    final sec = (s % 60).toString().padLeft(2, '0');
+    return '$h:$m:$sec';
+  }
+
+  double _intervalProgress(List<DayTimes> days, DateTime nextTime) {
+    DateTime? prevTime;
+    for (final d in days) {
+      for (final p in PrayerType.values) {
+        final t = d.timeOf(p);
+        if (!t.isAfter(_now) && (prevTime == null || t.isAfter(prevTime))) {
+          prevTime = t;
+        }
+      }
+    }
+    if (prevTime == null || !nextTime.isAfter(prevTime)) return 0.5;
+    final total = nextTime.difference(prevTime).inSeconds;
+    if (total <= 0) return 0.5;
+    final elapsed = _now.difference(prevTime).inSeconds;
+    return (elapsed / total).clamp(0.04, 1.0);
+  }
+
+  void _notifyNext(PrayerType? type) {
+    if (type == _lastNotified) return;
+    _lastNotified = type;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) widget.onNextChanged?.call(type);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
-    final next = nextPrayer(_now, ref.watch(upcomingDaysProvider));
+    final days = ref.watch(upcomingDaysProvider);
+    final today = ref.watch(trackingDayProvider);
+    final records = ref.watch(todayRecordsProvider).value ?? const {};
+    final doneCount = records.values
+        .where(
+          (r) =>
+              r.status == PrayerStatus.performed ||
+              r.status == PrayerStatus.compensated,
+        )
+        .length;
+    final next = days.isEmpty ? null : nextPrayer(_now, days);
+    _notifyNext(next?.type);
 
-    if (next?.type != _lastNext) {
-      _lastNext = next?.type;
-      WidgetsBinding.instance
-          .addPostFrameCallback((_) => widget.onNextChanged?.call(next?.type));
+    final startColor = p.isDark ? const Color(0xFF16382B) : p.dark;
+    final endColor = p.isDark ? const Color(0xFF0F261D) : p.primary;
+
+    if (next == null) {
+      return Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(colors: [startColor, endColor]),
+          borderRadius: BorderRadius.circular(24),
+        ),
+        child: const Center(
+          child: Text(
+            HomeStrings.noTimes,
+            style: TextStyle(color: Colors.white, fontSize: 16),
+          ),
+        ),
+      );
     }
 
-    final onPrimary = p.isDark ? p.text : Colors.white;
-    return Card(
-      color: p.primary,
-      elevation: 3,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 22, horizontal: 20),
-        child: next == null
-            ? Text(HomeStrings.noTimes,
-                textAlign: TextAlign.center, style: TextStyle(color: onPrimary))
-            : Semantics(
-                liveRegion: false,
-                label: HomeStrings.countdownSemantics(
-                    next.type.label, _format(next.time.difference(_now))),
-                child: Column(
+    final remaining = _fmt(next.time.difference(_now));
+    final progress = _intervalProgress(days, next.time);
+
+    return Semantics(
+      label: HomeStrings.countdownSemantics(next.type.label, remaining),
+      excludeSemantics: true,
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [startColor, endColor],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(
+            color: p.secondary.withValues(alpha: 0.45),
+            width: 1.2,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: p.dark.withValues(alpha: p.isDark ? 0.45 : 0.22),
+              blurRadius: 18,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: MihrabArchBackdrop(
+          borderRadius: 22,
+          lineColor: Colors.white.withValues(alpha: 0.08),
+          accentColor: p.secondary.withValues(alpha: 0.16),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(18, 14, 18, 14),
+            child: Column(
+              children: [
+                // Üst satır: Sıradaki vakit rozeti ve hedef saat kapsülü
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(HomeStrings.nextPrayer(next.type.label),
-                        style: TextStyle(
-                            color: onPrimary.withValues(alpha: 0.9), fontSize: 16)),
-                    const SizedBox(height: 6),
-                    Text(
-                      _format(next.time.difference(_now)),
-                      style: TextStyle(
-                        color: onPrimary,
-                        fontSize: 44,
-                        fontWeight: FontWeight.bold,
-                        fontFeatures: const [FontFeature.tabularFigures()],
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: p.secondary.withValues(alpha: 0.45),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            AppIcons.prayerIcon(next.type),
+                            size: 14,
+                            color: p.secondary,
+                          ),
+                          const SizedBox(width: 6),
+                          const Text(
+                            HomeStrings.nextBadge,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.8,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 2),
-                    Text(HomeStrings.timeLabel(formatTime(next.time)),
-                        style: TextStyle(color: onPrimary.withValues(alpha: 0.85))),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.18),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        HomeStrings.timeLabel(formatTime(next.time)),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
-              ),
+                const SizedBox(height: 10),
+                // Merkez: Vakit adı ve büyük sayaç
+                Text(
+                  HomeStrings.nextPrayer(next.type.label),
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.90),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  remaining,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 38,
+                    height: 1.08,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.5,
+                    fontFeatures: [FontFeature.tabularFigures()],
+                  ),
+                ),
+                const SizedBox(height: 10),
+                // İlerleme çubuğu
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(6),
+                  child: LinearProgressIndicator(
+                    value: progress,
+                    minHeight: 5,
+                    color: p.secondary,
+                    backgroundColor: Colors.white.withValues(alpha: 0.16),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                // Alt bilgi satırı: Tarih ve tamamlanan vakit sayısı
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          AppIcons.calendar,
+                          size: 14,
+                          color: Colors.white.withValues(alpha: 0.80),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          DateStrings.long(today),
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.85),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: p.secondary.withValues(alpha: 0.22),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        HomeStrings.completedSummary(doneCount, 5),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

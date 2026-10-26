@@ -54,6 +54,7 @@ void main() {
       }
       for (final t in kThemes) {
         expect(SettingsStrings.themeName(t.key).trim(), isNotEmpty);
+        expect(SettingsStrings.themeSubtitle(t.key).trim(), isNotEmpty);
       }
     });
 
@@ -93,9 +94,12 @@ void main() {
   });
 
   group('ikon sistemi', () {
-    test('her rozet ve tema için ikon var', () {
+    test('her rozet, vakit ve tema için ikon var', () {
       for (final id in AchievementId.values) {
         expect(AppIcons.achievement(id).codePoint, greaterThan(0));
+      }
+      for (final p in PrayerType.values) {
+        expect(AppIcons.prayerIcon(p).codePoint, greaterThan(0));
       }
       for (final t in kThemes) {
         expect(AppIcons.theme(t.key).codePoint, greaterThan(0));

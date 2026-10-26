@@ -144,5 +144,13 @@ void main() {
       final dhuhrUtc = t.dhuhr.toUtc();
       expect(dhuhrUtc.hour, inInclusiveRange(9, 11));
     });
+
+    test('güneş doğuş vakti ihtiyat için 1,5 dakika (90 sn) öne çekilir', () {
+      expect(kSunriseCautionOffset, const Duration(seconds: 90));
+      final t = const PrayerTimeService()
+          .compute(istanbul, DateTime(2026, 10, 26), CalcMethod.diyanet);
+      expect(t.sunrise.second, 0);
+      expect(t.fajr.isBefore(t.sunrise), isTrue);
+    });
   });
 }

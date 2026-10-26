@@ -41,7 +41,6 @@ Henüz çözülmemiş sorunlar, doğrulanmamış alanlar ve bilinçli sınırlar
 
 | Önem | Konu | Ayrıntı |
 |---|---|---|
-| Düşük | Çekmece başlığının üstünde durum çubuğu alanı beyaz kalıyor | `NavigationDrawer` kendi güvenli alanını uyguluyor; başlık yeşil durum çubuğunun altına uzanmıyor: [[ui-ekranlar]] |
 | Düşük | Gece 00:00–04:00 arası "sıradaki" vurgusu dünün listesinde | Vurgu vakit türüne bakar, tarihe bakmaz: [[takip-gunu-ve-sayac]] |
 | Düşük | Aylık karşılaştırma grafiği alt etiket aralığı sabit (5) | 30 günlük görünümde etiketler seyrek |
 

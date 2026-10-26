@@ -1,26 +1,26 @@
 # Ekranlar
 
-Gezinme yan menü (çekmece) iledir. Kod: `lib/ui/`.
+Gezinme alt gezinme çubuğu (`NavigationBar`) iledir. Kod: `lib/ui/`.
 
 ## Kabuk (`app_shell.dart`)
 
-`AppShell` tek bir `Scaffold` ve Material 3 `NavigationDrawer` kullanır. Seçili ekran `selectedDestinationProvider` ile tutulur; gövde, seçili hedefin `builder`'ı ile değiştirilir. Çekmece ekran değiştirirken eski ekranı yok eder; autoDispose sağlayıcılar bu sayede her girişte taze veri okur: [[durum-yonetimi]]. Çekmece başlığında uygulama adı ve `AppIcons.app`; hedef adları `NavStrings`, ikonları `AppIcons.nav*` kaynaklıdır: [[metin-sistemi]], [[ikon-sistemi]].
+`AppShell` tek bir `Scaffold` ve Material 3 `NavigationBar` (alt çubuk) kullanır. Seçili ekran `selectedDestinationProvider` ile tutulur; gövde, seçili hedefin `builder`'ı ile değiştirilir. Ekran değiştirirken eski ekran yok edilir; autoDispose sağlayıcılar bu sayede her girişte taze veri okur: [[durum-yonetimi]]. Üst barda (`AppBar`) 8 köşeli Selçuklu madalyonu (`SeljukMedallion`) içinde `AppIcons.app`, ekran başlığı, ana ekrandayken tıklanabilir şehir kapsülü (`ActionChip`) ve sağ üstte `AboutScreen`'i açan bilgi düğmesi (`AppIcons.navAbout`) yer alır. Kaza sekmesi, bekleyen kaza namazı varsa sayısını rozet (`Badge`) olarak gösterir.
 
-| # | Ekran | Dosya | Ana sağlayıcılar |
-|---|---|---|---|
-| 0 | Namaz Takip (ana) | `screens/home_screen.dart` | `settingsProvider`, `locationRefreshProvider`, `todayTimesProvider`, `todayRecordsProvider`, `trackingDayProvider` |
-| 1 | Rozetler & Seri | `screens/gamification_screen.dart` | `gamificationProvider` |
-| 2 | Kaza Namazları | `screens/qaza_screen.dart` | `qazaProvider` |
-| 3 | Süreç | `screens/stats_screen.dart` | `radarProvider`, `monthCountsProvider`, `weekComparisonProvider`, `dailyCountsProvider` |
-| 4 | Ayarlar | `screens/settings_screen.dart` | `settingsProvider` |
-| 5 | Hakkında | `screens/about_screen.dart` | — |
-| — | Şehir Seç (ek ekran) | `screens/city_picker_screen.dart` | `settingsProvider` |
+| # | Sekme (`tab*`) | Ekran Başlığı | Dosya | Ana sağlayıcılar |
+|---|---|---|---|---|
+| 0 | Vakitler | Namaz Takip | `screens/home_screen.dart` | `settingsProvider`, `locationRefreshProvider`, `todayTimesProvider`, `todayRecordsProvider`, `trackingDayProvider` |
+| 1 | Kaza | Kaza Namazları | `screens/qaza_screen.dart` | `qazaProvider` |
+| 2 | Süreç | Süreç | `screens/stats_screen.dart` (`widgets/stats_heatmap_tab.dart`, `widgets/stats_comparison_tab.dart`) | `radarProvider`, `monthCountsProvider`, `weekComparisonProvider`, `dailyCountsProvider` |
+| 3 | Rozetler | Rozetler & Seri | `screens/gamification_screen.dart` | `gamificationProvider` |
+| 4 | Ayarlar | Ayarlar | `screens/settings_screen.dart` | `settingsProvider` |
+| — | (Üst bar) | Hakkında | `screens/about_screen.dart` | — |
+| — | (Ek ekran) | Şehir Seç | `screens/city_picker_screen.dart` | `settingsProvider`, `citiesProvider` |
 
 ## Ana ekran
 
-Yukarıdan aşağıya: konum etiketi (yenilemek için aşağı çekilir), [[takip-gunu-ve-sayac]] geri sayım kartı, "BUGÜNÜN NAMAZLARI • tarih" başlığı, vakit kartları (Sabah, Güneş, Öğle, İkindi, Akşam, Yatsı). Konum yoksa kartların yerine konum isteme kartı çıkar: [[konum]]. Bir karta dokunmak işaretleme diyaloğunu açar: [[namaz-isaretleme]]. Bildirimden gelen sorular da bu ekranda açılır: [[bildirimler]]. Uygulama ön plana dönünce takip günü, konum ve kayıtlar tazelenir (`didChangeAppLifecycleState`).
+Yukarıdan aşağıya: uyarı kartları (`CorruptedDatabaseCard`, `NotificationHealthCard`), Mihrap kemeri ve Selçuklu yıldızı motifli [[takip-gunu-ve-sayac]] geri sayım Hero kartı (`CountdownCard` — sıradaki vakit rozeti, hedef saat, büyük tabular sayaç, iki vakit arası ilerleme çubuğu, tarih ve `X / 5 Vakit Eda Edildi` özeti), "BUGÜNÜN NAMAZLARI • tarih" başlığı ve sol kenarında dikey zaman çizelgesi (timeline) bulunan vakit kartları (`PrayerCard`: Sabah, Güneş, Öğle, İkindi, Akşam, Yatsı). Konum yoksa kartların yerine Selçuklu madalyonlu konum isteme kartı çıkar: [[konum]]. Bir karta dokunmak `SeljukMedallion` başlıklı işaretleme diyaloğunu açar: [[namaz-isaretleme]]. Bildirimden gelen sorular da bu ekranda açılır: [[bildirimler]]. Uygulama ön plana dönünce takip günü, konum ve kayıtlar tazelenir (`didChangeAppLifecycleState`).
 
-Widget'lar: `PrayerCard` (kart), `CountdownCard` (sayaç), `showPrayerDialog` (diyalog), `CorruptedDatabaseCard` (bozuk veritabanı yedeklenip sıfırlandığında gösterilen uyarı kartı), `NotificationHealthCard` (tam zamanlı alarm izni uyarısı; yalnızca izin yokken ve bildirimler açıkken görünür) → `lib/ui/widgets/`.
+Widget'lar: `PrayerCard` (zaman çizelgeli vakit kartı), `CountdownCard` (mihrap hero sayaç kartı), `MihrabArchBackdrop` ve `SeljukMedallion` (`islamic_pattern.dart` — `CustomPainter` tabanlı İslami geometrik motifler), `showPrayerDialog` (diyalog), `CorruptedDatabaseCard` (bozuk veritabanı uyarısı), `NotificationHealthCard` (tam zamanlı alarm izni uyarısı) → `lib/ui/widgets/`.
 
 **Başlatma hata ekranı:** `StartupErrorApp` (`lib/ui/startup_error_app.dart`), `NamazBackend.create` hata verirse normal uygulama yerine gösterilir: mesaj, ayrıntı ve tek düğme "Tekrar dene". Verileri silen bir eylem sunmaz. Emülatörde veritabanı yolu klasör yapılarak doğrulandı: hata sürerken ekran kalır, sorun giderilip "Tekrar dene"ye basılınca normal açılır.
 

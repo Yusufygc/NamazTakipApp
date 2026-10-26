@@ -8,6 +8,17 @@ abstract final class HomeStrings {
 
   static String timeLabel(String time) => 'Vakit: $time';
 
+  static const nextBadge = 'SIRADAKİ VAKİT';
+  static const nextTag = 'Sıradaki';
+  static const sunriseTag = 'Güneş Doğuşu';
+  static const congregationBadge = 'Cemaatle';
+  static const performedBadge = 'Kılındı';
+  static const missedBadge = 'Kılınmadı';
+  static const pendingBadge = 'Bekliyor';
+
+  static String completedSummary(int done, int total) =>
+      '$done / $total Vakit Eda Edildi';
+
   /// Ekran okuyucular için sayaç açıklaması.
   static String countdownSemantics(String name, String remaining) =>
       '$name vaktine $remaining kaldı';

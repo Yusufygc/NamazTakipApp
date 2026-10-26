@@ -17,8 +17,8 @@ Uygulamadaki tüm ikonlar tek yerdedir: `lib/core/icons/app_icons.dart`. Karar g
 |---|---|
 | Marka | `app` (cami) |
 | Durum ve uyarı | `error`, `retry`, `warning` |
-| Gezinme | `navHome`, `navBadges`, `navQaza`, `navStats`, `navSettings`, `navAbout` |
-| Vakit kartı | `sunrise`, `prayerNext`, `prayerPerformed`, `prayerMissed`, `location`, `locationDetect`, `city`, `search`, `selected` |
+| Gezinme | `navHome`/`navHomeSelected`, `navBadges`/`navBadgesSelected`, `navQaza`/`navQazaSelected`, `navStats`/`navStatsSelected`, `navSettings`/`navSettingsSelected`, `navAbout` |
+| Vakit kartı | `prayerIcon(PrayerType)`, `sunrise`, `prayerNext`, `prayerPerformed`, `prayerMissed`, `prayerPending`, `location`, `locationDetect`, `city`, `search`, `selected`, `chevronRight`, `calendar`, `notifications`, `timer`, `compass` |
 | Diyalog | `dialogHeader`, `confirmPerformed`, `confirmMissed` |
 | Kaza | `qazaItem`, `qazaEmpty`, `expand` |
 | Süreç | `statsRadar`, `statsHeatmap`, `statsCompare`, `weekCurrent`, `weekPrevious`, `trendUp/Down/Flat`, `monthPrevious/Next` |

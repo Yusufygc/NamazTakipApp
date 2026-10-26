@@ -12,25 +12,25 @@ Beş renk teması vardır; kullanıcı Ayarlar'dan seçer, seçim kalıcıdır. 
 
 ## Temalar
 
-| Anahtar | Ad | Karakter | `primary` | `background` | Koyu mu |
-|---|---|---|---|---|---|
-| `default` | Varsayılan | Adaçayı yeşili | `#A5C89E` | `#FAFAFA` | Hayır |
-| `dark` | Koyu | Koyu zemin, yeşil vurgu | `#5C8A6E` | `#121212` | Evet |
-| `ocean` | Okyanus | Mavi | `#5B9BD5` | `#F5F9FF` | Hayır |
-| `rose` | Gül Kurusu | Pembe | `#C2727A` | `#FFF5F7` | Hayır |
-| `gold` | Altın | Sarı | `#C9A94E` | `#FFFEF5` | Hayır |
+| Anahtar | Ad (`themeName`) | Alt Başlık (`themeSubtitle`) | `primary` | `secondary` | `background` | Koyu mu |
+|---|---|---|---|---|---|---|
+| `default` | Varsayılan | Selçuklu Zümrüdü | `#1B5E43` | `#C89D3C` | `#F8F5EE` | Hayır |
+| `dark` | Koyu | Gece Kubbesi | `#38B281` | `#E2B553` | `#0C1411` | Evet |
+| `ocean` | Okyanus | İznik Çinisi | `#175D85` | `#2EA3B8` | `#F3F8FB` | Hayır |
+| `rose` | Gül Kurusu | Bordo & Gül | `#8C3747` | `#C87A82` | `#FCF6F7` | Hayır |
+| `gold` | Altın | Tezhip Altını | `#8E6918` | `#D1A234` | `#FAF6EC` | Hayır |
 
-Renk değerleri eski React Native temalarıyla birebir aynıdır: [[gecis-gecmisi]]. Eski "Ayasofya" arka plan teması kaldırılmıştı ve taşınmadı.
+Beş tema anahtarı backend kalıcılığıyla birebir uyumludur; renk paletleri Selçuklu/Osmanlı İslami sanat tonlarıyla (zümrüt, gece kubbesi, İznik çinisi, gül kurusu, tezhip altını) ve yüksek kontrastla güncellenmiştir. `lib/ui/widgets/islamic_pattern.dart` içindeki `MihrabArchBackdrop` ve `SeljukMedallion` bileşenleri `CustomPainter` ile 8 köşeli Selçuklu yıldızı (*Rub el-Hizb*) ve sivri mihrap kemeri motiflerini çizer.
 
 ## Kararlar
 
 - Tema, sistem açık/koyu ayarını **izlemez**; yalnızca kullanıcı seçimi geçerlidir. Sistem temasını izleme fikri [[yol-haritasi]]'ndadır.
-- Açık temalarda `primary` renkler açık tonlardır; üstündeki metin beyazdır. Koyu temada metin `palette.text` olur. Bu kural kartlarda ve AppBar'da `isDark` kontrolüyle uygulanır.
-- Kontrast düzeltmeleri (kırmızı yazı, "Yükselişte" yeşili, şeffaf yerine harmanlanmış zemin) [[erisilebilirlik-ve-kontrast]] sayfasındadır.
+- Açık temalarda `primary` doygun/koyu tonlardır (`#1B5E43`, `#175D85`, `#8C3747`, `#8E6918`), `secondary` ise altın/turkuaz/gül vurgu rengidir; `AppBar` arka planla bütünleşir ve ana hero kartları `dark` → `primary` gradyanı üzerinde beyaz metin kullanır.
+- Kontrast düzeltmeleri [[erisilebilirlik-ve-kontrast]] sayfasındadır.
 
 ## Doğrulama durumu
 
-Yalnızca **Varsayılan** tema emülatörde gezildi ve düzeltildi. Koyu, Okyanus, Gül ve Altın temalarında her ekranın görsel kontrolü yapılmadı; kontrast sorunları çıkabilir: [[bilinen-sorunlar]], [[yol-haritasi]]. Ayarlar ekranında beş tema kartı (renk noktaları + ikon + ad) doğru görünür.
+**Varsayılan** (Selçuklu Zümrüdü), **Koyu** (Gece Kubbesi) ve **Okyanus** (İznik Çinisi) temaları emülatörde gezildi ve doğrulandı. Ayarlar ekranında beş tema kartı (ikon, ad, alt başlık ve dört renk örneği) doğru görünür.
 
 ## Yeni tema ekleme
 

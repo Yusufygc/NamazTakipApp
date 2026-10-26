@@ -1,20 +1,22 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:namaz_backend/namaz_backend.dart';
 
 import '../../core/format/time_format.dart';
+import '../../core/icons/app_icons.dart';
+import '../../core/strings/strings.dart';
 import '../../core/theme/app_theme.dart';
 import '../../providers/providers.dart';
 import '../widgets/corrupted_database_card.dart';
 import '../widgets/countdown_card.dart';
+import '../widgets/islamic_pattern.dart';
 import '../widgets/notification_health_card.dart';
 import '../widgets/prayer_card.dart';
 import '../widgets/prayer_dialog.dart';
 import 'city_picker_screen.dart';
-import '../../core/icons/app_icons.dart';
-import '../../core/strings/strings.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -83,21 +85,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     if (result == null || !mounted) return;
     final notifier = ref.read(todayRecordsProvider.notifier);
     if (result.answer == PrayerAnswer.performed) {
-      await notifier.markPerformed(date, prayer, congregation: result.congregation);
+      await notifier.markPerformed(
+        date,
+        prayer,
+        congregation: result.congregation,
+      );
     } else {
       await notifier.markMissed(date, prayer);
     }
   }
 
-  String _locationText(AsyncValue<AppLocation?> refresh, AppSettings s) {
-    if (s.location != null) return s.location!.label;
-    return refresh.isLoading ? LocationStrings.loading : LocationStrings.notFound;
-  }
-
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
-    final settings = ref.watch(settingsProvider);
     final refresh = ref.watch(locationRefreshProvider);
     final times = ref.watch(todayTimesProvider);
     final records = ref.watch(todayRecordsProvider).value ?? const {};
@@ -107,72 +107,147 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         ? (refresh.error as LocationException).failure
         : null;
 
+    final hasBanner = ref.watch(corruptedDbBackupProvider) != null ||
+        (ref.watch(settingsProvider.select((s) => s.notificationsEnabled)) &&
+            ref.watch(notificationHealthProvider).value?.isHealthy == false);
+
     return RefreshIndicator(
       onRefresh: () async {
         ref.invalidate(locationRefreshProvider);
         await ref.read(locationRefreshProvider.future).catchError((_) => null);
       },
-      child: ListView(
-        padding: const EdgeInsets.all(16),
-        physics: const AlwaysScrollableScrollPhysics(),
-        children: [
-          Center(
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          // Uyarı kartı yokken ve normal ekran yüksekliğinde tüm bileşenler
+          // kaydırma gerektirmeden tam ekrana yayılır.
+          final fitScreen =
+              times != null && !hasBanner && constraints.maxHeight >= 560;
+          if (!fitScreen) {
+            return ListView(
+              padding: const EdgeInsets.fromLTRB(16, 6, 16, 12),
+              physics: const AlwaysScrollableScrollPhysics(),
               children: [
-                Icon(AppIcons.location, size: 18, color: p.primary),
-                const SizedBox(width: 4),
-                Flexible(
-                  child: Text(
-                    _locationText(refresh, settings),
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    overflow: TextOverflow.ellipsis,
+                const CorruptedDatabaseCard(),
+                const NotificationHealthCard(),
+                if (times == null)
+                  _NoLocationCard(failure: failure, loading: refresh.isLoading)
+                else ...[
+                  CountdownCard(onNextChanged: (t) => setState(() => _next = t)),
+                  const SizedBox(height: 12),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 4, bottom: 4),
+                    child: Text(
+                      HomeStrings.todaysPrayers(DateStrings.long(day)),
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1.1,
+                        color: p.textLight,
+                      ),
+                    ),
                   ),
-                ),
+                  _card(PrayerType.fajr, times, records, isFirst: true),
+                  PrayerCard(
+                    name: PrayerStrings.sunrise,
+                    time: formatTime(times.sunrise),
+                    isDisplayOnly: true,
+                  ),
+                  _card(PrayerType.dhuhr, times, records),
+                  _card(PrayerType.asr, times, records),
+                  _card(PrayerType.maghrib, times, records),
+                  _card(PrayerType.isha, times, records, isLast: true),
+                ],
               ],
+            );
+          }
+
+          return SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: SizedBox(
+              height: math.max(constraints.maxHeight, 560),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 6, 16, 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    CountdownCard(
+                      onNextChanged: (t) => setState(() => _next = t),
+                    ),
+                    const SizedBox(height: 12),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 4, bottom: 4),
+                      child: Text(
+                        HomeStrings.todaysPrayers(DateStrings.long(day)),
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 1.1,
+                          color: p.textLight,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: _card(
+                        PrayerType.fajr,
+                        times,
+                        records,
+                        isFirst: true,
+                      ),
+                    ),
+                    Expanded(
+                      child: PrayerCard(
+                        name: PrayerStrings.sunrise,
+                        time: formatTime(times.sunrise),
+                        isDisplayOnly: true,
+                      ),
+                    ),
+                    Expanded(
+                      child: _card(PrayerType.dhuhr, times, records),
+                    ),
+                    Expanded(
+                      child: _card(PrayerType.asr, times, records),
+                    ),
+                    Expanded(
+                      child: _card(PrayerType.maghrib, times, records),
+                    ),
+                    Expanded(
+                      child: _card(
+                        PrayerType.isha,
+                        times,
+                        records,
+                        isLast: true,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ),
-          const SizedBox(height: 10),
-          const CorruptedDatabaseCard(),
-          const NotificationHealthCard(),
-          if (times == null)
-            _NoLocationCard(failure: failure, loading: refresh.isLoading)
-          else ...[
-            CountdownCard(onNextChanged: (t) => setState(() => _next = t)),
-            const SizedBox(height: 16),
-            Text(
-              HomeStrings.todaysPrayers(DateStrings.long(day)),
-              style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 1,
-                  color: p.textLight),
-            ),
-            const SizedBox(height: 6),
-            _card(PrayerType.fajr, times, records),
-            PrayerCard(
-              name: PrayerStrings.sunrise,
-              time: formatTime(times.sunrise),
-              isDisplayOnly: true,
-            ),
-            _card(PrayerType.dhuhr, times, records),
-            _card(PrayerType.asr, times, records),
-            _card(PrayerType.maghrib, times, records),
-            _card(PrayerType.isha, times, records),
-          ],
-        ],
+          );
+        },
       ),
     );
   }
 
-  Widget _card(PrayerType type, DayTimes times, Map<PrayerType, PrayerRecord> records) {
-    final status = records[type]?.status;
+  Widget _card(
+    PrayerType type,
+    DayTimes times,
+    Map<PrayerType, PrayerRecord> records, {
+    bool isFirst = false,
+    bool isLast = false,
+  }) {
+    final rec = records[type];
+    final status = rec?.status;
     return PrayerCard(
       name: type.label,
       time: formatTime(times.timeOf(type)),
-      isPerformed: status == PrayerStatus.performed || status == PrayerStatus.compensated,
+      prayerType: type,
+      isPerformed:
+          status == PrayerStatus.performed || status == PrayerStatus.compensated,
       isMissed: status == PrayerStatus.missed,
+      isCongregation: rec?.isCongregation ?? false,
       isNext: _next == type,
+      isFirst: isFirst,
+      isLast: isLast,
       onTap: () => _ask(type, ref.read(trackingDayProvider)),
     );
   }
@@ -205,19 +280,39 @@ class _NoLocationCard extends ConsumerWidget {
     return Card(
       color: p.card,
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(24),
         child: Column(
           children: [
-            if (loading)
-              const Padding(
-                padding: EdgeInsets.only(bottom: 12),
-                child: CircularProgressIndicator(),
-              ),
-            Text(_message, textAlign: TextAlign.center),
+            SeljukMedallion(
+              size: 64,
+              fillColor: p.primary.withValues(alpha: 0.12),
+              borderColor: p.secondary,
+              child: loading
+                  ? SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.5,
+                        color: p.primary,
+                      ),
+                    )
+                  : Icon(AppIcons.location, size: 28, color: p.primary),
+            ),
             const SizedBox(height: 16),
+            Text(
+              loading ? LocationStrings.loading : LocationStrings.notFound,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              _message,
+              textAlign: TextAlign.center,
+              style: TextStyle(color: p.textLight),
+            ),
+            const SizedBox(height: 20),
             Wrap(
-              spacing: 8,
-              runSpacing: 8,
+              spacing: 10,
+              runSpacing: 10,
               alignment: WrapAlignment.center,
               children: [
                 FilledButton.icon(
@@ -227,7 +322,9 @@ class _NoLocationCard extends ConsumerWidget {
                 ),
                 OutlinedButton.icon(
                   onPressed: () => Navigator.of(context).push(
-                    MaterialPageRoute<void>(builder: (_) => const CityPickerScreen()),
+                    MaterialPageRoute<void>(
+                      builder: (_) => const CityPickerScreen(),
+                    ),
                   ),
                   icon: const Icon(AppIcons.city),
                   label: const Text(LocationStrings.chooseCity),

@@ -80,81 +80,87 @@ class AppThemeDef {
   final AppPalette palette;
 }
 
-const _danger = Color(0xFFFF8A80);
+const _dangerLight = Color(0xFFC62828);
+const _dangerDark = Color(0xFFEF6C6C);
 
 const List<AppThemeDef> kThemes = [
+  // Selçuklu Zümrüdü (Varsayılan)
   AppThemeDef(
     'default',
     AppPalette(
-      primary: Color(0xFFA5C89E),
-      secondary: Color(0xFFD8E983),
-      accent: Color(0xFFFFFBB1),
-      dark: Color(0xFFAEB877),
-      background: Color(0xFFFAFAFA),
+      primary: Color(0xFF1B5E43),
+      secondary: Color(0xFFC89D3C),
+      accent: Color(0xFFEBE3D0),
+      dark: Color(0xFF103F2C),
+      background: Color(0xFFF8F5EE),
       card: Color(0xFFFFFFFF),
-      text: Color(0xFF2C3E50),
-      textLight: Color(0xFF7F8C8D),
-      danger: _danger,
+      text: Color(0xFF18261F),
+      textLight: Color(0xFF5A6D63),
+      danger: _dangerLight,
       isDark: false,
     ),
   ),
+  // Gece Kubbesi (Koyu)
   AppThemeDef(
     'dark',
     AppPalette(
-      primary: Color(0xFF5C8A6E),
-      secondary: Color(0xFF8BC34A),
-      accent: Color(0xFFFFD54F),
-      dark: Color(0xFF37474F),
-      background: Color(0xFF121212),
-      card: Color(0xFF1E1E1E),
-      text: Color(0xFFE0E0E0),
-      textLight: Color(0xFF9E9E9E),
-      danger: _danger,
+      primary: Color(0xFF38B281),
+      secondary: Color(0xFFE2B553),
+      accent: Color(0xFF1F362D),
+      dark: Color(0xFF1F7A56),
+      background: Color(0xFF0C1411),
+      card: Color(0xFF15221D),
+      text: Color(0xFFEAF2EE),
+      textLight: Color(0xFF93A89E),
+      danger: _dangerDark,
       isDark: true,
     ),
   ),
+  // İznik Çinisi (Okyanus)
   AppThemeDef(
     'ocean',
     AppPalette(
-      primary: Color(0xFF5B9BD5),
-      secondary: Color(0xFF81D4FA),
-      accent: Color(0xFFB3E5FC),
-      dark: Color(0xFF1565C0),
-      background: Color(0xFFF5F9FF),
+      primary: Color(0xFF175D85),
+      secondary: Color(0xFF2EA3B8),
+      accent: Color(0xFFD9ECF5),
+      dark: Color(0xFF0E3F5C),
+      background: Color(0xFFF3F8FB),
       card: Color(0xFFFFFFFF),
-      text: Color(0xFF1A237E),
-      textLight: Color(0xFF5C6BC0),
-      danger: _danger,
+      text: Color(0xFF142734),
+      textLight: Color(0xFF556E7F),
+      danger: _dangerLight,
       isDark: false,
     ),
   ),
+  // Gül-i Muhammedî (Gül Kurusu)
   AppThemeDef(
     'rose',
     AppPalette(
-      primary: Color(0xFFC2727A),
-      secondary: Color(0xFFF48FB1),
-      accent: Color(0xFFFCE4EC),
-      dark: Color(0xFF880E4F),
-      background: Color(0xFFFFF5F7),
+      primary: Color(0xFF8C3747),
+      secondary: Color(0xFFC87A82),
+      accent: Color(0xFFF5E1E4),
+      dark: Color(0xFF63212E),
+      background: Color(0xFFFCF6F7),
       card: Color(0xFFFFFFFF),
-      text: Color(0xFF3E2723),
-      textLight: Color(0xFF8D6E63),
-      danger: _danger,
+      text: Color(0xFF2B171B),
+      textLight: Color(0xFF73565C),
+      danger: _dangerLight,
       isDark: false,
     ),
   ),
+  // Tezhip Altını (Altın)
   AppThemeDef(
     'gold',
     AppPalette(
-      primary: Color(0xFFC9A94E),
-      secondary: Color(0xFFFFD54F),
-      accent: Color(0xFFFFF8E1),
-      dark: Color(0xFF6D5F1B),
-      background: Color(0xFFFFFEF5),
+      primary: Color(0xFF8E6918),
+      secondary: Color(0xFFD1A234),
+      accent: Color(0xFFF4E9CE),
+      dark: Color(0xFF63480C),
+      background: Color(0xFFFAF6EC),
       card: Color(0xFFFFFFFF),
-      text: Color(0xFF3E2723),
-      textLight: Color(0xFF8D6E63),
-      danger: _danger,
+      text: Color(0xFF282011),
+      textLight: Color(0xFF6E6045),
+      danger: _dangerLight,
       isDark: false,
     ),
   ),
@@ -170,6 +176,7 @@ ThemeData buildTheme(AppPalette p) {
     brightness: brightness,
   ).copyWith(
     primary: p.primary,
+    onPrimary: p.isDark ? const Color(0xFF09130F) : Colors.white,
     secondary: p.secondary,
     surface: p.card,
     onSurface: p.text,
@@ -182,24 +189,90 @@ ThemeData buildTheme(AppPalette p) {
     scaffoldBackgroundColor: p.background,
     extensions: [p],
     appBarTheme: AppBarTheme(
-      backgroundColor: p.primary,
-      foregroundColor: p.isDark ? p.text : Colors.white,
-      elevation: 2,
+      backgroundColor: p.background,
+      foregroundColor: p.text,
+      surfaceTintColor: Colors.transparent,
+      scrolledUnderElevation: 0,
+      elevation: 0,
       centerTitle: false,
       titleTextStyle: TextStyle(
-        color: p.isDark ? p.text : Colors.white,
+        color: p.text,
         fontSize: 20,
-        fontWeight: FontWeight.bold,
+        fontWeight: FontWeight.w700,
+        letterSpacing: -0.2,
       ),
     ),
-    drawerTheme: DrawerThemeData(backgroundColor: p.background, width: 280),
-    dividerColor: p.dark.withValues(alpha: 0.15),
+    cardTheme: CardThemeData(
+      color: p.card,
+      elevation: 0,
+      surfaceTintColor: Colors.transparent,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+        side: BorderSide(
+          color: p.primary.withValues(alpha: p.isDark ? 0.16 : 0.09),
+        ),
+      ),
+    ),
+    navigationBarTheme: NavigationBarThemeData(
+      backgroundColor: p.card,
+      surfaceTintColor: Colors.transparent,
+      elevation: 0,
+      height: 68,
+      indicatorColor: p.primary.withValues(alpha: p.isDark ? 0.22 : 0.12),
+      labelTextStyle: WidgetStateProperty.resolveWith((states) {
+        final selected = states.contains(WidgetState.selected);
+        return TextStyle(
+          fontSize: 12,
+          fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+          color: selected ? p.primary : p.textLight,
+        );
+      }),
+      iconTheme: WidgetStateProperty.resolveWith((states) {
+        final selected = states.contains(WidgetState.selected);
+        return IconThemeData(
+          size: 24,
+          color: selected ? p.primary : p.textLight,
+        );
+      }),
+    ),
+    filledButtonTheme: FilledButtonThemeData(
+      style: FilledButton.styleFrom(
+        backgroundColor: p.primary,
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+      ),
+    ),
+    segmentedButtonTheme: SegmentedButtonThemeData(
+      style: ButtonStyle(
+        backgroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) return p.primary;
+          return p.card;
+        }),
+        foregroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) return Colors.white;
+          return p.text;
+        }),
+        side: WidgetStatePropertyAll(
+          BorderSide(color: p.primary.withValues(alpha: 0.25)),
+        ),
+        shape: WidgetStatePropertyAll(
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+      ),
+    ),
+    dividerColor: p.primary.withValues(alpha: 0.12),
     textTheme: ThemeData(brightness: brightness)
         .textTheme
         .apply(bodyColor: p.text, displayColor: p.text),
     switchTheme: SwitchThemeData(
+      thumbColor: WidgetStateProperty.resolveWith(
+        (s) => s.contains(WidgetState.selected) ? Colors.white : null,
+      ),
       trackColor: WidgetStateProperty.resolveWith(
-          (s) => s.contains(WidgetState.selected) ? p.primary : null),
+        (s) => s.contains(WidgetState.selected) ? p.primary : null,
+      ),
     ),
   );
 }

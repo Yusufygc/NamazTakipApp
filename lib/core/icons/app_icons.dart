@@ -14,24 +14,51 @@ abstract final class AppIcons {
   static const IconData retry = Icons.refresh;
   static const IconData warning = Icons.warning_amber_rounded;
 
-  // ---- Gezinme (çekmece) ------------------------------------------------------
-  static const IconData navHome = Icons.home_outlined;
-  static const IconData navBadges = Icons.emoji_events_outlined;
-  static const IconData navQaza = Icons.event_busy_outlined;
+  // ---- Gezinme (alt çubuk ve üst bar) -----------------------------------------
+  static const IconData navHome = Icons.mosque_outlined;
+  static const IconData navHomeSelected = Icons.mosque;
+  static const IconData navBadges = Icons.workspace_premium_outlined;
+  static const IconData navBadgesSelected = Icons.workspace_premium;
+  static const IconData navQaza = Icons.history_edu_outlined;
+  static const IconData navQazaSelected = Icons.history_edu;
   static const IconData navStats = Icons.insights_outlined;
-  static const IconData navSettings = Icons.settings_outlined;
+  static const IconData navStatsSelected = Icons.insights;
+  static const IconData navSettings = Icons.tune_outlined;
+  static const IconData navSettingsSelected = Icons.tune;
   static const IconData navAbout = Icons.info_outline;
 
   // ---- Vakit kartı ve ana ekran ------------------------------------------------
-  static const IconData sunrise = Icons.wb_sunny;
-  static const IconData prayerNext = Icons.hourglass_top;
-  static const IconData prayerPerformed = Icons.check;
-  static const IconData prayerMissed = Icons.close;
-  static const IconData location = Icons.location_on;
-  static const IconData locationDetect = Icons.my_location;
-  static const IconData city = Icons.location_city;
-  static const IconData search = Icons.search;
-  static const IconData selected = Icons.check_circle;
+  static const IconData sunrise = Icons.wb_sunny_outlined;
+  static const IconData prayerNext = Icons.schedule_rounded;
+  static const IconData prayerPerformed = Icons.check_rounded;
+  static const IconData prayerMissed = Icons.close_rounded;
+  static const IconData prayerPending = Icons.radio_button_unchecked_rounded;
+  static const IconData location = Icons.place_outlined;
+  static const IconData locationDetect = Icons.my_location_rounded;
+  static const IconData city = Icons.location_city_rounded;
+  static const IconData search = Icons.search_rounded;
+  static const IconData selected = Icons.check_circle_rounded;
+  static const IconData chevronRight = Icons.chevron_right_rounded;
+  static const IconData calendar = Icons.calendar_today_outlined;
+  static const IconData notifications = Icons.notifications_active_outlined;
+  static const IconData timer = Icons.timer_outlined;
+  static const IconData compass = Icons.explore_outlined;
+
+  /// Vakit türüne göre atmosfer ikonu.
+  static IconData prayerIcon(PrayerType prayer) {
+    switch (prayer) {
+      case PrayerType.fajr:
+        return Icons.wb_twilight_rounded;
+      case PrayerType.dhuhr:
+        return Icons.light_mode_rounded;
+      case PrayerType.asr:
+        return Icons.wb_sunny_outlined;
+      case PrayerType.maghrib:
+        return Icons.nights_stay_outlined;
+      case PrayerType.isha:
+        return Icons.bedtime_outlined;
+    }
+  }
 
   // ---- Namaz diyaloğu -----------------------------------------------------------
   static const IconData dialogHeader = Icons.mosque;

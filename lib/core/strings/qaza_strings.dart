@@ -3,6 +3,10 @@ abstract final class QazaStrings {
   static const emptyTitle = 'Kaza namazınız yok';
   static const emptySubtitle = 'Allah kabul etsin.';
 
+  static const overviewTitle = 'Kaza Borcu Özeti';
+  static const totalPrayersLabel = 'Kaza Vakti';
+  static const totalDaysLabel = 'Eksik Gün';
+
   static String summary(int count, int days) =>
       'Toplam $count kaza namazı • $days gün';
 

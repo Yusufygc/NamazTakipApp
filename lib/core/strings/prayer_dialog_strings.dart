@@ -7,6 +7,7 @@ abstract final class PrayerDialogStrings {
 
   static const question = 'KILDINIZ MI?';
   static const congregation = 'Cemaatle kıldım';
+  static const congregationHint = 'Cemaat sevabıyla kaydedilir';
   static const performed = 'Kıldım';
   static const missed = 'Kılmadım';
 }

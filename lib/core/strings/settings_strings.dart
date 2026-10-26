@@ -38,6 +38,21 @@ abstract final class SettingsStrings {
     }
   }
 
+  static String themeSubtitle(String key) {
+    switch (key) {
+      case 'dark':
+        return 'Gece Kubbesi';
+      case 'ocean':
+        return 'İznik Çinisi';
+      case 'rose':
+        return 'Bordo & Gül';
+      case 'gold':
+        return 'Tezhip Altını';
+      default:
+        return 'Selçuklu Zümrüdü';
+    }
+  }
+
   static String calcMethodName(CalcMethod m) {
     switch (m) {
       case CalcMethod.diyanet:

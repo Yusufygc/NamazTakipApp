@@ -6,6 +6,10 @@ abstract final class GamificationStrings {
   static const bestStreak = 'En İyi Seri';
   static const fullDays = 'Tam Gün';
   static const badgesHeader = 'ROZETLER';
+  static const unlockedLabel = 'Kazanıldı';
+
+  static String unlockedCount(int unlocked, int total) =>
+      '$unlocked / $total Açıldı';
 
   static String progress(int value, int target) => '$value / $target';
 

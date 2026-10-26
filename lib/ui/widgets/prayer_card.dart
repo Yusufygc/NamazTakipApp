@@ -1,153 +1,313 @@
 import 'package:flutter/material.dart';
+import 'package:namaz_backend/namaz_backend.dart';
 
-import '../../core/theme/app_theme.dart';
 import '../../core/icons/app_icons.dart';
 import '../../core/strings/strings.dart';
+import '../../core/theme/app_theme.dart';
 
-/// Ana ekrandaki tek vakit satırı.
+/// Zaman çizelgesi (Timeline) bağlantılı vakit satırı kartı.
 class PrayerCard extends StatelessWidget {
   const PrayerCard({
     super.key,
     required this.name,
     required this.time,
+    this.prayerType,
     this.isPerformed = false,
     this.isMissed = false,
+    this.isCongregation = false,
     this.isNext = false,
     this.isDisplayOnly = false,
     this.onTap,
+    this.isFirst = false,
+    this.isLast = false,
   });
 
   final String name;
   final String time;
+  final PrayerType? prayerType;
   final bool isPerformed;
   final bool isMissed;
+  final bool isCongregation;
   final bool isNext;
   final bool isDisplayOnly;
   final VoidCallback? onTap;
+  final bool isFirst;
+  final bool isLast;
 
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
 
-    Color background = p.card;
-    Color? border;
-    Color textColor = p.text;
-    if (isDisplayOnly) {
-      border = const Color(0xFFFFCC00);
-    } else if (isNext) {
-      background = p.primary;
-      border = p.dark;
-      textColor = p.isDark ? p.text : Colors.white;
+    // Kart arka planı ve kenarlık renkleri
+    Color cardBg = p.card;
+    Color borderColor = p.primary.withValues(alpha: p.isDark ? 0.16 : 0.10);
+    double borderWidth = 1.0;
+
+    if (isNext) {
+      cardBg = Color.alphaBlend(
+        p.secondary.withValues(alpha: p.isDark ? 0.14 : 0.12),
+        p.card,
+      );
+      borderColor = p.secondary;
+      borderWidth = 1.8;
     } else if (isPerformed) {
-      // Şeffaf renk gölgeyi göstererek mat görünür; kartın üstüne harmanla.
-      background = Color.alphaBlend(p.secondary.withValues(alpha: 0.25), p.card);
-      border = p.secondary;
+      cardBg = Color.alphaBlend(
+        p.primary.withValues(alpha: p.isDark ? 0.18 : 0.08),
+        p.card,
+      );
+      borderColor = p.primary.withValues(alpha: 0.45);
     } else if (isMissed) {
-      background = Color.alphaBlend(p.danger.withValues(alpha: 0.15), p.card);
-      border = p.danger;
-      // Açık temalarda #FF8A80 beyaz üstünde düşük kontrastlı; koyu kırmızı kullan.
-      textColor = p.isDark ? p.danger : const Color(0xFFC62828);
+      cardBg = Color.alphaBlend(
+        p.danger.withValues(alpha: p.isDark ? 0.16 : 0.07),
+        p.card,
+      );
+      borderColor = p.danger.withValues(alpha: 0.45);
+    } else if (isDisplayOnly) {
+      cardBg = p.card.withValues(alpha: p.isDark ? 0.65 : 0.80);
     }
 
-    return Semantics(
-      button: !isDisplayOnly,
-      label: HomeStrings.prayerSemantics(name, time,
-          performed: isPerformed, missed: isMissed),
-      child: Card(
-        margin: const EdgeInsets.symmetric(vertical: 6),
-        elevation: 1.5,
-        color: background,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: border == null
-              ? BorderSide.none
-              : BorderSide(color: border, width: isNext ? 2 : 1),
+    // Zaman çizelgesi düğüm rengi ve ikonu
+    Color nodeColor = p.textLight.withValues(alpha: 0.35);
+    IconData nodeIcon = AppIcons.prayerPending;
+    if (isPerformed) {
+      nodeColor = p.primary;
+      nodeIcon = AppIcons.prayerPerformed;
+    } else if (isMissed) {
+      nodeColor = p.danger;
+      nodeIcon = AppIcons.prayerMissed;
+    } else if (isNext) {
+      nodeColor = p.secondary;
+      nodeIcon = AppIcons.prayerNext;
+    } else if (isDisplayOnly) {
+      nodeColor = p.secondary.withValues(alpha: 0.75);
+      nodeIcon = AppIcons.sunrise;
+    }
+
+    final leadingIcon = isDisplayOnly
+        ? AppIcons.sunrise
+        : (prayerType != null ? AppIcons.prayerIcon(prayerType!) : AppIcons.app);
+
+    final row = Row(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Sol dikey zaman çizelgesi (Timeline) sütunu
+        SizedBox(
+          width: 30,
+          child: Column(
+            children: [
+              Expanded(
+                child: Container(
+                  width: 2,
+                  color: isFirst
+                      ? Colors.transparent
+                      : p.primary.withValues(alpha: 0.20),
+                ),
+              ),
+              Container(
+                width: isNext ? 24 : 20,
+                height: isNext ? 24 : 20,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isPerformed || isNext ? nodeColor : p.background,
+                  border: Border.all(
+                    color: nodeColor,
+                    width: isNext ? 2.4 : 1.8,
+                  ),
+                  boxShadow: isNext
+                      ? [
+                          BoxShadow(
+                            color: p.secondary.withValues(alpha: 0.40),
+                            blurRadius: 8,
+                          ),
+                        ]
+                      : null,
+                ),
+                child: Icon(
+                  nodeIcon,
+                  size: isNext ? 13 : 11,
+                  color: isPerformed || isNext ? Colors.white : nodeColor,
+                ),
+              ),
+              Expanded(
+                child: Container(
+                  width: 2,
+                  color: isLast
+                      ? Colors.transparent
+                      : p.primary.withValues(alpha: 0.20),
+                ),
+              ),
+            ],
+          ),
         ),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(16),
-          onTap: isDisplayOnly ? null : onTap,
+        const SizedBox(width: 6),
+        // Sağ vakit kartı gövdesi
+        Expanded(
           child: Padding(
-            padding: EdgeInsets.symmetric(
-                horizontal: 20, vertical: isDisplayOnly ? 14 : 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(name,
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Material(
+              color: cardBg,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: BorderSide(color: borderColor, width: borderWidth),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: InkWell(
+                onTap: isDisplayOnly ? null : onTap,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 8,
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 38,
+                        height: 38,
+                        decoration: BoxDecoration(
+                          color: (isNext ? p.secondary : p.primary)
+                              .withValues(alpha: p.isDark ? 0.22 : 0.10),
+                          borderRadius: BorderRadius.circular(11),
+                        ),
+                        child: Icon(
+                          leadingIcon,
+                          size: 19,
+                          color: isNext ? p.secondary : p.primary,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          spacing: 8,
+                          runSpacing: 4,
+                          children: [
+                            Text(
+                              name,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight:
+                                    isNext ? FontWeight.w800 : FontWeight.w600,
+                                color: isDisplayOnly ? p.textLight : p.text,
+                              ),
+                            ),
+                            if (isNext)
+                              _StatusBadge(
+                                label: HomeStrings.nextTag,
+                                color: p.secondary,
+                                filled: true,
+                              ),
+                            if (isCongregation && isPerformed)
+                              _StatusBadge(
+                                label: HomeStrings.congregationBadge,
+                                color: p.primary,
+                                icon: AppIcons.congregation,
+                              )
+                            else if (isPerformed)
+                              _StatusBadge(
+                                label: HomeStrings.performedBadge,
+                                color: p.primary,
+                              )
+                            else if (isMissed)
+                              _StatusBadge(
+                                label: HomeStrings.missedBadge,
+                                color: p.danger,
+                              )
+                            else if (isDisplayOnly)
+                              _StatusBadge(
+                                label: HomeStrings.sunriseTag,
+                                color: p.textLight,
+                              ),
+                          ],
+                        ),
+                      ),
+                      Text(
+                        time,
                         style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: textColor)),
-                    const SizedBox(height: 2),
-                    Text(time,
-                        style: TextStyle(
-                            fontSize: 15,
-                            color: textColor.withValues(alpha: 0.85))),
-                  ],
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                          color: isNext
+                              ? p.primary
+                              : (isDisplayOnly ? p.textLight : p.text),
+                          fontFeatures: const [
+                            FontFeature.tabularFigures(),
+                          ],
+                        ),
+                      ),
+                      if (!isDisplayOnly) ...[
+                        const SizedBox(width: 6),
+                        Icon(
+                          AppIcons.chevronRight,
+                          size: 18,
+                          color: p.textLight.withValues(alpha: 0.6),
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
-                _StatusIcon(
-                  isDisplayOnly: isDisplayOnly,
-                  isPerformed: isPerformed,
-                  isMissed: isMissed,
-                  isNext: isNext,
-                ),
-              ],
+              ),
             ),
           ),
         ),
+      ],
+    );
+
+    return Semantics(
+      button: !isDisplayOnly && onTap != null,
+      label: HomeStrings.prayerSemantics(
+        name,
+        time,
+        performed: isPerformed,
+        missed: isMissed,
+      ),
+      excludeSemantics: true,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          if (constraints.hasBoundedHeight) return row;
+          return IntrinsicHeight(child: row);
+        },
       ),
     );
   }
 }
 
-class _StatusIcon extends StatelessWidget {
-  const _StatusIcon({
-    required this.isDisplayOnly,
-    required this.isPerformed,
-    required this.isMissed,
-    required this.isNext,
+class _StatusBadge extends StatelessWidget {
+  const _StatusBadge({
+    required this.label,
+    required this.color,
+    this.icon,
+    this.filled = false,
   });
 
-  final bool isDisplayOnly;
-  final bool isPerformed;
-  final bool isMissed;
-  final bool isNext;
+  final String label;
+  final Color color;
+  final IconData? icon;
+  final bool filled;
 
   @override
   Widget build(BuildContext context) {
-    final p = context.palette;
-    if (isDisplayOnly) {
-      return const Icon(AppIcons.sunrise, size: 28, color: Color(0xFFFFB300));
-    }
-
-    Widget circle(Color color, {Widget? child, bool filled = true}) => Container(
-          width: 32,
-          height: 32,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: filled ? color : null,
-            border: filled ? null : Border.all(color: color, width: 2),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: filled ? color : color.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null) ...[
+            Icon(icon, size: 12, color: filled ? Colors.white : color),
+            const SizedBox(width: 4),
+          ],
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              color: filled ? Colors.white : color,
+            ),
           ),
-          alignment: Alignment.center,
-          child: child,
-        );
-
-    if (isPerformed) {
-      return circle(p.secondary,
-          child: Icon(AppIcons.prayerPerformed,
-              size: 20, color: p.isDark ? Colors.black : p.dark));
-    }
-    if (isMissed) {
-      return circle(p.danger, child: const Icon(AppIcons.prayerMissed, size: 20, color: Colors.white));
-    }
-    return circle(
-      isNext ? Colors.white : p.textLight,
-      filled: false,
-      child: isNext
-          ? const Icon(AppIcons.prayerNext, size: 16, color: Colors.white)
-          : null,
+        ],
+      ),
     );
   }
 }
