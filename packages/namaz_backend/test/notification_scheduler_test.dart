@@ -8,6 +8,7 @@ import 'package:namaz_backend/src/data/settings_repository.dart';
 import 'package:namaz_backend/src/domain/notification_gateway.dart';
 import 'package:namaz_backend/src/domain/notification_plan.dart';
 import 'package:namaz_backend/src/domain/prayer.dart';
+import 'package:namaz_backend/src/domain/prayer_time_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
@@ -151,6 +152,114 @@ void main() {
     await broken.reschedule(now: now); // ikinci çağrı yeniden çalışabilmeli
     expect(failing.applied, 1);
   });
+
+  test('plan uygulanırken geçmişe düşen bildirim atlanır ve kalanlar planlanır',
+      () async {
+    final baseScheduler = await build();
+    final istanbul = baseScheduler.settings.effectiveLocation!;
+    final fajr = const PrayerTimeService()
+        .compute(istanbul, day, CalcMethod.diyanet)
+        .fajr;
+
+    // Plan kurulurken Sabah vaktine 1 sn vardır (Sabah plana girer);
+    // uygulama anına gelindiğinde saat Sabah'ı 1 sn geçmiştir.
+    var clockCalls = 0;
+    DateTime fakeClock() {
+      clockCalls++;
+      return clockCalls == 1
+          ? fajr.subtract(const Duration(seconds: 1))
+          : fajr.add(const Duration(seconds: 1));
+    }
+
+    final strictGateway = _StrictFutureGateway(
+      currentTime: () => fajr.add(const Duration(seconds: 1)),
+    );
+    final scheduler = NotificationScheduler(
+      settings: baseScheduler.settings,
+      prayers: repo,
+      texts: const TestTexts(),
+      notifications: strictGateway,
+      clock: fakeClock,
+    );
+
+    await scheduler.reschedule();
+
+    final fajrAdhanId = notificationId(day, PrayerType.fajr, reminder: false);
+    final fajrReminderId = notificationId(day, PrayerType.fajr, reminder: true);
+    expect(strictGateway.scheduled.any((n) => n.id == fajrAdhanId), isFalse,
+        reason: 'geçmişe düşen Sabah ezanı atlanmalı');
+    expect(strictGateway.scheduled.any((n) => n.id == fajrReminderId), isTrue,
+        reason: 'gelecekteki Sabah hatırlatması planlanmalı');
+    expect(strictGateway.scheduled.any((n) => n.id == dhuhrReminder()), isTrue,
+        reason: 'kalan bildirimler planlanmaya devam etmeli');
+    expect(strictGateway.scheduled.length, 19);
+  });
+
+  test(
+      'uygulama sırasında geçmiş zaman hatası fırlatan tek bildirim kalan planı durdurmaz',
+      () async {
+    final baseScheduler = await build();
+    final istanbul = baseScheduler.settings.effectiveLocation!;
+    final fajr = const PrayerTimeService()
+        .compute(istanbul, day, CalcMethod.diyanet)
+        .fajr;
+
+    // Plan kurulurken ve apply başlarken Sabah gelecektedir; ancak eklenti ilk
+    // öğeyi zamanlarken saat Sabah'ı geçer ve zonedSchedule gibi ArgumentError atar.
+    var currentClock = fajr.subtract(const Duration(seconds: 1));
+    final gateway = _StrictFutureGateway(
+      currentTime: () => currentClock,
+      onBeforeApply: () {
+        currentClock = fajr.add(const Duration(seconds: 1));
+      },
+    );
+    final scheduler = NotificationScheduler(
+      settings: baseScheduler.settings,
+      prayers: repo,
+      texts: const TestTexts(),
+      notifications: gateway,
+      clock: () => currentClock,
+    );
+
+    await scheduler.reschedule();
+
+    final fajrAdhanId = notificationId(day, PrayerType.fajr, reminder: false);
+    expect(gateway.scheduled.any((n) => n.id == fajrAdhanId), isFalse);
+    expect(gateway.scheduled.any((n) => n.id == dhuhrReminder()), isTrue);
+    expect(gateway.scheduled.length, 19);
+  });
+}
+
+class _StrictFutureGateway implements NotificationGateway {
+  _StrictFutureGateway({required this.currentTime, this.onBeforeApply});
+
+  final DateTime Function() currentTime;
+  final void Function()? onBeforeApply;
+  final List<PlannedNotification> scheduled = [];
+
+  @override
+  int get planningDays => 2;
+
+  @override
+  Future<void> apply(List<PlannedNotification> plan,
+      {required NotificationTexts texts}) async {
+    onBeforeApply?.call();
+    scheduled.clear();
+    final now = currentTime();
+    for (final n in plan) {
+      if (!n.scheduledAt.isAfter(now)) {
+        throw ArgumentError.value(
+          n.scheduledAt,
+          'scheduledDate',
+          'Must be a date in the future',
+        );
+      }
+      scheduled.add(n);
+    }
+  }
+
+  @override
+  Future<void> cancelAll() async => scheduled.clear();
 }
 
 class _ThrowingGateway implements NotificationGateway {

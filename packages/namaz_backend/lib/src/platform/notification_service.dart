@@ -136,19 +136,41 @@ class NotificationService implements NotificationGateway {
 
     final wanted = {for (final n in plan) n.id};
     for (final pending in await _plugin.pendingNotificationRequests()) {
-      if (!wanted.contains(pending.id)) await _plugin.cancel(id: pending.id);
+      if (!wanted.contains(pending.id)) {
+        try {
+          await _plugin.cancel(id: pending.id);
+        } catch (e) {
+          debugPrint(
+            '[Notifications] eski bildirim iptal edilemedi (id=${pending.id}): $e',
+          );
+        }
+      }
     }
 
     for (final n in plan) {
-      await _plugin.zonedSchedule(
-        id: n.id,
-        title: n.title,
-        body: n.body,
-        scheduledDate: tz.TZDateTime.from(n.scheduledAt, tz.local),
-        notificationDetails: details,
-        androidScheduleMode: mode,
-        payload: n.payload,
-      );
+      if (!n.scheduledAt.isAfter(DateTime.now())) {
+        debugPrint(
+          '[Notifications] geçmiş bildirim atlandı '
+          '(id=${n.id}, zaman=${n.scheduledAt})',
+        );
+        continue;
+      }
+      try {
+        await _plugin.zonedSchedule(
+          id: n.id,
+          title: n.title,
+          body: n.body,
+          scheduledDate: tz.TZDateTime.from(n.scheduledAt, tz.local),
+          notificationDetails: details,
+          androidScheduleMode: mode,
+          payload: n.payload,
+        );
+      } catch (e) {
+        debugPrint(
+          '[Notifications] bildirim zamanlanamadı '
+          '(id=${n.id}, zaman=${n.scheduledAt}): $e',
+        );
+      }
     }
   }
 

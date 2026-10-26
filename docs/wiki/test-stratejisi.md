@@ -12,7 +12,7 @@ flutter test                                     # ön yüz testleri (kökte)
 (cd packages/namaz_backend && flutter test)      # backend testleri
 ```
 
-Durum (2026-10-26): `flutter analyze` temiz; ön yüz **29**, backend **54**, toplam **83 test geçiyor**.
+Durum (2026-10-26): `flutter analyze` temiz; ön yüz **29**, backend **56**, toplam **85 test geçiyor**.
 
 ## Test dosyaları
 
@@ -21,7 +21,7 @@ Durum (2026-10-26): `flutter analyze` temiz; ön yüz **29**, backend **54**, to
 | `packages/namaz_backend/test/domain_test.dart` | 20 | `prayerDay` (04:00 kuralı, ay başı), `dateKey`, seri hesabı, `nextPrayer`, İstanbul vakitlerinin makul olması |
 | `packages/namaz_backend/test/prayer_repository_test.dart` | 12 | Bellek içi SQLite: tekrar işaretleme, kaza türetme, kaza etme, `dailyCounts`, `fullDays`, `performedByPrayer`; geçici dizinde gerçek dosyalarla bozuk veritabanı yedekleme ve sıfırlama |
 | `packages/namaz_backend/test/notification_plan_test.dart` | 9 | Bildirim kimlikleri, çift bildirim yok, geçmiş vakit, önceki vakti sorma, hatırlatma süresi, payload, 81 il |
-| `packages/namaz_backend/test/notification_scheduler_test.dart` | 7 | Planlayıcı kuyruğu: konum yok, bildirim kapalı, tek çağrı, eşzamanlı çağrı örtüşmez, hızlı çağrılar birleşir, hata sonrası kilitlenmez (sahte `NotificationGateway`, bellek içi SQLite, sahte `SharedPreferences`) |
+| `packages/namaz_backend/test/notification_scheduler_test.dart` | 9 | Planlayıcı kuyruğu: konum yok, bildirim kapalı, tek çağrı, eşzamanlı çağrı örtüşmez, hızlı çağrılar birleşir, hata sonrası kilitlenmez, geçmişe düşen ve geçmiş zaman hatası fırlatan öğeler kalan planı durdurmaz (sahte `NotificationGateway`, bellek içi SQLite, sahte `SharedPreferences`) |
 | `packages/namaz_backend/test/time_zone_instant_test.dart` | 2 | `TZDateTime.from` mutlak anı korur (zamanlama `tz.local`'e bağlı değil) |
 | `packages/namaz_backend/test/architecture_test.dart` | 4 | Backend arayüz paketi kullanmaz, `domain/` saf, katman yönleri, tek barrel |
 | `test/central_system_test.dart` | 12 | Metin ve ikon sistemi, `turkishUpper`, `foldTurkish`, merkezileştirme koruma kuralları |

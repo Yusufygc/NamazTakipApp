@@ -79,7 +79,7 @@ Backend testleri portu basit bir sahte ile doldurur (`_TestTexts`), böylece bac
 
 ## Test
 
-Backend testleri paketin kendi klasöründe çalışır: `cd packages/namaz_backend && flutter test`. 54 test: tarih/seri/vakit/gün sınırı mantığı, bellek içi SQLite repository'si ve dosya tabanlı bozuk veritabanı kurtarma testi, bildirim planı, planlayıcı kuyruğu (sahte `NotificationGateway`), saat dilimi anı, mimari kuralları: [[test-stratejisi]].
+Backend testleri paketin kendi klasöründe çalışır: `cd packages/namaz_backend && flutter test`. 56 test: tarih/seri/vakit/gün sınırı mantığı, bellek içi SQLite repository'si ve dosya tabanlı bozuk veritabanı kurtarma testi, bildirim planı, planlayıcı kuyruğu ve geçmiş zamanlı bildirim dayanıklılığı (sahte `NotificationGateway`), saat dilimi anı, mimari kuralları: [[test-stratejisi]].
 
 ## İlgili sayfalar
 

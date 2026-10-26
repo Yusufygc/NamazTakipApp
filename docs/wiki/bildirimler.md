@@ -25,7 +25,7 @@ Bildirim başlık ve metinlerinde emoji yoktur; sistem uygulama ikonunu gösteri
 
 `NotificationScheduler.reschedule()` **serileştirilir**: biri çalışırken gelen çağrılar tek bir "bir tur daha" isteğine birleşir, tur bitince güncel durumla bir kez daha çalışır. Böylece art arda iki işaretlemede eski planın, yenisinin iptal ettiği bildirimi (işaretlenmiş vaktin hatırlatmasını) geri eklemesi engellenir. Planlayıcı eklentiye değil `NotificationGateway` arayüzüne bağlıdır (`planningDays`, `apply`, `cancelAll`); `NotificationService` bunu uygular, testler sahte bir uygulama kullanır.
 
-Doğrulama: `notification_scheduler_test.dart` (konum yok, bildirim kapalı, tek çağrı, eşzamanlı çağrı örtüşmez, 10 hızlı çağrı ≤ 2 tur, hata sonrası kuyruk kilitlenmez). Serileştirme geçici olarak kapatıldığında iki test düştü (örtüşme 1 ve 9), geri açılınca geçti. Sınır: kuyruk tek izolat içindir; arka plan izolatı ayrı bir süreçtir ve sabit kimlikler zararı sınırlar.
+Doğrulama: `notification_scheduler_test.dart` (konum yok, bildirim kapalı, tek çağrı, eşzamanlı çağrı örtüşmez, 10 hızlı çağrı ≤ 2 tur, hata sonrası kuyruk kilitlenmez, uygulama anında geçmişe düşen veya geçmiş zaman hatası fırlatan tek bildirim kalan planı durdurmaz). Serileştirme geçici olarak kapatıldığında iki test düştü (örtüşme 1 ve 9), geri açılınca geçti; geçmiş zaman koruması geçici olarak kapatıldığında da iki yeni test `Must be a date in the future` ile düştü. Sınır: kuyruk tek izolat içindir; arka plan izolatı ayrı bir süreçtir ve sabit kimlikler zararı sınırlar.
 
 ## Metinler: port ve adaptör
 
@@ -41,8 +41,8 @@ Bugünden başlayarak `planningDays` gün planlanır: **Android 10, iOS 6**. iOS
 
 ## Uygulama (`NotificationService.apply`)
 
-1. Plan dışında kalan bekleyen bildirimler iptal edilir (örn. artık işaretlenmiş vaktin hatırlatması).
-2. Her planlanan bildirim `zonedSchedule` ile eklenir; zaman `tz.local` saat diliminde `TZDateTime`'dır.
+1. Plan dışında kalan bekleyen bildirimler iptal edilir (örn. artık işaretlenmiş vaktin hatırlatması); iptal hatası olursa günlüğe yazılıp devam edilir.
+2. Her planlanan bildirim `zonedSchedule` ile eklenir; zaman `tz.local` saat diliminde `TZDateTime`'dır. Uygulama anına gelindiğinde zamanı geçmişe düşmüş öğeler (`!scheduledAt.isAfter(now)`) günlüğe yazılarak atlanır; tek bir öğenin zamanlanmasında hata oluşursa hata `debugPrint` ile günlüğe yazılır ve kalan bildirimler planlanmaya devam eder.
 3. Android'de tam zamanlı alarm izni varsa `exactAllowWhileIdle`, yoksa `inexactAllowWhileIdle` kullanılır. **Yaklaşık modda sistem alarmı bir saate kadar kaydırabilir:** emülatörde izin verilmeyince alarmlar `window=+1h` (yaklaşık) göründü, izin verilince `window=0` (tam zamanlı). Bu, bir namaz uygulaması için ciddi bir risktir; bu yüzden ana ekranda izin yokken uyarı kartı çıkar (`NotificationHealthCard`): [[bilinen-sorunlar]], [[izinler]].
 
 **Saat dilimi notu:** `tz.local` cihazın saat diliminden alınamazsa UTC kalır, ama bu zamanlamayı bozmaz. `TZDateTime.from(an, tz.local)` mutlak anı korur ve eklenti native tarafa bölge adıyla aynı bölgedeki duvar saatini gönderir (`ZonedDateTime.of(..., ZoneId.of(ad))`). `test/time_zone_instant_test.dart` bu varsayımı korur.

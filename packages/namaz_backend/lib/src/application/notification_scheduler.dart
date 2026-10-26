@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 import '../data/prayer_repository.dart';
 import '../data/settings_repository.dart';
 import '../domain/dates.dart';
@@ -21,6 +23,7 @@ class NotificationScheduler {
     required this.texts,
     NotificationGateway? notifications,
     this.timeService = const PrayerTimeService(),
+    this.clock,
   }) : notifications = notifications ?? NotificationService.instance;
 
   final SettingsRepository settings;
@@ -28,6 +31,7 @@ class NotificationScheduler {
   final NotificationTexts texts;
   final NotificationGateway notifications;
   final PrayerTimeService timeService;
+  final DateTime Function()? clock;
 
   Future<void>? _running;
   bool _again = false;
@@ -57,7 +61,7 @@ class NotificationScheduler {
   }
 
   Future<void> _runOnce(DateTime? now) async {
-    final current = now ?? DateTime.now();
+    final current = now ?? (clock ?? DateTime.now)();
 
     if (!settings.notificationsEnabled) {
       await notifications.cancelAll();
@@ -90,6 +94,57 @@ class NotificationScheduler {
       reminderMinutes: settings.reminderMinutes,
       texts: texts,
     );
-    await notifications.apply(plan, texts: texts);
+    await _applyResilient(plan, fixedNow: now);
+  }
+
+  DateTime _applyClock(DateTime? fixedNow) =>
+      clock != null ? clock!() : (fixedNow ?? DateTime.now());
+
+  /// Plan uygulanırken geçmişte kalmış öğeleri atlar; uygulama sırasında tek bir
+  /// öğenin geçmiş zaman hatası fırlatması halinde o öğeyi günlüğe yazıp kalan
+  /// bildirimleri planlamaya devam eder.
+  Future<void> _applyResilient(
+    List<PlannedNotification> plan, {
+    required DateTime? fixedNow,
+  }) async {
+    var remaining = _skipPastItems(plan, _applyClock(fixedNow));
+    while (true) {
+      try {
+        await notifications.apply(remaining, texts: texts);
+        return;
+      } on ArgumentError catch (e) {
+        if (remaining.isEmpty) {
+          debugPrint('[Notifications] bildirim planı uygulanamadı: $e');
+          return;
+        }
+        final failed = remaining.first;
+        debugPrint(
+          '[Notifications] bildirim zamanlanamadı (id=${failed.id}, '
+          'zaman=${failed.scheduledAt}): $e',
+        );
+        remaining = _skipPastItems(
+          remaining.sublist(1),
+          _applyClock(fixedNow),
+        );
+      }
+    }
+  }
+
+  List<PlannedNotification> _skipPastItems(
+    List<PlannedNotification> items,
+    DateTime referenceNow,
+  ) {
+    final future = <PlannedNotification>[];
+    for (final n in items) {
+      if (n.scheduledAt.isAfter(referenceNow)) {
+        future.add(n);
+      } else {
+        debugPrint(
+          '[Notifications] geçmiş bildirim atlandı '
+          '(id=${n.id}, zaman=${n.scheduledAt})',
+        );
+      }
+    }
+    return future;
   }
 }

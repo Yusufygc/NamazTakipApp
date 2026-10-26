@@ -8,7 +8,6 @@ Henüz çözülmemiş sorunlar, doğrulanmamış alanlar ve bilinçli sınırlar
 |---|---|---|
 | Yüksek | iOS hiç derlenmedi | `Info.plist`, `AppDelegate`, arka plan kimliği kaynak koddan yazıldı; ilk derlemede hata olası: [[ios-yapilandirma]] |
 | Orta | Tam zamanlı alarm izni kullanıcıya bağlı | Ana ekranda uyarı kartı ve "Ayarları aç" düğmesi var; izin verilince alarmlar otomatik tam zamanlıya çevrilir (emülatörde doğrulandı). Kullanıcı izni vermezse bildirimler yine **bir saate kadar geç** gelir: [[izinler]], [[bildirimler]] |
-| Orta | Plan uygulanırken geçmişe düşen bir bildirim kalan tüm planı durdurur | `zonedSchedule` geçmiş zamanda `Must be a date in the future` atar; `apply` her öğeyi try/catch'siz sırayla zamanladığı için sonraki bildirimler kurulmaz (logda görüldü). Çözüm adayı: uygulama anında geçmiş öğeleri atla, öğe başına hata yakala: [[bildirimler]] |
 | Düşük | Ön plan ile arka plan izolatı aynı anda planlarsa serileştirme geçerli değil | `NotificationScheduler` kuyruğu tek izolat içindir; sabit kimlikler zararı sınırlar: [[bildirimler]] |
 | Düşük | Gizlilik politikası ve veri silme/dışa aktarma yok | Yedekleme kapatıldı; mağaza yayını için yasal metin ve kullanıcı eylemleri gerekir: [[android-yapilandirma]], [[yol-haritasi]] |
 | Yüksek | Gerçek telefonda test yok | Bildirim zamanlaması, pil kısıtlamaları (agresif tasarruf yapan üreticiler), GPS ve performans yalnızca emülatörde görüldü: [[bildirimler]] |

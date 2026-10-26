@@ -2,6 +2,9 @@
 
 Kronolojik kayıt; en yeni kayıt en üsttedir. Biçim: `## [YYYY-AA-GG] [İŞLEM_TİPİ] | Kısa Açıklama`. İşlem tipleri: INGEST, QUERY, UPDATE, DECISION, LINT, SETUP. Kurallar: [[wiki-kullanim]]. Harita: [[index]].
 
+## [2026-10-26] UPDATE | Geçmiş zamanlı ve hatalı bildirim öğeleri kalan planı durdurmaz
+`NotificationScheduler` ve `NotificationService.apply`, plan uygulanırken zamanı geçmişe düşen bildirimleri günlüğe yazıp atlar; tek bir öğenin zamanlanmasında hata oluşursa hatayı `debugPrint` ile günlüğe yazarak kalan bildirimleri planlamaya devam eder. `notification_scheduler_test.dart` içine sahte `NotificationGateway` ile iki yeni test eklendi ve mutasyon kontrolüyle doğrulandı. Testler: ön yüz 29, backend 56 (toplam 85), `flutter analyze` temiz. Sayfalar: [[bildirimler]], [[backend-paketi]], [[bilinen-sorunlar]], [[test-stratejisi]].
+
 ## [2026-10-26] UPDATE | Bozuk veritabanı silinmeden önce yedeklenir ve kullanıcı uyarılır
 `AppDatabase.open` mevcut veritabanı dosyasını açmadan önce ham baytlarını belleğe alır; SQLite 3 başlığı (`"SQLite format 3\x00"`), `PRAGMA integrity_check` veya `prayers` tablosu kontrolü başarısız olursa (ya da Android `DefaultDatabaseErrorHandler` dosyayı sıfırlarsa) özgün dosyayı `namaz_takip.db.bozuk-<zaman>` adıyla yedekler, temiz veritabanı açar ve ön yüzde `CorruptedDatabaseCard` ile kullanıcıyı bilgilendirir. Dosya tabanlı testler, mutasyon kontrolü ve Android emülatöründe (rastgele 256 baytlı bozuk dosya, SHA-256 eşleşmesi ve uyarı kartı) doğrulandı. Testler: ön yüz 29, backend 54 (toplam 83), `flutter analyze` temiz. Sayfalar: [[veri-katmani]], [[backend-paketi]], [[ayarlar-ve-kalicilik]], [[durum-yonetimi]], [[ui-ekranlar]], [[metin-sistemi]], [[bilinen-sorunlar]], [[test-stratejisi]], [[emulator-test-notlari]].
 
