@@ -16,6 +16,7 @@ Android'de bu anahtarlar `FlutterSharedPreferences` dosyasında `flutter.` önek
 | `manual_location` | JSON | yok | Elle seçilen il: `{lat, lon, city, country}` |
 | `last_location` | JSON | yok | Son başarılı GPS konumu |
 | `install_date` | String | ilk açılış | Takip başlangıç günü (`yyyy-MM-dd`) |
+| `corrupted_db_backup` | String | yok | Bozuk veritabanı sıfırlandığında alınan yedeğin yolu; kullanıcı uyarıyı onaylayınca silinir: [[veri-katmani]] |
 
 ## Önemli noktalar
 

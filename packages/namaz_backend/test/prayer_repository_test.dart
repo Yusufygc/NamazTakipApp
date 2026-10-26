@@ -1,7 +1,11 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:namaz_backend/src/domain/prayer.dart';
 import 'package:namaz_backend/src/data/app_database.dart';
 import 'package:namaz_backend/src/data/prayer_repository.dart';
+import 'package:path/path.dart' as p;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() {
@@ -89,5 +93,94 @@ void main() {
     expect(m[PrayerType.fajr], 1);
     expect(m[PrayerType.isha], 0);
     expect(m.length, 5);
+  });
+
+  group('bozuk veritabanı kurtarma', () {
+    late Directory tempDir;
+
+    setUp(() async {
+      tempDir = await Directory.systemTemp.createTemp('namaz_db_test_');
+    });
+
+    tearDown(() async {
+      if (await tempDir.exists()) {
+        await tempDir.delete(recursive: true);
+      }
+    });
+
+    test('rastgele baytlı bozuk dosyayı silmeden önce yedekler ve temiz açar',
+        () async {
+      final dbPath = p.join(tempDir.path, AppDatabase.fileName);
+      final corruptBytes = Uint8List.fromList(
+        List<int>.generate(256, (i) => (i * 73 + 19) & 0xff),
+      );
+      await File(dbPath).writeAsBytes(corruptBytes, flush: true);
+
+      // Yeni yedek alınırken varsa önceki .bozuk-* yedeği silinir, yer kaplamaz.
+      final oldBackup = File('$dbPath.bozuk-20260101-000000');
+      await oldBackup.writeAsBytes([1, 2, 3], flush: true);
+
+      final fixedNow = DateTime(2026, 10, 26, 21, 30, 45);
+      final recovered = await AppDatabase.open(path: dbPath, now: fixedNow);
+      addTearDown(recovered.close);
+
+      final expectedBackup = '$dbPath.bozuk-20261026-213045';
+      expect(recovered.corruptedBackupPath, expectedBackup);
+      expect(await oldBackup.exists(), isFalse);
+      expect(await File(expectedBackup).exists(), isTrue);
+      expect(await File(expectedBackup).readAsBytes(), corruptBytes);
+
+      // Yeni açılan veritabanı sağlam ve yazılabilir olmalıdır.
+      final recoveredRepo = PrayerRepository(recovered);
+      await recoveredRepo.markPerformed(today, PrayerType.fajr,
+          congregation: true);
+      final records = await recoveredRepo.recordsForDate(today);
+      expect(records[PrayerType.fajr]?.status, PrayerStatus.performed);
+    });
+
+    test('SQLite başlığı geçerli ama şeması/sayfası bozuk dosyayı da yedekler',
+        () async {
+      final dbPath = p.join(tempDir.path, AppDatabase.fileName);
+      final headerAndGarbage = Uint8List.fromList([
+        ...'SQLite format 3\x00'.codeUnits,
+        ...List<int>.generate(200, (i) => (i * 41 + 7) & 0xff),
+      ]);
+      await File(dbPath).writeAsBytes(headerAndGarbage, flush: true);
+
+      final fixedNow = DateTime(2026, 10, 26, 21, 31, 0);
+      final recovered = await AppDatabase.open(path: dbPath, now: fixedNow);
+      addTearDown(recovered.close);
+
+      final expectedBackup = '$dbPath.bozuk-20261026-213100';
+      expect(recovered.corruptedBackupPath, expectedBackup);
+      expect(await File(expectedBackup).readAsBytes(), headerAndGarbage);
+
+      final recoveredRepo = PrayerRepository(recovered);
+      await recoveredRepo.markMissed(today, PrayerType.isha);
+      final records = await recoveredRepo.recordsForDate(today);
+      expect(records[PrayerType.isha]?.status, PrayerStatus.missed);
+    });
+
+    test('sağlam veritabanı yeniden açıldığında yedeklenmez ve veriler korunur',
+        () async {
+      final dbPath = p.join(tempDir.path, AppDatabase.fileName);
+      final first = await AppDatabase.open(path: dbPath);
+      expect(first.corruptedBackupPath, isNull);
+      await PrayerRepository(first).markPerformed(today, PrayerType.dhuhr);
+      await first.close();
+
+      final reopened = await AppDatabase.open(path: dbPath);
+      addTearDown(reopened.close);
+      expect(reopened.corruptedBackupPath, isNull);
+
+      final backups = tempDir
+          .listSync()
+          .where((e) => e.path.contains('.bozuk-'))
+          .toList();
+      expect(backups, isEmpty);
+
+      final records = await PrayerRepository(reopened).recordsForDate(today);
+      expect(records[PrayerType.dhuhr]?.status, PrayerStatus.performed);
+    });
   });
 }

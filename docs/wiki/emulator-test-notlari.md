@@ -2,6 +2,13 @@
 
 Elle yapılan testlerin kaydı ve bulunan hatalar. Yeni bir test turu eklendiğinde bu sayfanın başına tarihli bölüm eklenir. Test yöntemi ve komutlar: [[gelistirme-ortami]], kontrol listesi: [[test-stratejisi]].
 
+## Tur 4 — 2026-10-26, bozuk veritabanı yedekleme ve uyarı (aynı emülatör)
+
+| Alan | Sonuç |
+|---|---|
+| Bozuk veritabanı yedekleme | `/dev/urandom` ile 256 rastgele bayt yazılan `namaz_takip.db` (`sha256: b5a5eed6...`) açılışta silinmeden önce `namaz_takip.db.bozuk-20261026-214907` olarak bire bir aynı hash ile yedeklendi; yeni `namaz_takip.db` (32 KB) temiz şemayla oluşturuldu |
+| Ön yüz uyarısı (`CorruptedDatabaseCard`) | Ana ekranda `Kayıt dosyası bozulduğu için sıfırlandı` başlığı, yedek dosya yolu ve `Anladım` düğmesi `uiautomator dump` ile doğrulandı; `Anladım`'a dokunulunca kart kapandı |
+
 ## Tur 3 — 2026-10-26, denetim bulguları #1–#7 düzeltmeleri (aynı emülatör)
 
 | Alan | Sonuç |

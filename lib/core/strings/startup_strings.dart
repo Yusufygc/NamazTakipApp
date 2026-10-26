@@ -1,4 +1,4 @@
-/// Uygulama açılırken oluşan hata ekranı.
+/// Uygulama açılırken oluşan hata ekranı ve veritabanı kurtarma uyarıları.
 abstract final class StartupStrings {
   static const title = 'Uygulama başlatılamadı';
   static const message =
@@ -7,4 +7,12 @@ abstract final class StartupStrings {
       'açın.';
 
   static String details(Object error) => 'Ayrıntı: $error';
+
+  static const corruptedDbTitle = 'Kayıt dosyası bozulduğu için sıfırlandı';
+  static const acknowledge = 'Anladım';
+
+  static String corruptedDbMessage(String backupPath) =>
+      'Namaz geçmişinizin tutulduğu veritabanı bozulmuş olarak tespit edildi '
+      've temiz bir veritabanı oluşturuldu. Bozuk dosya silinmeden önce '
+      'yedeklendi: $backupPath';
 }

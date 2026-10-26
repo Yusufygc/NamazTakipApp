@@ -2,6 +2,9 @@
 
 Kronolojik kayıt; en yeni kayıt en üsttedir. Biçim: `## [YYYY-AA-GG] [İŞLEM_TİPİ] | Kısa Açıklama`. İşlem tipleri: INGEST, QUERY, UPDATE, DECISION, LINT, SETUP. Kurallar: [[wiki-kullanim]]. Harita: [[index]].
 
+## [2026-10-26] UPDATE | Bozuk veritabanı silinmeden önce yedeklenir ve kullanıcı uyarılır
+`AppDatabase.open` mevcut veritabanı dosyasını açmadan önce ham baytlarını belleğe alır; SQLite 3 başlığı (`"SQLite format 3\x00"`), `PRAGMA integrity_check` veya `prayers` tablosu kontrolü başarısız olursa (ya da Android `DefaultDatabaseErrorHandler` dosyayı sıfırlarsa) özgün dosyayı `namaz_takip.db.bozuk-<zaman>` adıyla yedekler, temiz veritabanı açar ve ön yüzde `CorruptedDatabaseCard` ile kullanıcıyı bilgilendirir. Dosya tabanlı testler, mutasyon kontrolü ve Android emülatöründe (rastgele 256 baytlı bozuk dosya, SHA-256 eşleşmesi ve uyarı kartı) doğrulandı. Testler: ön yüz 29, backend 54 (toplam 83), `flutter analyze` temiz. Sayfalar: [[veri-katmani]], [[backend-paketi]], [[ayarlar-ve-kalicilik]], [[durum-yonetimi]], [[ui-ekranlar]], [[metin-sistemi]], [[bilinen-sorunlar]], [[test-stratejisi]], [[emulator-test-notlari]].
+
 ## [2026-10-26] REVIEW | Denetim raporunun yüksek öncelikli 7 bulgusu uygulandı
 #1 yedekleme kapatıldı; #2 release imzası anahtarsız derlemeyi durdurur; #3 tam zamanlı alarm izni yoksa ana ekranda uyarı kartı; #4 gün sınırı `min(04:00, Sabah)`; #5 bildirim planlayıcı sıraya alındı; #6 başlangıç hata ekranı ve hata kancaları. #7 yanlış alarm çıktı (saat dilimi ve eklenti kaynağıyla doğrulandı), rapordan geri çekildi. Testler: ön yüz 27, backend 51, `flutter analyze` temiz. Doğrulanmayanlar: gerçek release anahtarı üretilmedi, gerçek cihaz yok. Yeni iki bulgu çözülmedi (bozuk veritabanı sessizce siliniyor, geçmiş zamanlı bildirim planı durduruyor): [[bilinen-sorunlar]]. Sayfalar: [[denetim-raporu-2026-10-26]], [[bildirimler]], [[takip-gunu-ve-sayac]], [[derleme-ve-yayin]], [[test-stratejisi]], [[emulator-test-notlari]].
 

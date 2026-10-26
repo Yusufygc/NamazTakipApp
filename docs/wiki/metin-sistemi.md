@@ -28,7 +28,7 @@ Kullanıcıya görünen tüm metinler `lib/core/strings/` altında, modül baş�
 | `settings_strings.dart` | `SettingsStrings` + `CalcMethodLabel` | Ayarlar, tema adları, hesaplama yöntemi adları |
 | `about_strings.dart` | `AboutStrings` | Hakkında |
 | `notification_strings.dart` | `NotificationStrings` | Kanal adı ve bildirim metinleri |
-| `startup_strings.dart` | `StartupStrings` | Başlatma hata ekranı |
+| `startup_strings.dart` | `StartupStrings` | Başlatma hata ekranı ve bozuk veritabanı kurtarma uyarısı |
 | `notification_health_strings.dart` | `NotificationHealthStrings` | Tam zamanlı alarm izni uyarısı |
 | `notification_texts_adapter.dart` | `AppNotificationTexts` | Backend'in `NotificationTexts` portunu bu metinlerle doldurur: [[bildirimler]] |
 

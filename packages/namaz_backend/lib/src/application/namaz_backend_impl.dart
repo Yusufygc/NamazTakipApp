@@ -47,6 +47,9 @@ class NamazBackendImpl implements NamazBackend {
     final settings = SettingsRepository(prefs);
     await settings.ensureInstallDate(prayerDay(DateTime.now()));
     final database = await AppDatabase.open();
+    if (database.corruptedBackupPath != null) {
+      await settings.setCorruptedDbBackup(database.corruptedBackupPath);
+    }
 
     await NotificationService.instance.init();
 
@@ -261,6 +264,15 @@ class NamazBackendImpl implements NamazBackend {
 
   @override
   Future<void> openExactAlarmSettings() => _notifications.openExactAlarmSettings();
+
+  // ---- Veritabanı sağlığı --------------------------------------------------------
+
+  @override
+  String? get corruptedDatabaseBackup => _settings.corruptedDbBackup;
+
+  @override
+  Future<void> dismissCorruptedDatabaseNotice() =>
+      _settings.setCorruptedDbBackup(null);
 
   /// Planlama hatası kullanıcıya yansımasın ve işaretlemeyi bozmasın.
   void _rescheduleQuietly() {

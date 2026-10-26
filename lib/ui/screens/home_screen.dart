@@ -7,6 +7,7 @@ import 'package:namaz_backend/namaz_backend.dart';
 import '../../core/format/time_format.dart';
 import '../../core/theme/app_theme.dart';
 import '../../providers/providers.dart';
+import '../widgets/corrupted_database_card.dart';
 import '../widgets/countdown_card.dart';
 import '../widgets/notification_health_card.dart';
 import '../widgets/prayer_card.dart';
@@ -132,6 +133,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             ),
           ),
           const SizedBox(height: 10),
+          const CorruptedDatabaseCard(),
           const NotificationHealthCard(),
           if (times == null)
             _NoLocationCard(failure: failure, loading: refresh.isLoading)

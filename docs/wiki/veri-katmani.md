@@ -55,6 +55,16 @@ Yardımcılar `packages/namaz_backend/lib/src/domain/dates.dart` içindedir: `da
 | `fullDays()` | 5/5 olan günler |
 | `totalCongregation()`, `totalPerformed(vakit)` | Rozet verisi |
 
+## Bozuk veritabanı kurtarma (`AppDatabase.open`)
+
+Android'in `DefaultDatabaseErrorHandler` mekanizması, bozuk bir SQLite dosyası açıldığında hata fırlatmak yerine dosyayı sessizce silip boş bir veritabanı oluşturur. Kullanıcının geçmişini haber almadan kaybetmesini önlemek için `AppDatabase.open` şu sırayla çalışır:
+
+1. Dosya diskte zaten varsa, `openDatabase` çağrılmadan önce ham baytları belleğe okunur.
+2. İlk 16 baytın SQLite 3 imzası (`"SQLite format 3\x00"`) olup olmadığı ve dosyanın en az 100 bayt başlık taşıyıp taşımadığı kontrol edilir.
+3. Başlık geçerliyse veritabanı açılır; açılış sırasında `onCreate` tetiklendiyse (Android'in dosyayı sessizce sıfırladığı durum), `openDatabase` hata fırlattıysa veya `PRAGMA integrity_check` / `prayers` tablosu kontrolü başarısız olduysa dosya bozuk kabul edilir.
+4. Diskte eski yedeklerin birikmemesi için varsa önceki `namaz_takip.db.bozuk-*` dosyaları silinir; bozuk dosyanın bellekteki özgün baytları silinmeden önce aynı klasöre `namaz_takip.db.bozuk-<yyyyAAgg-SSddss>` adıyla yedeklenir; bozuk dosya (ve varsa `-wal`, `-shm`, `-journal` yan dosyaları) silinerek temiz bir veritabanı açılır.
+5. Yedek dosyanın yolu `AppDatabase.corruptedBackupPath` üzerinden `SettingsRepository`'ye (`corrupted_db_backup`) kaydedilir ve ön yüzde `CorruptedDatabaseCard` ile kullanıcıya gösterilir: [[ui-ekranlar]], [[ayarlar-ve-kalicilik]].
+
 ## Şema değişikliği nasıl yapılır
 
 1. `AppDatabase._version` artırılır.
@@ -66,7 +76,7 @@ Uygulama yayınlanmadığı için şu ana kadar veri taşıma gerekmedi.
 
 ## Test
 
-`packages/namaz_backend/test/prayer_repository_test.dart`, `sqflite_common_ffi` ile bellek içi veritabanında çalışır: [[test-stratejisi]].
+`packages/namaz_backend/test/prayer_repository_test.dart`, `sqflite_common_ffi` ile bellek içi veritabanında sorguları ve geçici dizinde gerçek dosyalarla bozuk veritabanı yedekleme/kurtarma davranışını test eder: [[test-stratejisi]].
 
 ## İlgili sayfalar
 

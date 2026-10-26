@@ -65,6 +65,24 @@ final paletteProvider = Provider<AppPalette>(
 final notificationHealthProvider = FutureProvider.autoDispose<NotificationHealth>(
     (ref) => ref.read(backendProvider).notificationHealth());
 
+// ---- Veritabanı sağlığı ----------------------------------------------------------
+
+/// Açılışta bozuk bir veritabanı tespit edilip sıfırlandıysa yedek dosya yolunu
+/// tutar; kullanıcı onayladığında temizlenir.
+class CorruptedDbNoticeNotifier extends Notifier<String?> {
+  @override
+  String? build() => ref.read(backendProvider).corruptedDatabaseBackup;
+
+  Future<void> dismiss() async {
+    await ref.read(backendProvider).dismissCorruptedDatabaseNotice();
+    state = null;
+  }
+}
+
+final corruptedDbBackupProvider =
+    NotifierProvider<CorruptedDbNoticeNotifier, String?>(
+        CorruptedDbNoticeNotifier.new);
+
 // ---- Konum --------------------------------------------------------------------
 
 /// Konumu tazeler; hata durumunda [LocationException] ile UI'a bildirir.

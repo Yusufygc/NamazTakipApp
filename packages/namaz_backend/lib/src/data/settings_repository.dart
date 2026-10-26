@@ -20,6 +20,7 @@ class SettingsRepository {
   static const _kManualLocation = 'manual_location';
   static const _kLastLocation = 'last_location';
   static const _kInstallDate = 'install_date';
+  static const _kCorruptedDbBackup = 'corrupted_db_backup';
 
   String get themeKey => _prefs.getString(_kTheme) ?? 'default';
   Future<void> setThemeKey(String v) => _prefs.setString(_kTheme, v);
@@ -78,4 +79,12 @@ class SettingsRepository {
       locationMode == LocationMode.manual && manualLocation != null
           ? manualLocation
           : lastLocation;
+
+  /// Bozuk veritabanı sıfırlandığında kullanıcıya gösterilecek yedek dosya yolu.
+  /// Kullanıcı uyarıyı onayladığında temizlenir.
+  String? get corruptedDbBackup => _prefs.getString(_kCorruptedDbBackup);
+
+  Future<void> setCorruptedDbBackup(String? path) => path == null
+      ? _prefs.remove(_kCorruptedDbBackup)
+      : _prefs.setString(_kCorruptedDbBackup, path);
 }

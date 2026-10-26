@@ -8,7 +8,6 @@ Henüz çözülmemiş sorunlar, doğrulanmamış alanlar ve bilinçli sınırlar
 |---|---|---|
 | Yüksek | iOS hiç derlenmedi | `Info.plist`, `AppDelegate`, arka plan kimliği kaynak koddan yazıldı; ilk derlemede hata olası: [[ios-yapilandirma]] |
 | Orta | Tam zamanlı alarm izni kullanıcıya bağlı | Ana ekranda uyarı kartı ve "Ayarları aç" düğmesi var; izin verilince alarmlar otomatik tam zamanlıya çevrilir (emülatörde doğrulandı). Kullanıcı izni vermezse bildirimler yine **bir saate kadar geç** gelir: [[izinler]], [[bildirimler]] |
-| Yüksek | Bozuk veritabanı Android tarafından sessizce silinip sıfırlanıyor | Emülatörde bozuk `namaz_takip.db` ile açılışta hata ekranı **çıkmadı**: Android'in `DefaultDatabaseErrorHandler`'ı dosyayı silip boş veritabanı oluşturdu (`prayers` 0 satır). Kullanıcı tüm geçmişini sessizce kaybeder. Çözüm adayları: düzenli dosya kopyası, açılışta bütünlük kontrolü, kendi hata işleyicisi: [[veri-katmani]], [[yol-haritasi]] |
 | Orta | Plan uygulanırken geçmişe düşen bir bildirim kalan tüm planı durdurur | `zonedSchedule` geçmiş zamanda `Must be a date in the future` atar; `apply` her öğeyi try/catch'siz sırayla zamanladığı için sonraki bildirimler kurulmaz (logda görüldü). Çözüm adayı: uygulama anında geçmiş öğeleri atla, öğe başına hata yakala: [[bildirimler]] |
 | Düşük | Ön plan ile arka plan izolatı aynı anda planlarsa serileştirme geçerli değil | `NotificationScheduler` kuyruğu tek izolat içindir; sabit kimlikler zararı sınırlar: [[bildirimler]] |
 | Düşük | Gizlilik politikası ve veri silme/dışa aktarma yok | Yedekleme kapatıldı; mağaza yayını için yasal metin ve kullanıcı eylemleri gerekir: [[android-yapilandirma]], [[yol-haritasi]] |
@@ -34,7 +33,7 @@ Henüz çözülmemiş sorunlar, doğrulanmamış alanlar ve bilinçli sınırlar
 | Önem | Konu | Ayrıntı |
 |---|---|---|
 | Orta | `workmanager_android` eski Kotlin eklentisini kullanıyor | Flutter ileride uyarıyı hataya çevirebilir; paket güncellemesi izlenmeli: [[bagimliliklar]] |
-| Düşük | Ön yüzde yalnızca iki widget testi grubu var (hata ekranı, bildirim sağlığı kartı); ekranların çoğu testsiz | Mantık backend'de testlidir: [[test-stratejisi]], [[backend-paketi]] |
+| Düşük | Ön yüzde yalnızca üç widget/kart testi grubu var (hata ekranı, bozuk veritabanı uyarısı, bildirim sağlığı kartı); ekranların çoğu testsiz | Mantık backend'de testlidir: [[test-stratejisi]], [[backend-paketi]] |
 | Düşük | Radar paydası ve karşılaştırma farkı için birim test yok | Hesap backend'de (`NamazBackendImpl`) ama doğrudan testi yok: [[istatistikler]] |
 | Düşük | Backend içinde depolar için soyut arayüz yok | Sınır `NamazBackend` arayüzündedir; repository'ler somut sınıflardır: [[011-front-backend-ayrimi]] |
 | Düşük | `flutter_launcher_icons` proje dosyasını bozuyor | Her üretimde elle geri alınmalı: [[uygulama-ikonu]] |

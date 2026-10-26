@@ -21,9 +21,10 @@ Ekranlar `backendProvider`'ı yalnızca bir olay anında (izin isteme, bildirim 
 
 - `locationRefreshProvider` (`FutureProvider`): `backend.refreshLocation()` çağırır, sonra `settingsProvider.reload()` yapar (backend yeni GPS konumunu kaydetmiş olabilir). Elle mod, GPS, son konum yedeği ve hata davranışı backend'dedir: [[konum]].
 
-## Bildirim sağlığı
+## Bildirim ve veritabanı sağlığı
 
 - `notificationHealthProvider` (`FutureProvider.autoDispose`): `backend.notificationHealth()`; ana ekrana dönülünce ve ayar ekranından dönülünce yenilenir. `NotificationHealthCard` bunu izler; "izin yok → var" geçişinde bir kez `rescheduleNotifications()` çağırır.
+- `corruptedDbBackupProvider` (`CorruptedDbNoticeNotifier`): `backend.corruptedDatabaseBackup` değerini tutar; `CorruptedDatabaseCard` üzerinden kullanıcı "Anladım" dediğinde `dismiss()` ile `backend.dismissCorruptedDatabaseNotice()` çağrılır ve uyarı kapanır: [[veri-katmani]].
 
 ## Takip günü ve vakitler
 

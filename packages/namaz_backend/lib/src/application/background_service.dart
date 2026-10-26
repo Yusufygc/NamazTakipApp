@@ -20,10 +20,14 @@ void handleBackgroundTasks(NotificationTexts texts) {
   Workmanager().executeTask((task, inputData) async {
     try {
       final prefs = await SharedPreferences.getInstance();
+      final settings = SettingsRepository(prefs);
       final db = await AppDatabase.open();
+      if (db.corruptedBackupPath != null) {
+        await settings.setCorruptedDbBackup(db.corruptedBackupPath);
+      }
       try {
         await NotificationScheduler(
-          settings: SettingsRepository(prefs),
+          settings: settings,
           prayers: PrayerRepository(db),
           texts: texts,
         ).reschedule();

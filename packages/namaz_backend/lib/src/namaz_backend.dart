@@ -119,4 +119,14 @@ abstract interface class NamazBackend {
   /// dönünce [rescheduleNotifications] çağrılmalıdır; mevcut alarmlar yaklaşık
   /// zamanlı kalır.
   Future<void> openExactAlarmSettings();
+
+  // ---- Veritabanı sağlığı -----------------------------------------------------
+
+  /// Açılışta bozuk bir veritabanı dosyası tespit edilip sıfırlandıysa,
+  /// silinmeden önce alınan yedeğin yolu (`namaz_takip.db.bozuk-<zaman>`).
+  /// Sorun yaşanmadıysa veya kullanıcı uyarıyı kapattıysa `null` döner.
+  String? get corruptedDatabaseBackup;
+
+  /// Bozuk veritabanı sıfırlama uyarısını onaylayıp kapatır.
+  Future<void> dismissCorruptedDatabaseNotice();
 }

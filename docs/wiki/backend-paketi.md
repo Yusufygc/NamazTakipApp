@@ -28,6 +28,7 @@ Paket, kök `pubspec.yaml`'daki `workspace:` bölümüyle uygulamaya bağlanır;
 | Kaza | `qazaItems()`, `compensate(item)` |
 | İstatistik | `trackingStart`, `weekComparison()`, `dailyCounts(n)`, `monthCounts(ay)`, `radar(gün)`, `gamification()` |
 | Bildirim | `notificationPrompts`, `takeLaunchPrompt()`, `requestNotificationPermission()`, `rescheduleNotifications()`, `notificationHealth()` (`NotificationHealth.exactAlarmsAllowed`), `openExactAlarmSettings()` |
+| Veritabanı sağlığı | `corruptedDatabaseBackup`, `dismissCorruptedDatabaseNotice()` |
 
 Arayüz yöntemleri düz Dart modelleri döner; SQL, eklenti sınıfı veya `Stream` dışında reaktif nesne sızmaz. Ön yüz bu arayüzün sahte (fake) bir uygulamasıyla test edilebilir.
 
@@ -78,7 +79,7 @@ Backend testleri portu basit bir sahte ile doldurur (`_TestTexts`), böylece bac
 
 ## Test
 
-Backend testleri paketin kendi klasöründe çalışır: `cd packages/namaz_backend && flutter test`. 51 test: tarih/seri/vakit/gün sınırı mantığı, bellek içi SQLite repository'si, bildirim planı, planlayıcı kuyruğu (sahte `NotificationGateway`), saat dilimi anı, mimari kuralları: [[test-stratejisi]].
+Backend testleri paketin kendi klasöründe çalışır: `cd packages/namaz_backend && flutter test`. 54 test: tarih/seri/vakit/gün sınırı mantığı, bellek içi SQLite repository'si ve dosya tabanlı bozuk veritabanı kurtarma testi, bildirim planı, planlayıcı kuyruğu (sahte `NotificationGateway`), saat dilimi anı, mimari kuralları: [[test-stratejisi]].
 
 ## İlgili sayfalar
 
