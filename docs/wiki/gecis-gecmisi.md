@@ -31,6 +31,8 @@ Doğrudan kullanıcı isteği: "React Native ve Expo'dan sıyrılmak". Karar ön
 | Flutter uygulaması `namaz_takip/` altında yazıldı, emülatörde test edildi | `ebce2b2` feat: rewrite app in Flutter |
 | RN/Expo kalıntıları silindi, Flutter kök dizine taşındı, launcher ikonları üretildi | `0d94fbc` chore: remove React Native/Expo sources and move Flutter project to repo root |
 | Merkezi ikon ve metin sistemi | `bb1ab70` refactor: add central icon system and modular string system |
+| Wiki sistemi | `d46cb18` docs: add LLM wiki system |
+| Ön yüz ve backend ayrı paketlere bölündü | [[011-front-backend-ayrimi]] |
 | Wiki sistemi kuruldu | [[log]] |
 
 Branch'ler: `main` (son RN sürümü), `backup-before-rewrite` (RN'in yedeği, "Bildirim sistemi düzeltildi" noktası), `flutter-migration` (Flutter). Silinen RN kodu `main` ve yedek branch'te durur.

@@ -1,26 +1,31 @@
 # Test Stratejisi
 
-Uygulamanın mantığı saf fonksiyonlarda ve ince katmanlarda tutulduğu için testlerin çoğu birim testtir. Arayüz ve eklenti davranışı emülatörde elle doğrulanır.
+Uygulamanın mantığı backend paketinde saf fonksiyonlarda ve ince katmanlarda tutulduğu için testlerin çoğu backend'in birim testidir. Ön yüzde yalnızca metin/ikon sistemi ve mimari sınırlar testlenir. Arayüz ve eklenti davranışı emülatörde elle doğrulanır.
 
 ## Çalıştırma
 
+İki paket vardır ve ikisinin testi ayrı çalıştırılır:
+
 ```bash
-flutter analyze   # statik analiz; temiz olmalı
-flutter test      # tüm testler
+flutter analyze                                  # tüm workspace; temiz olmalı
+flutter test                                     # ön yüz testleri (kökte)
+(cd packages/namaz_backend && flutter test)      # backend testleri
 ```
 
-Durum (2026-10-26): `flutter analyze` temiz, **44 test geçiyor**.
+Durum (2026-10-26): `flutter analyze` temiz; ön yüz **19**, backend **36**, toplam **55 test geçiyor**.
 
 ## Test dosyaları
 
 | Dosya | Test | Kapsam |
 |---|---|---|
-| `test/core_test.dart` | 14 | `prayerDay` (04:00 kuralı, ay başı), `dateKey`, seri hesabı, `nextPrayer`, İstanbul vakitlerinin makul olması |
-| `test/prayer_repository_test.dart` | 9 | Bellek içi SQLite: tekrar işaretleme, kaza türetme, kaza etme, `dailyCounts`, `fullDays`, `performedByPrayer` |
-| `test/notification_plan_test.dart` | 9 | Bildirim kimlikleri, çift bildirim yok, geçmiş vakit, önceki vakti sorma, hatırlatma süresi, payload, 81 il |
+| `packages/namaz_backend/test/domain_test.dart` | 14 | `prayerDay` (04:00 kuralı, ay başı), `dateKey`, seri hesabı, `nextPrayer`, İstanbul vakitlerinin makul olması |
+| `packages/namaz_backend/test/prayer_repository_test.dart` | 9 | Bellek içi SQLite: tekrar işaretleme, kaza türetme, kaza etme, `dailyCounts`, `fullDays`, `performedByPrayer` |
+| `packages/namaz_backend/test/notification_plan_test.dart` | 9 | Bildirim kimlikleri, çift bildirim yok, geçmiş vakit, önceki vakti sorma, hatırlatma süresi, payload, 81 il |
+| `packages/namaz_backend/test/architecture_test.dart` | 4 | Backend arayüz paketi kullanmaz, `domain/` saf, katman yönleri, tek barrel |
 | `test/central_system_test.dart` | 12 | Metin ve ikon sistemi, `turkishUpper`, `foldTurkish`, merkezileştirme koruma kuralları |
+| `test/architecture_test.dart` | 7 | Ön yüz `src/` ve backend-only paketleri içe aktarmaz, `pubspec.yaml` temiz, `backendProvider` kullanımı sınırlı, `AppNotificationTexts` adaptörü |
 
-Sayılar 2026-10-26 itibarıyladır (toplam 44); test eklenince bu tablo güncellenir.
+Sayılar 2026-10-26 itibarıyladır; test eklenince bu tablo güncellenir.
 
 ## Koruma testleri
 

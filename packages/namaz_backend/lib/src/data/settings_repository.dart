@@ -2,10 +2,9 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../core/date_utils.dart';
-import '../services/prayer_time_service.dart';
-
-enum LocationMode { auto, manual }
+import '../domain/dates.dart';
+import '../domain/models.dart';
+import '../domain/prayer_time_service.dart';
 
 /// Kullanıcı ayarları ve küçük kalıcı durumlar (SharedPreferences).
 class SettingsRepository {

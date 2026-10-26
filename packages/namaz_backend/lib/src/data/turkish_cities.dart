@@ -1,4 +1,4 @@
-import '../services/prayer_time_service.dart';
+import '../domain/prayer_time_service.dart';
 
 /// Elle konum seçimi için 81 il merkezi (yaklaşık koordinatlar; vakit
 /// hesabı için şehir düzeyinde doğruluk yeterlidir).

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../achievements.dart';
+import 'package:namaz_backend/namaz_backend.dart';
 
 /// Uygulamanın tüm ikonları tek yerde. Ekranlarda `Icons.xxx` veya emoji
 /// kullanılmaz; anlamsal ad üzerinden bu sınıfa başvurulur. Bir ikonu

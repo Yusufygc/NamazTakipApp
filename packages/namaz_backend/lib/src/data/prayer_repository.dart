@@ -1,43 +1,9 @@
 import 'package:sqflite/sqflite.dart';
 
-import '../core/date_utils.dart';
-import '../core/prayer.dart';
+import '../domain/dates.dart';
+import '../domain/models.dart';
+import '../domain/prayer.dart';
 import 'app_database.dart';
-
-class PrayerRecord {
-  const PrayerRecord({
-    required this.date,
-    required this.prayer,
-    required this.status,
-    required this.isCongregation,
-  });
-
-  final DateTime date;
-  final PrayerType prayer;
-  final PrayerStatus status;
-  final bool isCongregation;
-}
-
-/// Kaza listesindeki tek satır.
-class QazaItem {
-  const QazaItem(this.date, this.prayer, this.status);
-
-  final DateTime date;
-  final PrayerType prayer;
-
-  /// `pending` = gün bitti ama işaretlenmedi, `missed` = kullanıcı "kılmadım" dedi.
-  final PrayerStatus status;
-
-  bool get isAutoDetected => status == PrayerStatus.pending;
-}
-
-/// Bir günün, kılınan vakit sayısıyla özeti.
-class DayCount {
-  const DayCount(this.date, this.performed);
-
-  final DateTime date;
-  final int performed;
-}
 
 class PrayerRepository {
   PrayerRepository(this._appDb);

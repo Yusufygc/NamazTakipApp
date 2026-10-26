@@ -1,11 +1,9 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:namaz_backend/namaz_backend.dart';
 
-import '../../core/app_theme.dart';
-import '../../core/date_utils.dart';
-import '../../core/prayer.dart';
-import '../../data/prayer_repository.dart';
+import '../../core/theme/app_theme.dart';
 import '../../providers/providers.dart';
 import '../../core/icons/app_icons.dart';
 import '../../core/strings/strings.dart';
@@ -181,7 +179,7 @@ class _HeatmapTabState extends ConsumerState<_HeatmapTab> {
     final today = ref.watch(trackingDayProvider);
     final isCurrent = _month.year == today.year && _month.month == today.month;
     final async = ref.watch(monthCountsProvider(_month));
-    final install = ref.read(settingsRepositoryProvider).installDate ?? today;
+    final install = ref.read(backendProvider).trackingStart;
 
     return ListView(
       padding: const EdgeInsets.all(16),

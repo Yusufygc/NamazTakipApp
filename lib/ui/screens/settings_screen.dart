@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:namaz_backend/namaz_backend.dart';
 
-import '../../core/app_theme.dart';
-import '../../data/settings_repository.dart';
+import '../../core/theme/app_theme.dart';
 import '../../providers/providers.dart';
-import '../../services/prayer_time_service.dart';
 import 'city_picker_screen.dart';
 import '../../core/icons/app_icons.dart';
 import '../../core/strings/strings.dart';

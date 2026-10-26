@@ -48,6 +48,7 @@ Arama kutulu 81 il listesi; seçilen il işaretli gelir, seçince ayar kaydedili
 
 ## Ortak kurallar
 
+- Ekranlar backend'i doğrudan çağırmaz; Riverpod sağlayıcılarını kullanır. `backendProvider` yalnızca olay anlarında (izin, bildirim akışı, şehir listesi, takip başlangıcı) okunur; test bunu sınırlar: [[durum-yonetimi]], [[backend-paketi]].
 - Renkler `context.palette` ile alınır, sabit renk yazılmaz (istisna: ısı haritası ve durum renkleri): [[tema-sistemi]].
 - Metin ve ikon merkezi sistemlerden gelir; test bunu zorlar: [[metin-sistemi]], [[ikon-sistemi]].
 - Ekran okuyucu etiketleri ve kontrast kararları: [[erisilebilirlik-ve-kontrast]].

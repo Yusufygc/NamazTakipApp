@@ -12,8 +12,9 @@ Namaz Takip projesinin bilgi tabanı. Her işe buradan başlayın; kurallar içi
 
 ## Mimari ve veri
 
-- [[mimari-genel]] — Beş katman, başlangıç sırası ve örnek veri akışı.
-- [[durum-yonetimi]] — Riverpod sağlayıcıları ve kullanılan desenler.
+- [[mimari-genel]] — Ön yüz ve backend paketleri, sınır kuralları, başlangıç sırası ve örnek veri akışı.
+- [[backend-paketi]] — `namaz_backend`: herkese açık yüz, `NamazBackend` arayüzü, katmanlar ve metin portu.
+- [[durum-yonetimi]] — Ön yüzdeki Riverpod sağlayıcıları (backend'e delege eden ince katman) ve desenler.
 - [[veri-katmani]] — SQLite şeması, durum kodları, tarih biçimi, repository sorguları.
 - [[ayarlar-ve-kalicilik]] — `shared_preferences` anahtarları ve küçük kalıcı durum.
 - [[bagimliliklar]] — Paketler, neden seçildikleri, uyarılar.
@@ -67,6 +68,7 @@ Namaz Takip projesinin bilgi tabanı. Her işe buradan başlayın; kurallar içi
 - [[008-merkezi-ikon-ve-metin]] — Merkezi ikon ve modüler metin sistemi.
 - [[009-konum-yedek-zinciri]] — Konum: medium → high → son bilinen.
 - [[010-wiki-sistemi]] — Proje bilgisi `docs/wiki/` içinde tutulur.
+- [[011-front-backend-ayrimi]] — Ön yüz ve backend ayrı paketlerdir.
 
 ## Ham kaynaklar
 

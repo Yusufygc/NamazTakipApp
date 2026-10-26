@@ -1,6 +1,6 @@
 # Tema Sistemi
 
-Beş renk teması vardır; kullanıcı Ayarlar'dan seçer, seçim kalıcıdır. Kod: `lib/core/app_theme.dart`.
+Beş renk teması vardır; kullanıcı Ayarlar'dan seçer, seçim kalıcıdır. Kod: `lib/core/theme/app_theme.dart`.
 
 ## Yapı
 

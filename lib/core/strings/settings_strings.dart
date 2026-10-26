@@ -1,4 +1,4 @@
-import '../../services/prayer_time_service.dart';
+import 'package:namaz_backend/namaz_backend.dart';
 
 /// Ayarlar ekranı, hesaplama yöntemleri ve tema adları.
 abstract final class SettingsStrings {

@@ -4,7 +4,7 @@ Uygulama iki farklı "gün" kavramı kullanır ve sıradaki vakti saate göre he
 
 ## Takip günü
 
-Kullanıcı gece 00:30'da Yatsı'yı kılarsa bu hâlâ "dünün" namazıdır. Bu yüzden `prayerDay(now)` (`lib/core/date_utils.dart`) saat **04:00'ten önce bir önceki günü** döner. Eşik `kLateNightCutoffHour = 4`'tür; sabah ezanı genelde 04:30'dan sonra olduğu için güvenli kabul edilir. Gerçek İslami gün akşam ezanıyla başlar; bu kural onun basit bir yaklaşımıdır ([[sozluk]]).
+Kullanıcı gece 00:30'da Yatsı'yı kılarsa bu hâlâ "dünün" namazıdır. Bu yüzden `prayerDay(now)` (`packages/namaz_backend/lib/src/domain/dates.dart`) saat **04:00'ten önce bir önceki günü** döner. Eşik `kLateNightCutoffHour = 4`'tür; sabah ezanı genelde 04:30'dan sonra olduğu için güvenli kabul edilir. Gerçek İslami gün akşam ezanıyla başlar; bu kural onun basit bir yaklaşımıdır ([[sozluk]]).
 
 - İşaretlemeler takip gününe yazılır: [[namaz-isaretleme]].
 - Ana ekranda "BUGÜNÜN NAMAZLARI • tarih" başlığı takip gününü gösterir.
@@ -32,7 +32,7 @@ Doğrulama: emülatörde saat 19:34:30'a alınınca 19:35'te Yatsı bildirimi ge
 
 ## Test
 
-`test/core_test.dart`: `prayerDay` (00:30, 03:59, 04:00, ay başı), `nextPrayer` (öğleden sonra, yatsıdan sonra, gece yarısından sonra).
+`packages/namaz_backend/test/domain_test.dart`: `prayerDay` (00:30, 03:59, 04:00, ay başı), `nextPrayer` (öğleden sonra, yatsıdan sonra, gece yarısından sonra).
 
 ## İlgili sayfalar
 

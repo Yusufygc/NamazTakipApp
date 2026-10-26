@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:namaz_backend/namaz_backend.dart';
 
-import '../../core/app_theme.dart';
-import '../../core/date_utils.dart';
-import '../../core/prayer.dart';
+import '../../core/theme/app_theme.dart';
 import '../../core/icons/app_icons.dart';
 import '../../core/strings/strings.dart';
 

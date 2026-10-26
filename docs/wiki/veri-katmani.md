@@ -1,6 +1,6 @@
 # Veri Katmanı (SQLite)
 
-Depolama `sqflite` iledir. Dosya adı `namaz_takip.db`, şema sürümü 1. Kod: `lib/data/app_database.dart`, `lib/data/prayer_repository.dart`. Neden `sqflite`: [[007-sqflite-secimi]].
+Depolama `sqflite` iledir. Dosya adı `namaz_takip.db`, şema sürümü 1. Kod: `packages/namaz_backend/lib/src/data/app_database.dart`, `packages/namaz_backend/lib/src/data/prayer_repository.dart`. Neden `sqflite`: [[007-sqflite-secimi]].
 
 ## Şema
 
@@ -37,7 +37,7 @@ Kural: bir vaktin satırı yalnızca kullanıcı işaretleyince oluşur. İşare
 
 Tarihler `yyyy-MM-dd` metni olarak saklanır; metin sıralaması tarih sıralamasıyla aynıdır, `BETWEEN` ve `ORDER BY` doğru çalışır. Eski uygulama `dd-MM-yyyy` kullandığı için sıralama ve seri hesabı hatalıydı: [[003-iso-tarih-formati]].
 
-Yardımcılar `lib/core/date_utils.dart` içindedir: `dateKey`, `parseDateKey`, `dateOnly`, `addDays`, `daysBetween`, `daysDiff` (yaz/kış saatinden etkilenmez).
+Yardımcılar `packages/namaz_backend/lib/src/domain/dates.dart` içindedir: `dateKey`, `parseDateKey`, `dateOnly`, `addDays`, `daysBetween`, `daysDiff` (yaz/kış saatinden etkilenmez).
 
 ## Tekrar işaretleme
 
@@ -66,7 +66,7 @@ Uygulama yayınlanmadığı için şu ana kadar veri taşıma gerekmedi.
 
 ## Test
 
-`test/prayer_repository_test.dart`, `sqflite_common_ffi` ile bellek içi veritabanında çalışır: [[test-stratejisi]].
+`packages/namaz_backend/test/prayer_repository_test.dart`, `sqflite_common_ffi` ile bellek içi veritabanında çalışır: [[test-stratejisi]].
 
 ## İlgili sayfalar
 

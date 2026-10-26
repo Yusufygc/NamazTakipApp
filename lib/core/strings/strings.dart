@@ -12,6 +12,7 @@ export 'home_strings.dart';
 export 'location_strings.dart';
 export 'nav_strings.dart';
 export 'notification_strings.dart';
+export 'notification_texts_adapter.dart';
 export 'prayer_dialog_strings.dart';
 export 'prayer_strings.dart';
 export 'qaza_strings.dart';

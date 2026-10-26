@@ -1,6 +1,6 @@
 # Ayarlar ve Küçük Kalıcı Durum
 
-Ayarlar ve küçük durumlar `shared_preferences` ile saklanır; kod `lib/data/settings_repository.dart`. Büyük ve ilişkisel veri SQLite'tadır: [[veri-katmani]]. Arayüz tarafında `settingsProvider` bu depoyu sarar: [[durum-yonetimi]].
+Ayarlar ve küçük durumlar `shared_preferences` ile saklanır; kod `packages/namaz_backend/lib/src/data/settings_repository.dart`. Büyük ve ilişkisel veri SQLite'tadır: [[veri-katmani]]. Depo backend'dedir; ön yüz ayarları `NamazBackend.settings` (`AppSettings`) ile görür, `settingsProvider` bu görüntüyü tutar: [[durum-yonetimi]], [[backend-paketi]]. `theme` anahtarı backend için anlamsız bir metindir; yalnızca kalıcılığı sağlar.
 
 ## Anahtarlar
 
@@ -19,10 +19,10 @@ Android'de bu anahtarlar `FlutterSharedPreferences` dosyasında `flutter.` önek
 
 ## Önemli noktalar
 
-- **`install_date`**: `main.dart` ilk açılışta takip gününü yazar (`ensureInstallDate`); sonra değişmez. Kaza listesi bu günden başlar ([[kaza-sistemi]]) ve radar yüzdesi bu günden önceki günleri paydaya katmaz ([[istatistikler]]).
+- **`install_date`**: `NamazBackend.create` ilk açılışta takip gününü yazar (`ensureInstallDate`); sonra değişmez. Kaza listesi bu günden başlar ([[kaza-sistemi]]) ve radar yüzdesi bu günden önceki günleri paydaya katmaz ([[istatistikler]]).
 - **`last_location`**: GPS her başarılı olduğunda yazılır. Arka plan görevi GPS kullanmadığı için bu konumla çalışır: [[arka-plan-gorevleri]].
 - **`effectiveLocation`**: Hesapta kullanılan konum. Elle modda ve elle konum varsa o; aksi halde `last_location`. Hiçbiri yoksa `null` ve ana ekran konum isteme kartını gösterir.
-- Konum nesnesi `AppLocation`'dır (`lib/services/prayer_time_service.dart`), `toJson`/`fromJson` ile saklanır; bozuk JSON sessizce yok sayılır.
+- Konum nesnesi `AppLocation`'dır (`packages/namaz_backend/lib/src/domain/prayer_time_service.dart`), `toJson`/`fromJson` ile saklanır; bozuk JSON sessizce yok sayılır.
 
 ## Neden veritabanında değil
 

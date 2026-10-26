@@ -2,7 +2,7 @@
 # See https://dart.dev/tools/pub/glossary#lockfile
 packages:
   adhan_dart:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: adhan_dart
       sha256: b1a280975b73052eb3b213430adf481f241bfc1cd839b2b0f4368bfe1a1b7ee5
@@ -191,7 +191,7 @@ packages:
     source: hosted
     version: "6.0.0"
   flutter_local_notifications:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: flutter_local_notifications
       sha256: fd5fc8966a8b34337ac182dc394f3506139b69d8138d4e9e174a13d6468adcd4
@@ -244,7 +244,7 @@ packages:
     source: sdk
     version: "0.0.0"
   flutter_timezone:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: flutter_timezone
       sha256: "7830bc64bef0b003468fc1f58fc3f3faf54817f8cd6e68fa818b306560410d68"
@@ -265,7 +265,7 @@ packages:
     source: hosted
     version: "0.1.1"
   geocoding:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: geocoding
       sha256: "40f845e0a5505d4b47da991057f2ab25cd1c68bc4570255c7d4cfbb03a952063"
@@ -297,7 +297,7 @@ packages:
     source: hosted
     version: "5.0.0"
   geolocator:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: geolocator
       sha256: "2b3bc0f7320d5a5fa02f8209ffcf1aaa7c2cabb7b2bedbc0cfeb5ff2778b8b09"
@@ -400,14 +400,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.12.0"
-  intl:
-    dependency: "direct main"
-    description:
-      name: intl
-      sha256: "1ca20c894b1717686a2319b8548763d812bc0aabdac580420a44c5178c57a867"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.20.3"
   jni:
     dependency: transitive
     description:
@@ -537,7 +529,7 @@ packages:
     source: hosted
     version: "4.1.0"
   path:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: path
       sha256: "75cca69d1490965be98c73ceaea117e8a04dd21217b37b292c9ddbec0d955bc5"
@@ -625,7 +617,7 @@ packages:
     source: hosted
     version: "3.4.3"
   shared_preferences:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: shared_preferences
       sha256: "1e85e0dccf5b4a016077fea7dfbb4a7cb39c759ac1596fcf60c06deadb7da91f"
@@ -694,7 +686,7 @@ packages:
     source: hosted
     version: "1.10.2"
   sqflite:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: sqflite
       sha256: "21a9750de2deb464946e9f41c7ddf176e25553618afdfc774868cd454990c06a"
@@ -718,7 +710,7 @@ packages:
     source: hosted
     version: "2.5.14"
   sqflite_common_ffi:
-    dependency: "direct dev"
+    dependency: transitive
     description:
       name: sqflite_common_ffi
       sha256: "119d730460264a1f11f414d9eaa43fb686789357e81ce35f9e8ccb66ddd040e4"
@@ -806,7 +798,7 @@ packages:
     source: hosted
     version: "0.7.12"
   timezone:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: timezone
       sha256: "9f4e5a1a0e4fef7dd3424842c0575db01bfb7a11730e8d55753fcd5c5c98767b"
@@ -862,7 +854,7 @@ packages:
     source: hosted
     version: "6.4.0"
   workmanager:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: workmanager
       sha256: "96b09a4a852ec487d29371f27031dab80ce2e260911e2dbe0f904951e22a3956"

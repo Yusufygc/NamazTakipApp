@@ -37,7 +37,7 @@ Gün kartları genişletilebilir (`ExpansionTile`): başlıkta tarih ve "N Kaza"
 
 ## Test
 
-`test/prayer_repository_test.dart`: bugünün bekleyen vakti kaza değildir; işaretlenmeyen geçmiş günler otomatik kazadır (2 gün × 5 = 10); 5/5 kılınan gün listeden çıkar; kaza edilen vakit çıkar; aynı vakit tekrar işaretlenince tek kayıt kalır.
+`packages/namaz_backend/test/prayer_repository_test.dart`: bugünün bekleyen vakti kaza değildir; işaretlenmeyen geçmiş günler otomatik kazadır (2 gün × 5 = 10); 5/5 kılınan gün listeden çıkar; kaza edilen vakit çıkar; aynı vakit tekrar işaretlenince tek kayıt kalır.
 
 ## İlgili sayfalar
 

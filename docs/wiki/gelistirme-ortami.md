@@ -36,7 +36,8 @@ Kurulumdan sonra yapıldı (önce yapılmamıştı): cmdline-tools hash'i Google
 ```bash
 flutter pub get
 flutter analyze
-flutter test
+flutter test                                   # ön yüz
+(cd packages/namaz_backend && flutter test)    # backend
 flutter build apk --debug
 ```
 
@@ -56,7 +57,7 @@ adb shell am start -n com.namaztakip.app/com.namaztakip.namaz_takip.MainActivity
 - **Donanım hızlandırma:** WHPX kullanılabilir (`emulator -accel-check`).
 - **Konum:** Emülatör PC'nin konumunu kullanmaz. `adb emu geo fix 28.9784 41.0082` (boylam, enlem; İstanbul). Konum bir uygulama GPS isterken verilmelidir; uygulama `high` doğrulukta GPS ister: [[konum]].
 - **Saat dilimi:** Emülatör varsayılan olarak UTC'dir ve vakitler 3 saat kayık görünür. `adb shell cmd alarm set-timezone Europe/Istanbul` ile düzeltilir: [[namaz-vakitleri]].
-- **Saati değiştirmek (bildirim testi):** `adb root` (yalnızca `google_apis` imajlarında), `adb shell settings put global auto_time 0`, `adb shell date MMDDhhmmYYYY.ss` (örn. `102619342026.30`). Test sonunda `auto_time 1` ve `adb unroot`.
+- **Saati değiştirmek (bildirim testi):** `adb root` (yalnızca `google_apis` imajlarında), `adb shell settings put global auto_time 0`, `adb shell date MMDDhhmmYYYY.ss` (örn. `102619342026.30`; yıl dört hane ve **doğru** yazılmalı, `3026` yazılırsa saat 3026'ya gider). Test sonunda `auto_time 1` ve `adb unroot`.
 - **Ekran görüntüsü:** `adb exec-out screencap -p > ekran.png`. Ekran metinleri: `adb shell uiautomator dump`.
 - **Veritabanını okuma (root ile):** `adb shell sqlite3 /data/data/com.namaztakip.app/databases/namaz_takip.db "select * from prayers"`. Root yokken `run-as com.namaztakip.app` ile ayarlar dosyası okunabilir.
 - **Alarmları görmek:** `adb shell dumpsys alarm | grep com.namaztakip.app`.

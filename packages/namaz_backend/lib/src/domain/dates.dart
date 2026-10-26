@@ -1,32 +1,28 @@
-import 'package:intl/intl.dart';
-
 import 'prayer.dart';
 
 /// Gece yarısından sonra bu saate kadar "dünün" namazları geçerlidir.
 const int kLateNightCutoffHour = 4;
 
-final DateFormat _keyFormat = DateFormat('yyyy-MM-dd');
-final DateFormat _timeFormat = DateFormat('HH:mm');
-
 /// Saat bilgisini atar.
 DateTime dateOnly(DateTime d) => DateTime(d.year, d.month, d.day);
 
+String _two(int n) => n.toString().padLeft(2, '0');
+
 /// Veritabanı anahtarı: `2026-01-25`. Metin sıralaması tarih sıralamasıyla aynıdır.
-String dateKey(DateTime d) => _keyFormat.format(d);
+String dateKey(DateTime d) => '${d.year.toString().padLeft(4, '0')}-${_two(d.month)}-${_two(d.day)}';
 
 DateTime parseDateKey(String key) {
   final p = key.split('-').map(int.parse).toList();
   return DateTime(p[0], p[1], p[2]);
 }
 
-String formatTime(DateTime d) => _timeFormat.format(d);
-
 /// Gün ekler; yaz/kış saati geçişinde bile takvim gününü korur.
 DateTime addDays(DateTime d, int days) => DateTime(d.year, d.month, d.day + days);
 
 /// İki takvim günü arasındaki gün farkı (yaz/kış saatinden etkilenmez).
-int daysDiff(DateTime a, DateTime b) =>
-    DateTime.utc(a.year, a.month, a.day).difference(DateTime.utc(b.year, b.month, b.day)).inDays;
+int daysDiff(DateTime a, DateTime b) => DateTime.utc(a.year, a.month, a.day)
+    .difference(DateTime.utc(b.year, b.month, b.day))
+    .inDays;
 
 /// Takip açısından "bugün". 00:00–03:59 arası hâlâ dünkü gündür.
 DateTime prayerDay(DateTime now) {

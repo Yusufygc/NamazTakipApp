@@ -38,7 +38,7 @@ Bu olmadan derleme hata verir.
 
 ## Manifest
 
-İzinler ve anlamları: [[izinler]]. Eklenti alıcıları:
+İzinler ve anlamları: [[izinler]]. Eklentiler [[backend-paketi]]'nde olsa da manifest uygulama (ön yüz) paketinde kalır; backend'in ihtiyaç duyduğu izinler ve alıcılar burada tanımlanır. Eklenti alıcıları:
 
 - `ScheduledNotificationReceiver`: zamanlanmış bildirimi gösterir.
 - `ScheduledNotificationBootReceiver`: `BOOT_COMPLETED`, `MY_PACKAGE_REPLACED`, `QUICKBOOT_POWERON` olaylarında bildirimleri yeniden kurar.

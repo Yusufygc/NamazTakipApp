@@ -7,6 +7,7 @@ Henüz çözülmemiş sorunlar, doğrulanmamış alanlar ve bilinçli sınırlar
 | Önem | Konu | Ayrıntı |
 |---|---|---|
 | Yüksek | iOS hiç derlenmedi | `Info.plist`, `AppDelegate`, arka plan kimliği kaynak koddan yazıldı; ilk derlemede hata olası: [[ios-yapilandirma]] |
+| Yüksek | Tam zamanlı alarm izni kullanıcıya bağlı | Temiz kurulumda "Alarms & reminders" anahtarı kapalıdır; kullanıcı açmadan çıkarsa bildirimler yaklaşık modda planlanır ve **bir saate kadar geç** gelebilir (emülatörde `window=+1h` gözlendi, izin verilince `window=0`). Çözüm adayları: izni ilk açılışta açıklayıp ayarlara yönlendirmek, izin yokken ayarlarda uyarı göstermek, `USE_EXACT_ALARM` değerlendirmek: [[izinler]], [[bildirimler]], [[yol-haritasi]] |
 | Yüksek | Gerçek telefonda test yok | Bildirim zamanlaması, pil kısıtlamaları (agresif tasarruf yapan üreticiler), GPS ve performans yalnızca emülatörde görüldü: [[bildirimler]] |
 | Orta | Dört tema görsel test edilmedi | Koyu, Okyanus, Gül, Altın; kontrast sorunları çıkabilir: [[tema-sistemi]] |
 | Orta | Arka plan görevinin periyodik tetiklenmesi gözlenmedi | 12 saatlik görev emülatör oturumuna sığmadı: [[arka-plan-gorevleri]] |
@@ -29,7 +30,9 @@ Henüz çözülmemiş sorunlar, doğrulanmamış alanlar ve bilinçli sınırlar
 | Önem | Konu | Ayrıntı |
 |---|---|---|
 | Orta | `workmanager_android` eski Kotlin eklentisini kullanıyor | Flutter ileride uyarıyı hataya çevirebilir; paket güncellemesi izlenmeli: [[bagimliliklar]] |
-| Düşük | Widget testi yok; sağlayıcılar testsiz | Radar paydası ve karşılaştırma farkı dahil: [[test-stratejisi]], [[istatistikler]] |
+| Düşük | Widget testi yok; ön yüz sağlayıcıları testsiz | Mantık backend'de testlidir: [[test-stratejisi]], [[backend-paketi]] |
+| Düşük | Radar paydası ve karşılaştırma farkı için birim test yok | Hesap backend'de (`NamazBackendImpl`) ama doğrudan testi yok: [[istatistikler]] |
+| Düşük | Backend içinde depolar için soyut arayüz yok | Sınır `NamazBackend` arayüzündedir; repository'ler somut sınıflardır: [[011-front-backend-ayrimi]] |
 | Düşük | `flutter_launcher_icons` proje dosyasını bozuyor | Her üretimde elle geri alınmalı: [[uygulama-ikonu]] |
 
 ## Arayüz tutarsızlıkları

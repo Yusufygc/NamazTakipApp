@@ -1,7 +1,7 @@
 import 'package:adhan_dart/adhan_dart.dart' as adhan;
 
-import '../core/date_utils.dart';
-import '../core/prayer.dart';
+import 'dates.dart';
+import 'prayer.dart';
 
 /// Konum bilgisi (GPS veya elle seçilmiş).
 class AppLocation {

@@ -11,7 +11,8 @@ Namaz Takip, günlük namazları takip eden ve kaza namazlarını otomatik liste
 | Uygulama kimliği (Android) | `com.namaztakip.app` |
 | Sürüm | 1.0.0+1 |
 | Çatı | Flutter 3.47 (Dart 3.13), Material 3 |
-| Durum yönetimi | Riverpod 3, bkz. [[durum-yonetimi]] |
+| Yapı | İki paket: ön yüz (`namaz_takip`) ve backend (`packages/namaz_backend`), tek arayüzle bağlı: [[mimari-genel]], [[backend-paketi]] |
+| Durum yönetimi | Riverpod 3 (ön yüz), bkz. [[durum-yonetimi]] |
 | Depolama | SQLite (`sqflite`) + `shared_preferences`, bkz. [[veri-katmani]], [[ayarlar-ve-kalicilik]] |
 | Vakit hesabı | Cihazda, `adhan_dart` ile, bkz. [[namaz-vakitleri]] |
 | Geliştirici | MYY |
@@ -28,7 +29,7 @@ Namaz Takip, günlük namazları takip eden ve kaza namazlarını otomatik liste
 
 ## Durum (2026-10-26)
 
-- Kod yazıldı, `flutter analyze` temiz, 44 test geçiyor: [[test-stratejisi]].
+- Kod yazıldı, `flutter analyze` temiz, 55 test geçiyor (ön yüz 19, backend 36): [[test-stratejisi]].
 - Android emülatörde (Android 36) elle doğrulandı: [[emulator-test-notlari]].
 - Gerçek telefonda, iOS'ta ve dört ek temada görsel test yapılmadı: [[bilinen-sorunlar]], [[yol-haritasi]].
 - Eski React Native/Expo sürümü silindi, Flutter projesi depo köküne taşındı: [[gecis-gecmisi]], [[001-flutter-gecisi]].
@@ -38,8 +39,9 @@ Namaz Takip, günlük namazları takip eden ve kaza namazlarını otomatik liste
 Git kökü ile Flutter kökü aynı klasördür.
 
 ```
-lib/                 uygulama kodu, bkz. [[mimari-genel]]
-test/                birim testleri, bkz. [[test-stratejisi]]
+lib/                 ön yüz: ekranlar, sağlayıcılar, tema, ikon, metin (bkz. mimari-genel)
+packages/namaz_backend/  backend: vakit, veri, konum, bildirim, istatistik (bkz. backend-paketi)
+test/                ön yüz testleri (bkz. test-stratejisi)
 android/, ios/       platform projeleri, bkz. [[android-yapilandirma]], [[ios-yapilandirma]]
 assets/icon/         ikon kaynakları, bkz. [[uygulama-ikonu]]
 docs/wiki/           bu bilgi tabanı

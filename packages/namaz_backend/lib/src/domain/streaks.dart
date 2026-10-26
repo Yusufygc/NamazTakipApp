@@ -1,4 +1,4 @@
-import 'date_utils.dart';
+import 'dates.dart';
 
 class StreakStats {
   const StreakStats({

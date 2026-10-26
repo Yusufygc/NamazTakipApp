@@ -7,8 +7,7 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest_all.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
-import '../core/strings/strings.dart';
-import 'notification_plan.dart';
+import '../domain/notification_plan.dart';
 
 /// Arka plan izolatında da kullanılabilen, yalnızca eklenti çağıran ince katman.
 class NotificationService {
@@ -90,7 +89,8 @@ class NotificationService {
 
   /// Planı uygular: aynı id'ler üzerine yazılır, plan dışı kalan eski
   /// bekleyen bildirimler iptal edilir.
-  Future<void> apply(List<PlannedNotification> plan) async {
+  Future<void> apply(List<PlannedNotification> plan,
+      {required NotificationTexts texts}) async {
     await init();
 
     final android = _plugin.resolvePlatformSpecificImplementation<
@@ -100,11 +100,11 @@ class NotificationService {
         ? AndroidScheduleMode.exactAllowWhileIdle
         : AndroidScheduleMode.inexactAllowWhileIdle;
 
-    const details = NotificationDetails(
+    final details = NotificationDetails(
       android: AndroidNotificationDetails(
         _channelId,
-        NotificationStrings.channelName,
-        channelDescription: NotificationStrings.channelDescription,
+        texts.channelName,
+        channelDescription: texts.channelDescription,
         importance: Importance.high,
         priority: Priority.high,
       ),

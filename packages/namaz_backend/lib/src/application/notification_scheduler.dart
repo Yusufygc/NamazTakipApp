@@ -1,10 +1,10 @@
-import '../core/date_utils.dart';
-import '../core/prayer.dart';
 import '../data/prayer_repository.dart';
 import '../data/settings_repository.dart';
-import 'notification_plan.dart';
-import 'notification_service.dart';
-import 'prayer_time_service.dart';
+import '../domain/dates.dart';
+import '../domain/notification_plan.dart';
+import '../domain/prayer.dart';
+import '../domain/prayer_time_service.dart';
+import '../platform/notification_service.dart';
 
 /// Ayarlar + konum + işaretleme durumundan bildirim planını kurup uygular.
 /// Ön planda ve arka plan görevinde aynı kod çalışır.
@@ -12,12 +12,14 @@ class NotificationScheduler {
   NotificationScheduler({
     required this.settings,
     required this.prayers,
+    required this.texts,
     NotificationService? notifications,
     this.timeService = const PrayerTimeService(),
   }) : notifications = notifications ?? NotificationService.instance;
 
   final SettingsRepository settings;
   final PrayerRepository prayers;
+  final NotificationTexts texts;
   final NotificationService notifications;
   final PrayerTimeService timeService;
 
@@ -53,7 +55,8 @@ class NotificationScheduler {
       days: days,
       isDone: (date, prayer) => done.contains('${dateKey(date)}|${prayer.key}'),
       reminderMinutes: settings.reminderMinutes,
+      texts: texts,
     );
-    await notifications.apply(plan);
+    await notifications.apply(plan, texts: texts);
   }
 }

@@ -2,18 +2,21 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workmanager/workmanager.dart';
 
+import 'notification_scheduler.dart';
 import '../data/app_database.dart';
 import '../data/prayer_repository.dart';
 import '../data/settings_repository.dart';
-import 'notification_scheduler.dart';
+import '../domain/notification_plan.dart';
 
 const String kRefreshTaskName = 'refreshNotifications';
 const String _kUniqueName = 'namaz_takip_refresh';
 
-/// Workmanager tarafından ayrı izolatta çağrılır. Konumu GPS'ten almaz,
-/// son bilinen konumla vakitleri cihazda hesaplayıp bildirimleri yeniler.
-@pragma('vm:entry-point')
-void backgroundDispatcher() {
+/// Arka plan izolatında çağrılır. Konumu GPS'ten almaz; son bilinen konumla
+/// vakitleri cihazda hesaplayıp bildirimleri yeniler.
+///
+/// İşleyiciyi, Workmanager'ın ister gibi üst düzey bir fonksiyon olarak ön yüz
+/// kaydeder (ve metinleri kendi verir); backend yalnızca işi yapar.
+void handleBackgroundTasks(NotificationTexts texts) {
   Workmanager().executeTask((task, inputData) async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -22,6 +25,7 @@ void backgroundDispatcher() {
         await NotificationScheduler(
           settings: SettingsRepository(prefs),
           prayers: PrayerRepository(db),
+          texts: texts,
         ).reschedule();
       } finally {
         await db.close();
@@ -37,8 +41,10 @@ void backgroundDispatcher() {
 class BackgroundService {
   const BackgroundService();
 
-  Future<void> register() async {
-    await Workmanager().initialize(backgroundDispatcher);
+  /// [entryPoint], `@pragma('vm:entry-point')` ile işaretli üst düzey bir
+  /// fonksiyon olmalıdır; içinde `NamazBackend.handleBackgroundTasks` çağrılır.
+  Future<void> register(void Function() entryPoint) async {
+    await Workmanager().initialize(entryPoint);
     await Workmanager().registerPeriodicTask(
       _kUniqueName,
       kRefreshTaskName,

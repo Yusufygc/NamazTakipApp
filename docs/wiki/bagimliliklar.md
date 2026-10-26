@@ -2,6 +2,17 @@
 
 `pubspec.yaml` içindeki paketler ve neden kullanıldıkları. Sürümler 2026-10-26 itibarıyla `pubspec.lock`'tadır.
 
+## Hangi pakette
+
+Bağımlılıklar iki pakete bölünmüştür ([[011-front-backend-ayrimi]]). Ön yüzün `pubspec.yaml`'ında yalnızca arayüz paketleri bulunur; test bunu denetler: [[test-stratejisi]].
+
+| Paket | Bağımlılıkları |
+|---|---|
+| Ön yüz (`namaz_takip`, kök `pubspec.yaml`) | `flutter_riverpod`, `fl_chart`, `cupertino_icons` (kullanılmıyor), `namaz_backend`; geliştirme: `flutter_test`, `flutter_lints`, `flutter_launcher_icons` |
+| Backend (`packages/namaz_backend/pubspec.yaml`) | `adhan_dart`, `sqflite`, `path`, `shared_preferences`, `geolocator`, `geocoding`, `flutter_local_notifications`, `timezone`, `flutter_timezone`, `workmanager`; geliştirme: `flutter_test`, `flutter_lints`, `sqflite_common_ffi` |
+
+`intl` paketi kaldırıldı: tarih anahtarı ve saat biçimi elle üretiliyor (`dateKey`, `formatTime`).
+
 ## Çalışma zamanı
 
 | Paket | Sürüm | Ne için | Sayfa |
@@ -18,7 +29,6 @@
 | `flutter_timezone` | ^5.1.1 | Cihazın saat dilimi kimliği | [[bildirimler]] |
 | `workmanager` | ^0.10.10 | Arka planda periyodik görev | [[arka-plan-gorevleri]] |
 | `fl_chart` | ^1.3.0 | Radar, çubuk ve çizgi grafikleri | [[istatistikler]] |
-| `intl` | ^0.20.3 | `DateFormat` ile veritabanı tarih anahtarı (`yyyy-MM-dd`) ve saat gösterimi (`HH:mm`). Ay ve gün adları `intl` ile değil, kendi `DateStrings` modülümüzle üretilir | [[veri-katmani]], [[metin-sistemi]] |
 | `cupertino_icons` | ^1.0.8 | Şablondan gelen; kullanılmıyor | |
 
 ## Geliştirme
@@ -27,7 +37,7 @@
 |---|---|
 | `flutter_test` | Test çatısı: [[test-stratejisi]] |
 | `flutter_lints` | Statik analiz kuralları |
-| `sqflite_common_ffi` | Masaüstünde bellek içi SQLite ile repository testleri |
+| `sqflite_common_ffi` | Backend: masaüstünde bellek içi SQLite ile repository testleri |
 | `flutter_launcher_icons` | Launcher ikonlarını üretir: [[uygulama-ikonu]] |
 
 ## Kararlar ve uyarılar

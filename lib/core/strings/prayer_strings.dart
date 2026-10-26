@@ -1,4 +1,4 @@
-import '../prayer.dart';
+import 'package:namaz_backend/namaz_backend.dart';
 
 /// Vakit adları.
 abstract final class PrayerStrings {

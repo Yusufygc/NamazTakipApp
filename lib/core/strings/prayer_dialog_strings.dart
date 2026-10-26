@@ -1,4 +1,4 @@
-import '../text_utils.dart';
+import '../format/text_utils.dart';
 
 /// "X namazını kıldınız mı?" diyaloğu.
 abstract final class PrayerDialogStrings {

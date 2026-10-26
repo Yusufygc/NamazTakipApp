@@ -20,6 +20,10 @@ Projede kullanılan terimler. Kodda İngilizce, arayüzde Türkçe karşılıkla
 | Seri | Üst üste tam (5/5) günlerin sayısı | [[seri-ve-rozetler]] |
 | Rozet | Belirli bir hedefe ulaşınca açılan başarım | [[seri-ve-rozetler]] |
 | Hatırlatma | Ezandan N dakika sonra gelen "kıldınız mı?" bildirimi | [[bildirimler]] |
+| Ön yüz (front) | Kullanıcıya görünen her şey: ekranlar, tema, ikon, metin, Riverpod sağlayıcıları. Uygulama paketi `namaz_takip` | [[mimari-genel]] |
+| Backend | Arayüz dışındaki her şey: vakit hesabı, SQLite, ayarlar, konum, bildirim, arka plan, kaza ve istatistik kuralları. Paket `namaz_backend` | [[backend-paketi]] |
+| `NamazBackend` | Ön yüzün backend ile tek konuşma arayüzü | [[backend-paketi]] |
+| Port | Backend'in bir bağımlılığı dışarıdan istediği arayüz; örn. `NotificationTexts` | [[backend-paketi]] |
 | Takip başlangıcı | Uygulamanın ilk açıldığı gün (`install_date`); kaza hesabı buradan başlar | [[ayarlar-ve-kalicilik]] |
 
 ## İlgili sayfalar

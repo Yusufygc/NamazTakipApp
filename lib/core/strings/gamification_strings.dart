@@ -1,4 +1,4 @@
-import '../achievements.dart';
+import 'package:namaz_backend/namaz_backend.dart';
 
 /// Seri ve rozetler.
 abstract final class GamificationStrings {

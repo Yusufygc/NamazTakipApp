@@ -2,18 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 
-import 'prayer_time_service.dart';
-
-enum LocationFailure { serviceDisabled, denied, deniedForever, unavailable }
-
-class LocationException implements Exception {
-  const LocationException(this.failure);
-
-  final LocationFailure failure;
-
-  @override
-  String toString() => 'LocationException($failure)';
-}
+import '../domain/models.dart';
+import '../domain/prayer_time_service.dart';
 
 class LocationService {
   const LocationService();

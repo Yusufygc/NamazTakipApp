@@ -50,7 +50,8 @@ Sana "Wiki'yi Lint et" dediğimde:
 Ayrıntılar wiki'dedir (`docs/wiki/index.md`); burada yalnızca her oturumda bilinmesi gerekenler var.
 
 *   **Proje:** Namaz Takip, Flutter (Android + iOS). Git kökü ve Flutter kökü aynı klasördür (`pubspec.yaml` burada). Ayrıntı: `[[proje-ozeti]]`.
-*   **Komutlar:** `flutter pub get`, `flutter analyze`, `flutter test`, `flutter build apk --debug`. Windows ortam kurulumu ve emülatör komutları: `[[gelistirme-ortami]]`.
+*   **Ön yüz / backend ayrımı (kural):** Uygulama iki pakettir. Ön yüz (`lib/`) yalnızca `package:namaz_backend/namaz_backend.dart` ve `NamazBackend` arayüzü ile backend'i (`packages/namaz_backend/`) tanır; `src/` içe aktarılmaz, depolama/konum/bildirim/arka plan paketleri ön yüzde kullanılmaz. Yeni iş kuralı backend'e, görünüm ve metin ön yüze yazılır. İki `architecture_test.dart` bunu denetler. Ayrıntı: `[[mimari-genel]]`, `[[backend-paketi]]`.
+*   **Komutlar:** `flutter pub get`, `flutter analyze`, `flutter test` (ön yüz) ve `cd packages/namaz_backend && flutter test` (backend), `flutter build apk --debug`. Windows ortam kurulumu ve emülatör komutları: `[[gelistirme-ortami]]`.
 *   **Merkezi sistemler (kural):** Ekranlara emoji, `Icons.xxx` veya sabit Türkçe metin yazılmaz. İkonlar `lib/core/icons/app_icons.dart`, metinler `lib/core/strings/` altındadır; `test/central_system_test.dart` bunu denetler. Ayrıntı: `[[ikon-sistemi]]`, `[[metin-sistemi]]`.
 *   **Doğrulama:** Bir değişiklikten sonra `flutter analyze` temiz olmalı ve `flutter test` geçmeli. Bildirim, konum ve arayüz davranışı emülatörde veya cihazda doğrulanmadan "çalışıyor" denmez. Ayrıntı: `[[test-stratejisi]]`, `[[emulator-test-notlari]]`.
 *   **Dil ve ton:** Wiki sayfaları, commit mesajları ve kod yorumları normal, tam cümlelerle yazılır. Kullanıcıya görünen metinler Türkçedir.

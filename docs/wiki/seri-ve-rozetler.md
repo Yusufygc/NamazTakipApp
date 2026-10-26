@@ -1,6 +1,6 @@
 # Seri ve Rozetler
 
-Oyunlaştırma katmanı. Kod: `lib/core/streaks.dart`, `lib/core/achievements.dart`, `lib/ui/screens/gamification_screen.dart`.
+Oyunlaştırma katmanı. Kod: `packages/namaz_backend/lib/src/domain/streaks.dart`, `packages/namaz_backend/lib/src/domain/achievements.dart`, `lib/ui/screens/gamification_screen.dart`.
 
 ## Tam gün ve seri
 
@@ -44,7 +44,7 @@ Gün farkı `daysDiff` ile hesaplanır (yaz/kış saatinden etkilenmez): [[veri-
 
 ## Test
 
-`test/core_test.dart`: boş liste, bugünle biten seri, dünle biten seri devam eder, iki gün önce biten seri kopar ama en iyi seri korunur, ay sınırını aşan seri.
+`packages/namaz_backend/test/domain_test.dart`: boş liste, bugünle biten seri, dünle biten seri devam eder, iki gün önce biten seri kopar ama en iyi seri korunur, ay sınırını aşan seri.
 
 ## İlgili sayfalar
 

@@ -1,13 +1,11 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:namaz_takip/core/achievements.dart';
-import 'package:namaz_takip/core/app_theme.dart';
+import 'package:namaz_backend/namaz_backend.dart';
+import 'package:namaz_takip/core/theme/app_theme.dart';
 import 'package:namaz_takip/core/icons/app_icons.dart';
-import 'package:namaz_takip/core/prayer.dart';
 import 'package:namaz_takip/core/strings/strings.dart';
-import 'package:namaz_takip/core/text_utils.dart';
-import 'package:namaz_takip/services/prayer_time_service.dart';
+import 'package:namaz_takip/core/format/text_utils.dart';
 
 /// Emoji ve sembol aralıkları (ikon sistemi bunların yerine geçti).
 final _emoji = RegExp('[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B50}\u{2B1B}\u{FE0F}]',

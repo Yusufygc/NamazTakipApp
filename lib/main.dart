@@ -1,40 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:namaz_backend/namaz_backend.dart';
 
-import 'core/app_theme.dart';
-import 'core/date_utils.dart';
-import 'data/app_database.dart';
-import 'data/settings_repository.dart';
-import 'providers/providers.dart';
-import 'services/background_service.dart';
-import 'services/notification_service.dart';
-import 'ui/app_shell.dart';
 import 'core/strings/strings.dart';
+import 'core/theme/app_theme.dart';
+import 'providers/providers.dart';
+import 'ui/app_shell.dart';
+
+/// Arka plan görevinin giriş noktası. Workmanager üst düzey ve işaretli bir
+/// fonksiyon ister; metinleri ön yüz verir, işi backend yapar.
+@pragma('vm:entry-point')
+void namazBackgroundEntryPoint() {
+  NamazBackend.handleBackgroundTasks(const AppNotificationTexts());
+}
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final prefs = await SharedPreferences.getInstance();
-  final settings = SettingsRepository(prefs);
-  await settings.ensureInstallDate(prayerDay(DateTime.now()));
-  final db = await AppDatabase.open();
-
   // İzin pencereleri ilk ekran çizildikten sonra, HomeScreen'de sırayla istenir.
-  await NotificationService.instance.init();
-
-  // Arka plan yenilemesi desteklenmeyen ortamda (ör. masaüstü) uygulamayı durdurmasın.
-  try {
-    await const BackgroundService().register();
-  } catch (e) {
-    debugPrint('[Background] kaydedilemedi: $e');
-  }
+  final backend = await NamazBackend.create(const NamazBackendConfig(
+    notificationTexts: AppNotificationTexts(),
+    backgroundEntryPoint: namazBackgroundEntryPoint,
+  ));
 
   runApp(ProviderScope(
-    overrides: [
-      settingsRepositoryProvider.overrideWithValue(settings),
-      appDatabaseProvider.overrideWithValue(db),
-    ],
+    overrides: [backendProvider.overrideWithValue(backend)],
     child: const NamazTakipApp(),
   ));
 }

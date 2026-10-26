@@ -1,6 +1,6 @@
 # İstatistikler (Süreç)
 
-Süreç ekranı üç sekmeden oluşur: Performans (radar), Isı Haritası ve Karşılaştırma. Kod: `lib/ui/screens/stats_screen.dart`; veri sağlayıcıları [[durum-yonetimi]]'ndedir. Eskiden ayrı sayfalar olan haftalık, aylık ve karşılaştırma tek "Süreç" altında birleşti: [[urun-gereksinimleri]].
+Süreç ekranı üç sekmeden oluşur: Performans (radar), Isı Haritası ve Karşılaştırma. Kod: `lib/ui/screens/stats_screen.dart`; hesaplar backend'de (`packages/namaz_backend/lib/src/application/namaz_backend_impl.dart`), ön yüz sağlayıcıları yalnızca çağırır: [[durum-yonetimi]], [[backend-paketi]]. Eskiden ayrı sayfalar olan haftalık, aylık ve karşılaştırma tek "Süreç" altında birleşti: [[urun-gereksinimleri]].
 
 Tüm sayımlar yalnızca `performed` (durum 1) vakitleri sayar; kaza edilenler dahil değildir: [[veri-katmani]], [[kaza-sistemi]].
 
@@ -25,7 +25,7 @@ Tüm sayımlar yalnızca `performed` (durum 1) vakitleri sayar; kaza edilenler d
 
 ## Test
 
-`test/prayer_repository_test.dart`: `dailyCounts` sıfır günleri de döner ve yalnız kılınanı sayar; `performedByPrayer` beş vakti de döner. Radar paydası ve karşılaştırma mantığı sağlayıcı içindedir ve ayrıca birim testlenmemiştir: [[test-stratejisi]].
+`packages/namaz_backend/test/prayer_repository_test.dart`: `dailyCounts` sıfır günleri de döner ve yalnız kılınanı sayar; `performedByPrayer` beş vakti de döner. Radar paydası ve karşılaştırma mantığı backend uygulamasındadır ve doğrudan birim testlenmemiştir: [[test-stratejisi]].
 
 ## İlgili sayfalar
 

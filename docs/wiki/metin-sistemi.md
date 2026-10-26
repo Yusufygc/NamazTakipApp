@@ -28,10 +28,11 @@ Kullanıcıya görünen tüm metinler `lib/core/strings/` altında, modül baş�
 | `settings_strings.dart` | `SettingsStrings` + `CalcMethodLabel` | Ayarlar, tema adları, hesaplama yöntemi adları |
 | `about_strings.dart` | `AboutStrings` | Hakkında |
 | `notification_strings.dart` | `NotificationStrings` | Kanal adı ve bildirim metinleri |
+| `notification_texts_adapter.dart` | `AppNotificationTexts` | Backend'in `NotificationTexts` portunu bu metinlerle doldurur: [[bildirimler]] |
 
-Enum'ların görünen adı enum içinde değil, strings modülündedir: `PrayerType.label` (`prayer_strings.dart`), `CalcMethod.label` (`settings_strings.dart`). Böylece çekirdek model dile bağımlı olmaz.
+Metin sistemi **ön yüze** aittir; backend metin içermez, bildirim metinlerini port üzerinden alır ([[backend-paketi]]). Enum'lar backend'dedir (`PrayerType`, `CalcMethod`, `AchievementId`); etiket uzantıları ön yüzdedir. Enum'ların görünen adı enum içinde değil, strings modülündedir: `PrayerType.label` (`prayer_strings.dart`), `CalcMethod.label` (`settings_strings.dart`). Böylece çekirdek model dile bağımlı olmaz.
 
-## Türkçe yardımcılar (`lib/core/text_utils.dart`)
+## Türkçe yardımcılar (`lib/core/format/text_utils.dart`)
 
 | Fonksiyon | Neden |
 |---|---|

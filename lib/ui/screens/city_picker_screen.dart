@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/app_theme.dart';
-import '../../data/turkish_cities.dart';
+import '../../core/theme/app_theme.dart';
 import '../../providers/providers.dart';
 import '../../core/icons/app_icons.dart';
 import '../../core/strings/strings.dart';
-import '../../core/text_utils.dart';
+import '../../core/format/text_utils.dart';
 
 /// Elle şehir seçimi (GPS kullanılmak istenmediğinde).
 class CityPickerScreen extends ConsumerStatefulWidget {
@@ -25,7 +24,7 @@ class _CityPickerScreenState extends ConsumerState<CityPickerScreen> {
     final current = ref.watch(settingsProvider).manualLocation;
     final q = foldTurkish(_query.trim());
     final cities = [
-      for (final c in kTurkishCities)
+      for (final c in ref.read(backendProvider).cities)
         if (q.isEmpty || foldTurkish(c.city).contains(q)) c,
     ];
 

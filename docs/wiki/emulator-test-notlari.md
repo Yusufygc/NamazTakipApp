@@ -2,6 +2,25 @@
 
 Elle yapılan testlerin kaydı ve bulunan hatalar. Yeni bir test turu eklendiğinde bu sayfanın başına tarihli bölüm eklenir. Test yöntemi ve komutlar: [[gelistirme-ortami]], kontrol listesi: [[test-stratejisi]].
 
+## Tur 2 — 2026-10-26, front/backend ayrımından sonra (aynı emülatör)
+
+Amaç: yeniden düzenlemenin davranışı bozmadığını doğrulamak. Test edilen sürüm: debug APK, **temiz kurulum** (uninstall + install).
+
+| Alan | Sonuç |
+|---|---|
+| Açılış ve izin sırası | Önce ekran, sonra konum, sonra bildirim izni; ardından "Alarms & reminders" ekranı açıldı |
+| GPS konumu | `geo fix` ile "İstanbul, Türkiye"; vakitler ve geri sayım doğru |
+| İşaretleme | Öğle "Kıldım + cemaatle" → veritabanında `dhuhr\|1\|1` |
+| Bildirim planı | Alarmlar kayıtlı; izin verilince tam zamanlı (`window=0`) |
+| Bildirim metni | Saat 06:10:30'a alınınca 06:11'de "Sabah Namazını Kıldınız mı?" geldi (metin ön yüz adaptöründen) |
+| Arka plan kaydı | `NamazBackend.create` içinde kayıt, hata yok |
+
+**Bulgu:** Taze kurulumda "Alarms & reminders" anahtarı kapalı geldi; ben geri tuşuyla çıkınca alarmlar yaklaşık zamanlı (`window=+1h`, `flags=0x20`) kuruldu ve 05:56 alarmı saatinde ateşlenmedi. `appops set com.namaztakip.app SCHEDULE_EXACT_ALARM allow` ve yeniden açılıştan sonra alarmlar tam zamanlı oldu. Bu refaktörün hatası değil, mevcut tasarımın riskidir: [[bilinen-sorunlar]], [[izinler]], [[bildirimler]].
+
+Düzenek notu: `adb shell date` biçimi `MMDDhhmmYYYY.ss`'dir; yıl yanlış yazılınca (`3026`) saat 3026'ya gitti ve komut hata verdi: [[gelistirme-ortami]].
+
+Bu turda görsel ekran gezisi yapılmadı; ekranlar bir önceki turdaki sürümle aynı kodu kullanıyor ve yalnızca içe aktarmaları değişti. Test edilmeyenler listesi değişmedi.
+
 ## Tur 1 — 2026-10-26 (Android 36 emülatörü, Pixel 8, `google_apis` x86_64)
 
 Test edilen sürüm: debug APK, yalnızca **Varsayılan** tema.

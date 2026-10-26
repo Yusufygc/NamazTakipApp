@@ -2,16 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:namaz_backend/namaz_backend.dart';
 
-import '../../core/app_theme.dart';
-import '../../core/date_utils.dart';
-import '../../core/prayer.dart';
-import '../../data/prayer_repository.dart';
+import '../../core/format/time_format.dart';
+import '../../core/theme/app_theme.dart';
 import '../../providers/providers.dart';
-import '../../services/location_service.dart';
-import '../../services/notification_plan.dart';
-import '../../services/notification_service.dart';
-import '../../services/prayer_time_service.dart';
 import '../widgets/countdown_card.dart';
 import '../widgets/prayer_card.dart';
 import '../widgets/prayer_dialog.dart';
@@ -28,7 +23,6 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen>
     with WidgetsBindingObserver {
-  final service = NotificationService.instance;
   StreamSubscription<PrayerPrompt>? _promptSub;
   PrayerType? _next;
 
@@ -36,10 +30,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _promptSub = service.prompts.listen(_askPrompt);
-    final launch = service.launchPrompt;
+    final backend = ref.read(backendProvider);
+    _promptSub = backend.notificationPrompts.listen(_askPrompt);
+    final launch = backend.takeLaunchPrompt();
     if (launch != null) {
-      service.launchPrompt = null;
       WidgetsBinding.instance.addPostFrameCallback((_) => _askPrompt(launch));
     }
     WidgetsBinding.instance.addPostFrameCallback((_) => _requestPermissions());
@@ -54,8 +48,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     }
     if (!mounted) return;
     if (ref.read(settingsProvider).notificationsEnabled) {
-      await service.requestPermissions();
-      if (mounted) await ref.read(notificationSchedulerProvider).reschedule();
+      final backend = ref.read(backendProvider);
+      await backend.requestNotificationPermission();
+      if (mounted) await backend.rescheduleNotifications();
     }
   }
 

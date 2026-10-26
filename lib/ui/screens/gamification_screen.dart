@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:namaz_backend/namaz_backend.dart';
 
-import '../../core/achievements.dart';
-import '../../core/app_theme.dart';
+import '../../core/theme/app_theme.dart';
 import '../../providers/providers.dart';
 import '../../core/icons/app_icons.dart';
 import '../../core/strings/strings.dart';

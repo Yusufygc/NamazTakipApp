@@ -1,10 +1,10 @@
 # Namaz Vakitleri
 
-Vakitler cihazda, internet kullanılmadan hesaplanır. Kod: `lib/services/prayer_time_service.dart`. Karar gerekçesi: [[002-vakitler-cihazda-hesaplanir]].
+Vakitler cihazda, internet kullanılmadan hesaplanır. Kod: `packages/namaz_backend/lib/src/domain/prayer_time_service.dart`. Karar gerekçesi: [[002-vakitler-cihazda-hesaplanir]].
 
 ## Nasıl hesaplanır
 
-`PrayerTimeService.compute(konum, gün, yöntem)` bir `DayTimes` döner (`lib/core/prayer.dart`): fecr, güneş, öğle, ikindi, akşam, yatsı. Altta `adhan_dart` paketinin `PrayerTimes` sınıfı çalışır.
+`PrayerTimeService.compute(konum, gün, yöntem)` bir `DayTimes` döner (`packages/namaz_backend/lib/src/domain/prayer.dart`): fecr, güneş, öğle, ikindi, akşam, yatsı. Altta `adhan_dart` paketinin `PrayerTimes` sınıfı çalışır.
 
 - Paket zamanları **UTC** `DateTime` olarak verir; servis `.toLocal()` ile cihaz saat dilimine çevirir. Bu yüzden vakitler cihazın saat dilimine göre görünür (emülatörde UTC iken vakitler 3 saat kaymış görünmüştü; saat dilimi İstanbul yapılınca doğru oldu: [[emulator-test-notlari]]).
 - Yalnızca tarih kısmı kullanılır; `compute` içinde gün `dateOnly` ile sadeleştirilir.
@@ -37,7 +37,7 @@ Türkiye için gerekli değildir; paket `HighLatitudeRule` sunar ancak uygulama 
 
 ## Test
 
-`test/core_test.dart`: İstanbul için vakitlerin sıralı ve makul olduğu (haziran, UTC dönüşümü) doğrulanır. Doğruluk karşılaştırması elle yapıldı ve bu sayfadadır; otomatik testte API çağrısı yoktur.
+`packages/namaz_backend/test/domain_test.dart`: İstanbul için vakitlerin sıralı ve makul olduğu (haziran, UTC dönüşümü) doğrulanır. Doğruluk karşılaştırması elle yapıldı ve bu sayfadadır; otomatik testte API çağrısı yoktur.
 
 ## İlgili sayfalar
 

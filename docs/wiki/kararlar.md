@@ -29,6 +29,7 @@ Tarih: YYYY-AA-GG
 | [[008-merkezi-ikon-ve-metin]] | Merkezi ikon ve modüler metin sistemi | Kabul edildi |
 | [[009-konum-yedek-zinciri]] | Konum: medium → high → son bilinen | Kabul edildi |
 | [[010-wiki-sistemi]] | Proje bilgisi `docs/wiki/` içinde tutulur | Kabul edildi |
+| [[011-front-backend-ayrimi]] | Ön yüz ve backend ayrı paketlerdir | Kabul edildi |
 
 ## İlgili sayfalar
 

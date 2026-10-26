@@ -1,6 +1,6 @@
 # Konum
 
-Vakit hesabı koordinat ister. Konum iki şekilde belirlenir: GPS (otomatik) veya elle il seçimi. Kod: `lib/services/location_service.dart`, `lib/data/turkish_cities.dart`, `locationRefreshProvider`.
+Vakit hesabı koordinat ister. Konum iki şekilde belirlenir: GPS (otomatik) veya elle il seçimi. Kod: `packages/namaz_backend/lib/src/platform/location_service.dart`, `packages/namaz_backend/lib/src/data/turkish_cities.dart`, `NamazBackend.refreshLocation()`. Ön yüzde `locationRefreshProvider` bunu çağırır: [[backend-paketi]].
 
 ## Modlar
 
@@ -25,7 +25,7 @@ Ayarlar ekranında iki seçenek bir radyo grubudur; elle seçeneği şehir seçi
 
 ## Hata durumları ve ana ekran
 
-`locationRefreshProvider` hata verirse ve daha önce kaydedilmiş bir konum varsa onunla devam eder; yoksa hatayı iletir. Ana ekran bu durumda bir kart gösterir: mesaj (`LocationStrings`), "Tekrar dene" ve "Şehir seç" düğmeleri. Konum yokken vakit ve sayaç gösterilmez: [[ui-ekranlar]].
+`NamazBackend.refreshLocation()` hata verirse ve daha önce kaydedilmiş bir konum varsa onunla devam eder; yoksa hatayı iletir. Ana ekran bu durumda bir kart gösterir: mesaj (`LocationStrings`), "Tekrar dene" ve "Şehir seç" düğmeleri. Konum yokken vakit ve sayaç gösterilmez: [[ui-ekranlar]].
 
 ## Elle şehir
 

@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:namaz_takip/core/date_utils.dart';
-import 'package:namaz_takip/core/prayer.dart';
-import 'package:namaz_takip/core/streaks.dart';
-import 'package:namaz_takip/services/prayer_time_service.dart';
+import 'package:namaz_backend/src/domain/dates.dart';
+import 'package:namaz_backend/src/domain/prayer.dart';
+import 'package:namaz_backend/src/domain/streaks.dart';
+import 'package:namaz_backend/src/domain/prayer_time_service.dart';
 
 void main() {
   group('prayerDay', () {

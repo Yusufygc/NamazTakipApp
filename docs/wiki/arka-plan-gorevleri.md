@@ -1,12 +1,12 @@
 # Arka Plan Görevleri
 
-Bildirimlerin pencere dışına taşmaması için uygulama kapalıyken de periyodik olarak yeniden planlama yapılır. Kod: `lib/services/background_service.dart`, paket: `workmanager`.
+Bildirimlerin pencere dışına taşmaması için uygulama kapalıyken de periyodik olarak yeniden planlama yapılır. Kod: `packages/namaz_backend/lib/src/application/background_service.dart`, paket: `workmanager`.
 
 ## Nasıl çalışır
 
-- `BackgroundService.register()` `main.dart` içinde çağrılır: `Workmanager().initialize(backgroundDispatcher)` ve ardından `registerPeriodicTask`.
+- `NamazBackend.create(config)` içinde `BackgroundService.register(entryPoint)` çağrılır: `Workmanager().initialize(entryPoint)` ve ardından `registerPeriodicTask`. Giriş noktasını **ön yüz** verir (`NamazBackendConfig.backgroundEntryPoint`).
 - Görev adı `namaz_takip_refresh`, sıklık **12 saat**, ilk gecikme 1 saat, `ExistingPeriodicWorkPolicy.keep` (zaten kayıtlıysa yeniden kaydetmez).
-- `backgroundDispatcher` (`@pragma('vm:entry-point')`) ayrı bir izolatta çalışır: `SharedPreferences` ve veritabanını yeniden açar, `NotificationScheduler.reschedule()` çağırır, veritabanını kapatır. Başarı `true`, hata `false` döner.
+- Giriş noktası ön yüzde `namazBackgroundEntryPoint` (`@pragma('vm:entry-point')`, `lib/main.dart`) adlı üst düzey fonksiyondur; Workmanager bunu ister. İçinde `NamazBackend.handleBackgroundTasks(const AppNotificationTexts())` çağrılır. Backend ayrı izolatta `SharedPreferences` ve veritabanını yeniden açar, `NotificationScheduler.reschedule()` çağırır, veritabanını kapatır. Başarı `true`, hata `false` döner. Metinleri ön yüz verdiği için arka planda da bildirim metni doğru dildedir: [[bildirimler]].
 - Görev **GPS kullanmaz**; son kayıtlı konumu kullanır. Arka plan konum izni gerekmez: [[konum]].
 - Kayıt başarısız olursa (örn. desteklenmeyen platform) uygulama durmaz; hata günlüğe yazılır.
 
@@ -33,6 +33,10 @@ Kayıt koduna ve `flutter analyze`'a kadar doğrulandı. Görevin gerçekten tet
 
 `workmanager_android` eski Kotlin Gradle eklentisini uyguluyor; derleme uyarı verir: [[bagimliliklar]], [[android-yapilandirma]].
 
+## Neden giriş noktası ön yüzde
+
+Workmanager, arka plan işleyicisinin üst düzey ve `vm:entry-point` ile işaretli bir fonksiyon olmasını ister, ve bu izolat uygulamanın bellek durumunu paylaşmaz. Metinler ön yüze ait olduğundan işleyiciyi ön yüz kaydeder; iş (planlama) backend'dedir. Bu, ön yüz ile backend arasındaki tek geri çağrı bağımlılığıdır: [[011-front-backend-ayrimi]].
+
 ## İlgili sayfalar
 
-[[bildirimler]] · [[konum]] · [[ios-yapilandirma]]
+[[bildirimler]] · [[konum]] · [[ios-yapilandirma]] · [[backend-paketi]]

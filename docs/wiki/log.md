@@ -2,6 +2,9 @@
 
 Kronolojik kayıt; en yeni kayıt en üsttedir. Biçim: `## [YYYY-AA-GG] [İŞLEM_TİPİ] | Kısa Açıklama`. İşlem tipleri: INGEST, QUERY, UPDATE, DECISION, LINT, SETUP. Kurallar: [[wiki-kullanim]]. Harita: [[index]].
 
+## [2026-10-26] DECISION | Ön yüz ve backend ayrı paketlere bölündü
+Backend `packages/namaz_backend/` paketine taşındı (pub workspace); ön yüz yalnızca `NamazBackend` arayüzünü ve sade modelleri kullanıyor. İş kuralları sağlayıcılardan backend'e taşındı, bildirim metinleri `NotificationTexts` portuna alındı, iki `architecture_test.dart` sınırı denetliyor. Wiki yolları ve mimari sayfaları güncellendi; temiz kurulumda tam zamanlı alarm izninin kapalı kalabildiği bulundu. Sayfalar: [[mimari-genel]], [[backend-paketi]], [[durum-yonetimi]], [[bildirimler]], [[test-stratejisi]], [[bilinen-sorunlar]]. Karar: [[011-front-backend-ayrimi]].
+
 ## [2026-10-26] LINT | İlk bağlantı denetimi yapıldı
 47 sayfa betikle tarandı: kırık bağlantı, öksüz sayfa, dizinde eksik sayfa ve "İlgili sayfalar" bölümü eksik sayfa yok. Yazım sırasında kodla çelişen üç iddia bulunup düzeltildi (`intl` kullanımı, "sıradaki" vurgusunun tarih kontrolü, ilk derleme süreleri); eski uygulamanın `reminder_settings` tablosunun kullanılmadığı `main` branch'inde doğrulandı. Kalan bilinen sorunlar [[bilinen-sorunlar]] sayfasındadır.
 

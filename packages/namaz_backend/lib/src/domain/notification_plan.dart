@@ -1,6 +1,24 @@
-import '../core/date_utils.dart';
-import '../core/prayer.dart';
-import '../core/strings/strings.dart';
+import 'dates.dart';
+import 'prayer.dart';
+
+/// Bildirim metinlerini üreten port. Metin ve dil kararı arayüz katmanına aittir;
+/// backend yalnızca hangi vakit için hangi metnin gerektiğini söyler.
+abstract interface class NotificationTexts {
+  String get channelName;
+  String get channelDescription;
+
+  /// Ezan vaktinde gelen bildirimin başlığı.
+  String adhanTitle(PrayerType prayer);
+
+  /// Önceki vakit zaten kılındıysa yalnızca vaktin girdiğini söyleyen metin.
+  String adhanBody(PrayerType prayer);
+
+  /// "X ezanı okundu, Y namazını kıldın mı?" metni.
+  String adhanAskBody(PrayerType prayer, PrayerType asked);
+
+  String reminderTitle(PrayerType prayer);
+  String get reminderBody;
+}
 
 /// Planlanan tek bir bildirim; platformdan bağımsız, saf veri.
 class PlannedNotification {
@@ -61,6 +79,7 @@ List<PlannedNotification> buildNotificationPlan({
   required List<DayTimes> days,
   required bool Function(DateTime date, PrayerType prayer) isDone,
   required int reminderMinutes,
+  required NotificationTexts texts,
 }) {
   final plan = <PlannedNotification>[];
   for (final day in days) {
@@ -76,10 +95,10 @@ List<PlannedNotification> buildNotificationPlan({
         plan.add(PlannedNotification(
           id: notificationId(day.date, type, reminder: false),
           scheduledAt: adhanAt,
-          title: NotificationStrings.adhanTitle(type.label),
+          title: texts.adhanTitle(type),
           body: answered
-              ? NotificationStrings.adhanBody(type.label)
-              : NotificationStrings.adhanAskBody(type.label, askType.label),
+              ? texts.adhanBody(type)
+              : texts.adhanAskBody(type, askType),
           payload: answered ? null : PrayerPrompt(askDate, askType).encode(),
         ));
       }
@@ -90,8 +109,8 @@ List<PlannedNotification> buildNotificationPlan({
         plan.add(PlannedNotification(
           id: notificationId(day.date, type, reminder: true),
           scheduledAt: remindAt,
-          title: NotificationStrings.reminderTitle(type.label),
-          body: NotificationStrings.reminderBody,
+          title: texts.reminderTitle(type),
+          body: texts.reminderBody,
           payload: PrayerPrompt(day.date, type).encode(),
         ));
       }

@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:namaz_backend/namaz_backend.dart';
 
-import '../../core/app_theme.dart';
-import '../../core/date_utils.dart';
-import '../../core/prayer.dart';
+import '../../core/format/time_format.dart';
+import '../../core/theme/app_theme.dart';
 import '../../providers/providers.dart';
 import '../../core/strings/strings.dart';
 

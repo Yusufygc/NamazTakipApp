@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:namaz_takip/core/prayer.dart';
-import 'package:namaz_takip/data/app_database.dart';
-import 'package:namaz_takip/data/prayer_repository.dart';
+import 'package:namaz_backend/src/domain/prayer.dart';
+import 'package:namaz_backend/src/data/app_database.dart';
+import 'package:namaz_backend/src/data/prayer_repository.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() {
