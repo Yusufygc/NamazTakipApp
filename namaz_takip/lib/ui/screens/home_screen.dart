@@ -1,0 +1,241 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../core/app_theme.dart';
+import '../../core/date_utils.dart';
+import '../../core/prayer.dart';
+import '../../data/prayer_repository.dart';
+import '../../providers/providers.dart';
+import '../../services/location_service.dart';
+import '../../services/notification_plan.dart';
+import '../../services/notification_service.dart';
+import '../../services/prayer_time_service.dart';
+import '../widgets/countdown_card.dart';
+import '../widgets/prayer_card.dart';
+import '../widgets/prayer_dialog.dart';
+import 'city_picker_screen.dart';
+
+class HomeScreen extends ConsumerStatefulWidget {
+  const HomeScreen({super.key});
+
+  @override
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen>
+    with WidgetsBindingObserver {
+  final service = NotificationService.instance;
+  StreamSubscription<PrayerPrompt>? _promptSub;
+  PrayerType? _next;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _promptSub = service.prompts.listen(_askPrompt);
+    final launch = service.launchPrompt;
+    if (launch != null) {
+      service.launchPrompt = null;
+      WidgetsBinding.instance.addPostFrameCallback((_) => _askPrompt(launch));
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) => _requestPermissions());
+  }
+
+  /// Önce konum, sonra bildirim izni: iki sistem penceresi çakışmasın.
+  Future<void> _requestPermissions() async {
+    try {
+      await ref.read(locationRefreshProvider.future);
+    } catch (_) {
+      // Konum verilmediyse ana ekran kendi mesajını gösterir.
+    }
+    if (!mounted) return;
+    if (ref.read(settingsProvider).notificationsEnabled) {
+      await service.requestPermissions();
+      if (mounted) await ref.read(notificationSchedulerProvider).reschedule();
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _promptSub?.cancel();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      ref.read(trackingDayProvider.notifier).sync();
+      ref.invalidate(locationRefreshProvider);
+      ref.invalidate(todayRecordsProvider);
+    }
+  }
+
+  Future<void> _askPrompt(PrayerPrompt prompt) async {
+    if (!mounted) return;
+    await _ask(prompt.prayer, prompt.date);
+  }
+
+  Future<void> _ask(PrayerType prayer, DateTime date) async {
+    final result = await showPrayerDialog(context, prayer: prayer, date: date);
+    if (result == null || !mounted) return;
+    final notifier = ref.read(todayRecordsProvider.notifier);
+    if (result.answer == PrayerAnswer.performed) {
+      await notifier.markPerformed(date, prayer, congregation: result.congregation);
+    } else {
+      await notifier.markMissed(date, prayer);
+    }
+  }
+
+  String _locationText(AsyncValue<AppLocation?> refresh, AppSettings s) {
+    if (s.location != null) return s.location!.label;
+    return refresh.isLoading ? 'Konum alınıyor...' : 'Konum bulunamadı';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    final settings = ref.watch(settingsProvider);
+    final refresh = ref.watch(locationRefreshProvider);
+    final times = ref.watch(todayTimesProvider);
+    final records = ref.watch(todayRecordsProvider).value ?? const {};
+    final day = ref.watch(trackingDayProvider);
+
+    final failure = refresh.error is LocationException
+        ? (refresh.error as LocationException).failure
+        : null;
+
+    return RefreshIndicator(
+      onRefresh: () async {
+        ref.invalidate(locationRefreshProvider);
+        await ref.read(locationRefreshProvider.future).catchError((_) => null);
+      },
+      child: ListView(
+        padding: const EdgeInsets.all(16),
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          Center(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.location_on, size: 18, color: p.primary),
+                const SizedBox(width: 4),
+                Flexible(
+                  child: Text(
+                    _locationText(refresh, settings),
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10),
+          if (times == null)
+            _NoLocationCard(failure: failure, loading: refresh.isLoading)
+          else ...[
+            CountdownCard(onNextChanged: (t) => setState(() => _next = t)),
+            const SizedBox(height: 16),
+            Text(
+              'BUGÜNÜN NAMAZLARI  •  ${formatDateTr(day)}',
+              style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 1,
+                  color: p.textLight),
+            ),
+            const SizedBox(height: 6),
+            _card(PrayerType.fajr, times, records),
+            PrayerCard(
+              name: 'Güneş',
+              time: formatTime(times.sunrise),
+              isDisplayOnly: true,
+            ),
+            _card(PrayerType.dhuhr, times, records),
+            _card(PrayerType.asr, times, records),
+            _card(PrayerType.maghrib, times, records),
+            _card(PrayerType.isha, times, records),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _card(PrayerType type, DayTimes times, Map<PrayerType, PrayerRecord> records) {
+    final status = records[type]?.status;
+    return PrayerCard(
+      name: type.trName,
+      time: formatTime(times.timeOf(type)),
+      isPerformed: status == PrayerStatus.performed || status == PrayerStatus.compensated,
+      isMissed: status == PrayerStatus.missed,
+      isNext: _next == type,
+      onTap: () => _ask(type, ref.read(trackingDayProvider)),
+    );
+  }
+}
+
+class _NoLocationCard extends ConsumerWidget {
+  const _NoLocationCard({required this.failure, required this.loading});
+
+  final LocationFailure? failure;
+  final bool loading;
+
+  String get _message {
+    switch (failure) {
+      case LocationFailure.serviceDisabled:
+        return 'Cihazın konum servisi kapalı. Açın veya şehrinizi elle seçin.';
+      case LocationFailure.denied:
+        return 'Konum izni verilmedi. İzin verin veya şehrinizi elle seçin.';
+      case LocationFailure.deniedForever:
+        return 'Konum izni kalıcı olarak reddedildi. Ayarlardan izin verin '
+            'veya şehrinizi elle seçin.';
+      case LocationFailure.unavailable:
+        return 'Konum alınamadı. Tekrar deneyin veya şehrinizi elle seçin.';
+      case null:
+        return 'Namaz vakitleri için konumunuz gerekiyor.';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final p = context.palette;
+    return Card(
+      color: p.card,
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            if (loading)
+              const Padding(
+                padding: EdgeInsets.only(bottom: 12),
+                child: CircularProgressIndicator(),
+              ),
+            Text(_message, textAlign: TextAlign.center),
+            const SizedBox(height: 16),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              alignment: WrapAlignment.center,
+              children: [
+                FilledButton.icon(
+                  onPressed: () => ref.invalidate(locationRefreshProvider),
+                  icon: const Icon(Icons.my_location),
+                  label: const Text('Tekrar dene'),
+                ),
+                OutlinedButton.icon(
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(builder: (_) => const CityPickerScreen()),
+                  ),
+                  icon: const Icon(Icons.location_city),
+                  label: const Text('Şehir seç'),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
