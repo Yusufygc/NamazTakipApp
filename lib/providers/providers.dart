@@ -58,6 +58,13 @@ final settingsProvider =
 final paletteProvider = Provider<AppPalette>(
     (ref) => themeByKey(ref.watch(settingsProvider).themeKey).palette);
 
+// ---- Bildirim sağlığı ------------------------------------------------------------
+
+/// Tam zamanlı alarm izni gibi bildirim zamanlamasını etkileyen durum.
+/// Ana ekrana dönüldüğünde ve ayar ekranından dönüldüğünde yenilenir.
+final notificationHealthProvider = FutureProvider.autoDispose<NotificationHealth>(
+    (ref) => ref.read(backendProvider).notificationHealth());
+
 // ---- Konum --------------------------------------------------------------------
 
 /// Konumu tazeler; hata durumunda [LocationException] ile UI'a bildirir.
@@ -69,14 +76,14 @@ final locationRefreshProvider = FutureProvider<AppLocation?>((ref) async {
 
 // ---- Vakitler ------------------------------------------------------------------
 
-/// Takip günü (gece 04:00'e kadar dünkü gün). Uygulama açık kalırken gün
+/// Takip günü (gün sınırı: min(04:00, Sabah vakti)). Uygulama açık kalırken gün
 /// değişimini yakalamak için [sync] düzenli çağrılır.
 class TrackingDayNotifier extends Notifier<DateTime> {
   @override
-  DateTime build() => prayerDay(DateTime.now());
+  DateTime build() => ref.read(backendProvider).trackingDay();
 
   void sync() {
-    final now = prayerDay(DateTime.now());
+    final now = ref.read(backendProvider).trackingDay();
     if (now != state) state = now;
   }
 }

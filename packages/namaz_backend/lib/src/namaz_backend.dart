@@ -64,6 +64,9 @@ abstract interface class NamazBackend {
   /// [day] için vakitler; konum yoksa `null`.
   DayTimes? timesFor(DateTime day);
 
+  /// Takip günü (varsayılan: şimdi). Gün sınırı `min(04:00, Sabah vakti)`'dir.
+  DateTime trackingDay([DateTime? now]);
+
   // ---- Takip ---------------------------------------------------------------------
 
   Future<Map<PrayerType, PrayerRecord>> recordsForDate(DateTime date);
@@ -108,4 +111,12 @@ abstract interface class NamazBackend {
 
   Future<bool> requestNotificationPermission();
   Future<void> rescheduleNotifications();
+
+  /// Bildirimlerin zamanında gelmesini etkileyen durum (tam zamanlı alarm izni).
+  Future<NotificationHealth> notificationHealth();
+
+  /// Sistemin "Alarmlar ve hatırlatıcılar" ayar ekranını açar. Kullanıcı
+  /// dönünce [rescheduleNotifications] çağrılmalıdır; mevcut alarmlar yaklaşık
+  /// zamanlı kalır.
+  Future<void> openExactAlarmSettings();
 }

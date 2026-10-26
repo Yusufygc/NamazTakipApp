@@ -83,6 +83,17 @@ class AppSettings {
   final AppLocation? location;
 }
 
+/// Bildirimlerin zamanında gelmesini etkileyen sistem durumu.
+class NotificationHealth {
+  const NotificationHealth({required this.exactAlarmsAllowed});
+
+  /// Tam zamanlı alarm izni. Yoksa bildirimler yaklaşık zamanlı kurulur ve
+  /// (Android'de) bir saate kadar geç gelebilir. Android dışında her zaman `true`.
+  final bool exactAlarmsAllowed;
+
+  bool get isHealthy => exactAlarmsAllowed;
+}
+
 enum LocationFailure { serviceDisabled, denied, deniedForever, unavailable }
 
 class LocationException implements Exception {

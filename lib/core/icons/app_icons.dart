@@ -9,6 +9,11 @@ abstract final class AppIcons {
   // ---- Marka ----------------------------------------------------------------
   static const IconData app = Icons.mosque;
 
+  // ---- Durum ve uyarı ---------------------------------------------------------
+  static const IconData error = Icons.error_outline;
+  static const IconData retry = Icons.refresh;
+  static const IconData warning = Icons.warning_amber_rounded;
+
   // ---- Gezinme (çekmece) ------------------------------------------------------
   static const IconData navHome = Icons.home_outlined;
   static const IconData navBadges = Icons.emoji_events_outlined;

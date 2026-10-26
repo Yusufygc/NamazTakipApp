@@ -7,10 +7,11 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest_all.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
+import '../domain/notification_gateway.dart';
 import '../domain/notification_plan.dart';
 
 /// Arka plan izolatında da kullanılabilen, yalnızca eklenti çağıran ince katman.
-class NotificationService {
+class NotificationService implements NotificationGateway {
   NotificationService._();
 
   static final NotificationService instance = NotificationService._();
@@ -31,6 +32,7 @@ class NotificationService {
   PrayerPrompt? launchPrompt;
 
   /// iOS en fazla 64 bekleyen bildirim tutar; Android'de sınır daha geniştir.
+  @override
   int get planningDays => Platform.isIOS ? 6 : 10;
 
   Future<void> init() async {
@@ -40,7 +42,11 @@ class NotificationService {
       final info = await FlutterTimezone.getLocalTimezone();
       tz.setLocalLocation(tz.getLocation(info.identifier));
     } catch (e) {
-      debugPrint('[Notifications] timezone alınamadı: $e');
+      // Zararsızdır: bildirimler `TZDateTime.from(an, tz.local)` ile mutlak bir
+      // ana planlanır ve eklenti bölge adıyla aynı bölgedeki duvar saatini
+      // native tarafa gönderir; `tz.local` UTC kalsa da an değişmez
+      // (test/time_zone_instant_test.dart bunu korur).
+      debugPrint('[Notifications] cihaz saat dilimi alınamadı, UTC kalıyor: $e');
     }
 
     await _plugin.initialize(
@@ -87,8 +93,25 @@ class NotificationService {
     return granted;
   }
 
+  /// Tam zamanlı alarm izni var mı? (Android dışında her zaman evet.)
+  Future<bool> canScheduleExactAlarms() async {
+    await init();
+    final android = _plugin.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
+    return await android?.canScheduleExactNotifications() ?? true;
+  }
+
+  /// Android'in "Alarmlar ve hatırlatıcılar" ayar ekranını açar.
+  Future<void> openExactAlarmSettings() async {
+    await init();
+    final android = _plugin.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
+    await android?.requestExactAlarmsPermission();
+  }
+
   /// Planı uygular: aynı id'ler üzerine yazılır, plan dışı kalan eski
   /// bekleyen bildirimler iptal edilir.
+  @override
   Future<void> apply(List<PlannedNotification> plan,
       {required NotificationTexts texts}) async {
     await init();
@@ -129,6 +152,7 @@ class NotificationService {
     }
   }
 
+  @override
   Future<void> cancelAll() async {
     await init();
     await _plugin.cancelAll();

@@ -8,6 +8,7 @@ import '../../core/format/time_format.dart';
 import '../../core/theme/app_theme.dart';
 import '../../providers/providers.dart';
 import '../widgets/countdown_card.dart';
+import '../widgets/notification_health_card.dart';
 import '../widgets/prayer_card.dart';
 import '../widgets/prayer_dialog.dart';
 import 'city_picker_screen.dart';
@@ -67,6 +68,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       ref.read(trackingDayProvider.notifier).sync();
       ref.invalidate(locationRefreshProvider);
       ref.invalidate(todayRecordsProvider);
+      ref.invalidate(notificationHealthProvider);
     }
   }
 
@@ -130,6 +132,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             ),
           ),
           const SizedBox(height: 10),
+          const NotificationHealthCard(),
           if (times == null)
             _NoLocationCard(failure: failure, loading: refresh.isLoading)
           else ...[

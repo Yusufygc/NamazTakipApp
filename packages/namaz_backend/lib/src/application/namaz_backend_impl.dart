@@ -64,7 +64,7 @@ class NamazBackendImpl implements NamazBackend {
     );
   }
 
-  DateTime get _today => prayerDay(DateTime.now());
+  DateTime get _today => trackingDay();
 
   // ---- Ayarlar ----------------------------------------------------------------
 
@@ -145,6 +145,12 @@ class NamazBackendImpl implements NamazBackend {
     final loc = _settings.effectiveLocation;
     if (loc == null) return null;
     return _timeService.compute(loc, day, _settings.calcMethod);
+  }
+
+  @override
+  DateTime trackingDay([DateTime? now]) {
+    final current = now ?? DateTime.now();
+    return prayerDay(current, fajrToday: timesFor(dateOnly(current))?.fajr);
   }
 
   // ---- Takip ---------------------------------------------------------------------
@@ -248,6 +254,13 @@ class NamazBackendImpl implements NamazBackend {
 
   @override
   Future<void> rescheduleNotifications() => _scheduler.reschedule();
+
+  @override
+  Future<NotificationHealth> notificationHealth() async => NotificationHealth(
+      exactAlarmsAllowed: await _notifications.canScheduleExactAlarms());
+
+  @override
+  Future<void> openExactAlarmSettings() => _notifications.openExactAlarmSettings();
 
   /// Planlama hatası kullanıcıya yansımasın ve işaretlemeyi bozmasın.
   void _rescheduleQuietly() {

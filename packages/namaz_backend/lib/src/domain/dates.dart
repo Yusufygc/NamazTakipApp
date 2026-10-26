@@ -1,6 +1,7 @@
 import 'prayer.dart';
 
-/// Gece yarısından sonra bu saate kadar "dünün" namazları geçerlidir.
+/// Gece yarısından sonra bu saate kadar (Sabah vakti bu saatten önce girmediyse)
+/// "dünün" namazları geçerlidir.
 const int kLateNightCutoffHour = 4;
 
 /// Saat bilgisini atar.
@@ -24,10 +25,17 @@ int daysDiff(DateTime a, DateTime b) => DateTime.utc(a.year, a.month, a.day)
     .difference(DateTime.utc(b.year, b.month, b.day))
     .inDays;
 
-/// Takip açısından "bugün". 00:00–03:59 arası hâlâ dünkü gündür.
-DateTime prayerDay(DateTime now) {
+/// Takip açısından "bugün". Gün sınırı `min(04:00, bugünkü Sabah vakti)`'dir:
+/// sınırdan önce hâlâ dünkü gündür.
+///
+/// Sabah vakti 04:00'ten önce girdiğinde (örn. yazın İstanbul'da 03:24) gün o
+/// anda değişir; böylece Sabah namazı doğru güne yazılır. [fajrToday] verilmezse
+/// (konum yok) yalnızca 04:00 kuralı uygulanır.
+DateTime prayerDay(DateTime now, {DateTime? fajrToday}) {
   final today = dateOnly(now);
-  return now.hour < kLateNightCutoffHour ? addDays(today, -1) : today;
+  var boundary = DateTime(now.year, now.month, now.day, kLateNightCutoffHour);
+  if (fajrToday != null && fajrToday.isBefore(boundary)) boundary = fajrToday;
+  return now.isBefore(boundary) ? addDays(today, -1) : today;
 }
 
 /// [from] ile [to] arasındaki (ikisi dahil) takvim günleri.

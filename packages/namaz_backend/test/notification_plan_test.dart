@@ -4,40 +4,7 @@ import 'package:namaz_backend/src/domain/prayer.dart';
 import 'package:namaz_backend/src/data/turkish_cities.dart';
 import 'package:namaz_backend/src/domain/notification_plan.dart';
 
-/// Backend metin üretmez; test, portu basit bir sahte ile doldurur.
-class _TestTexts implements NotificationTexts {
-  const _TestTexts();
-
-  static const _names = {
-    PrayerType.fajr: 'Sabah',
-    PrayerType.dhuhr: 'Öğle',
-    PrayerType.asr: 'İkindi',
-    PrayerType.maghrib: 'Akşam',
-    PrayerType.isha: 'Yatsı',
-  };
-
-  @override
-  String get channelName => 'kanal';
-
-  @override
-  String get channelDescription => 'açıklama';
-
-  @override
-  String adhanTitle(PrayerType prayer) => '${_names[prayer]} Vakti';
-
-  @override
-  String adhanBody(PrayerType prayer) => '${_names[prayer]} vakti girdi.';
-
-  @override
-  String adhanAskBody(PrayerType prayer, PrayerType asked) =>
-      '${_names[prayer]} ezanı okundu. ${_names[asked]} namazını kıldın mı?';
-
-  @override
-  String reminderTitle(PrayerType prayer) => '${_names[prayer]} Namazını Kıldınız mı?';
-
-  @override
-  String get reminderBody => 'işaretle';
-}
+import 'support/test_texts.dart';
 
 DayTimes _day(DateTime d) => DayTimes(
       date: d,
@@ -74,7 +41,7 @@ void main() {
       days: [_day(d1), _day(d2)],
       isDone: (_, _) => false,
       reminderMinutes: 15,
-      texts: const _TestTexts(),
+      texts: const TestTexts(),
     );
     expect(plan.map((n) => n.id).toSet().length, plan.length);
     expect(plan.length, 20);
@@ -86,7 +53,7 @@ void main() {
       days: [_day(d1)],
       isDone: (_, _) => false,
       reminderMinutes: 15,
-      texts: const _TestTexts(),
+      texts: const TestTexts(),
     );
     // Öğle ezanı ve hatırlatması geçti; ikindi, akşam, yatsı kaldı.
     expect(plan.every((n) => n.scheduledAt.isAfter(DateTime(2026, 1, 10, 13))), isTrue);
@@ -99,7 +66,7 @@ void main() {
       days: [_day(d1)],
       isDone: (_, _) => false,
       reminderMinutes: 15,
-      texts: const _TestTexts(),
+      texts: const TestTexts(),
     );
     final fajr = plan.firstWhere(
         (n) => n.id == notificationId(d1, PrayerType.fajr, reminder: false));
@@ -119,7 +86,7 @@ void main() {
       days: [_day(d1)],
       isDone: (date, p) => date == d1 && p == PrayerType.dhuhr,
       reminderMinutes: 15,
-      texts: const _TestTexts(),
+      texts: const TestTexts(),
     );
     expect(plan.any((n) => n.id == notificationId(d1, PrayerType.dhuhr, reminder: true)),
         isFalse);
@@ -135,7 +102,7 @@ void main() {
       days: [_day(d1)],
       isDone: (_, _) => false,
       reminderMinutes: 20,
-      texts: const _TestTexts(),
+      texts: const TestTexts(),
     );
     final r = plan.firstWhere(
         (n) => n.id == notificationId(d1, PrayerType.maghrib, reminder: true));

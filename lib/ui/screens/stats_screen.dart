@@ -162,7 +162,7 @@ class _HeatmapTabState extends ConsumerState<_HeatmapTab> {
   @override
   void initState() {
     super.initState();
-    final today = prayerDay(DateTime.now());
+    final today = ref.read(backendProvider).trackingDay();
     _month = DateTime(today.year, today.month);
   }
 

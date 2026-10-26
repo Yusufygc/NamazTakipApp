@@ -18,6 +18,44 @@ void main() {
     });
   });
 
+  group('prayerDay Sabah vaktiyle (gün sınırı = min(04:00, Sabah))', () {
+    // Yaz: İstanbul 21 Haziran, Sabah 03:24.
+    final summerFajr = DateTime(2026, 6, 21, 3, 24);
+    test('yazın Sabah vakti girince gün değişir (03:30 bugündür)', () {
+      expect(prayerDay(DateTime(2026, 6, 21, 3, 30), fajrToday: summerFajr),
+          DateTime(2026, 6, 21));
+    });
+    test('yazın Sabah vaktinden önce hâlâ dünkü gün', () {
+      expect(prayerDay(DateTime(2026, 6, 21, 3, 23), fajrToday: summerFajr),
+          DateTime(2026, 6, 20));
+      expect(prayerDay(DateTime(2026, 6, 21, 3, 24), fajrToday: summerFajr),
+          DateTime(2026, 6, 21));
+    });
+    test('Sabah vakti verilmezse eski 04:00 kuralı korunur', () {
+      expect(prayerDay(DateTime(2026, 6, 21, 3, 30)), DateTime(2026, 6, 20));
+    });
+
+    // Kış: İstanbul 21 Aralık, Sabah 06:46; sınır 04:00 kalır.
+    final winterFajr = DateTime(2026, 12, 21, 6, 46);
+    test('kışın sınır 04:00 kalır (Sabah geç girse de)', () {
+      expect(prayerDay(DateTime(2026, 12, 21, 3, 59), fajrToday: winterFajr),
+          DateTime(2026, 12, 20));
+      expect(prayerDay(DateTime(2026, 12, 21, 4, 0), fajrToday: winterFajr),
+          DateTime(2026, 12, 21));
+      expect(prayerDay(DateTime(2026, 12, 21, 5, 0), fajrToday: winterFajr),
+          DateTime(2026, 12, 21));
+    });
+    test('Sabah tam 04:00 ise sınır 04:00', () {
+      final f = DateTime(2026, 5, 1, 4, 0);
+      expect(prayerDay(DateTime(2026, 5, 1, 3, 59), fajrToday: f), DateTime(2026, 4, 30));
+      expect(prayerDay(DateTime(2026, 5, 1, 4, 0), fajrToday: f), DateTime(2026, 5, 1));
+    });
+    test('gece yarısından sonra yazın da dünkü gün', () {
+      expect(prayerDay(DateTime(2026, 6, 21, 0, 30), fajrToday: summerFajr),
+          DateTime(2026, 6, 20));
+    });
+  });
+
   group('dateKey', () {
     test('ISO biçimi ve geri çevirme', () {
       expect(dateKey(DateTime(2026, 1, 5)), '2026-01-05');
