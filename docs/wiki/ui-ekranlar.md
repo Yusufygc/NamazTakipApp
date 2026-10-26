@@ -20,7 +20,9 @@ Gezinme yan menü (çekmece) iledir. Kod: `lib/ui/`.
 
 Yukarıdan aşağıya: konum etiketi (yenilemek için aşağı çekilir), [[takip-gunu-ve-sayac]] geri sayım kartı, "BUGÜNÜN NAMAZLARI • tarih" başlığı, vakit kartları (Sabah, Güneş, Öğle, İkindi, Akşam, Yatsı). Konum yoksa kartların yerine konum isteme kartı çıkar: [[konum]]. Bir karta dokunmak işaretleme diyaloğunu açar: [[namaz-isaretleme]]. Bildirimden gelen sorular da bu ekranda açılır: [[bildirimler]]. Uygulama ön plana dönünce takip günü, konum ve kayıtlar tazelenir (`didChangeAppLifecycleState`).
 
-Widget'lar: `PrayerCard` (kart), `CountdownCard` (sayaç), `showPrayerDialog` (diyalog) → `lib/ui/widgets/`.
+Widget'lar: `PrayerCard` (kart), `CountdownCard` (sayaç), `showPrayerDialog` (diyalog), `NotificationHealthCard` (tam zamanlı alarm izni uyarısı; yalnızca izin yokken ve bildirimler açıkken görünür) → `lib/ui/widgets/`.
+
+**Başlatma hata ekranı:** `StartupErrorApp` (`lib/ui/startup_error_app.dart`), `NamazBackend.create` hata verirse normal uygulama yerine gösterilir: mesaj, ayrıntı ve tek düğme "Tekrar dene". Verileri silen bir eylem sunmaz. Emülatörde veritabanı yolu klasör yapılarak doğrulandı: hata sürerken ekran kalır, sorun giderilip "Tekrar dene"ye basılınca normal açılır.
 
 ## Rozetler & Seri
 

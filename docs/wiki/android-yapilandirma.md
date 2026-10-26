@@ -47,7 +47,11 @@ Bildirim eylem düğmeleri kullanılmadığı için `ActionBroadcastReceiver` ta
 
 ## İmzalama
 
-`release` yapısı şu an **debug anahtarıyla** imzalanır (`signingConfig = signingConfigs.getByName("debug")`). Yan yükleme için yeterlidir; Play Store için release keystore gerekir: [[derleme-ve-yayin]].
+`release` yapısı `android/key.properties` varsa gerçek anahtarla imzalanır; yoksa derleme durur (`ALLOW_DEBUG_SIGNING=1` ile bilerek debug imzaya geçilebilir). Ayrıntı ve anahtar üretimi: [[derleme-ve-yayin]].
+
+## Yedekleme kapalı
+
+Namaz kayıtları dini inanç bilgisi taşır (KVKK m.6). Bu yüzden manifest'te `android:allowBackup="false"` ve `android:dataExtractionRules="@xml/data_extraction_rules"` vardır; `res/xml/data_extraction_rules.xml` Android 12+ için bulut yedeğini ve cihazdan cihaza aktarımı tümüyle dışlar. Sonuç: bulut yedeği yoktur, yeni telefonda kayıtlar sıfırdan başlar. Doğrulama: `aapt2` ile manifest'te `allowBackup=false`, `dumpsys package` bayraklarında `ALLOW_BACKUP` yok. Gizlilik politikası ve uygulama içi veri silme/dışa aktarma henüz yok: [[bilinen-sorunlar]].
 
 ## Bilinen uyarılar ve tuzaklar
 

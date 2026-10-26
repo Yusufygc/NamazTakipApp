@@ -12,17 +12,21 @@ flutter test                                     # ön yüz testleri (kökte)
 (cd packages/namaz_backend && flutter test)      # backend testleri
 ```
 
-Durum (2026-10-26): `flutter analyze` temiz; ön yüz **19**, backend **36**, toplam **55 test geçiyor**.
+Durum (2026-10-26): `flutter analyze` temiz; ön yüz **27**, backend **51**, toplam **78 test geçiyor**.
 
 ## Test dosyaları
 
 | Dosya | Test | Kapsam |
 |---|---|---|
-| `packages/namaz_backend/test/domain_test.dart` | 14 | `prayerDay` (04:00 kuralı, ay başı), `dateKey`, seri hesabı, `nextPrayer`, İstanbul vakitlerinin makul olması |
+| `packages/namaz_backend/test/domain_test.dart` | 20 | `prayerDay` (04:00 kuralı, ay başı), `dateKey`, seri hesabı, `nextPrayer`, İstanbul vakitlerinin makul olması |
 | `packages/namaz_backend/test/prayer_repository_test.dart` | 9 | Bellek içi SQLite: tekrar işaretleme, kaza türetme, kaza etme, `dailyCounts`, `fullDays`, `performedByPrayer` |
 | `packages/namaz_backend/test/notification_plan_test.dart` | 9 | Bildirim kimlikleri, çift bildirim yok, geçmiş vakit, önceki vakti sorma, hatırlatma süresi, payload, 81 il |
+| `packages/namaz_backend/test/notification_scheduler_test.dart` | 7 | Planlayıcı kuyruğu: konum yok, bildirim kapalı, tek çağrı, eşzamanlı çağrı örtüşmez, hızlı çağrılar birleşir, hata sonrası kilitlenmez (sahte `NotificationGateway`, bellek içi SQLite, sahte `SharedPreferences`) |
+| `packages/namaz_backend/test/time_zone_instant_test.dart` | 2 | `TZDateTime.from` mutlak anı korur (zamanlama `tz.local`'e bağlı değil) |
 | `packages/namaz_backend/test/architecture_test.dart` | 4 | Backend arayüz paketi kullanmaz, `domain/` saf, katman yönleri, tek barrel |
 | `test/central_system_test.dart` | 12 | Metin ve ikon sistemi, `turkishUpper`, `foldTurkish`, merkezileştirme koruma kuralları |
+| `test/startup_error_app_test.dart` | 2 | Başlatma hata ekranı: mesaj, ayrıntı, "Tekrar dene"; veri silen eylem yok |
+| `test/notification_health_card_test.dart` | 6 | Uyarı kartı: izin yokken görünür, izin varken/bildirim kapalıyken görünmez, düğme ayarı açar, "yok → var" geçişinde bir kez yeniden planlar (sahte `NamazBackend`) |
 | `test/architecture_test.dart` | 7 | Ön yüz `src/` ve backend-only paketleri içe aktarmaz, `pubspec.yaml` temiz, `backendProvider` kullanımı sınırlı, `AppNotificationTexts` adaptörü |
 
 Sayılar 2026-10-26 itibarıyladır; test eklenince bu tablo güncellenir.
@@ -43,7 +47,7 @@ Bu üç kural [[ikon-sistemi]] ve [[metin-sistemi]] kurallarının otomatik dene
 
 ## Kapsanmayanlar (bilinçli)
 
-- **Widget testi yok.** Ekranlar emülatörde elle gezilir: [[emulator-test-notlari]].
+- **Widget testleri sınırlıdır:** yalnızca başlatma hata ekranı ve bildirim sağlığı kartı. Diğer ekranlar emülatörde elle gezilir: [[emulator-test-notlari]].
 - **Riverpod sağlayıcıları** ayrıca test edilmez; mantıkları servis ve repository'dedir: [[durum-yonetimi]]. İstatistik radar paydası ve karşılaştırma farkı sağlayıcı içindedir ve testsizdir: [[istatistikler]].
 - **Eklentiler** (konum, bildirim, workmanager) birim testte çağrılmaz; yalnızca etraflarındaki karar kodu testlenir: [[bildirimler]], [[konum]].
 - **Aladhan karşılaştırması** otomatik değil, elle yapıldı: [[namaz-vakitleri]].

@@ -52,8 +52,9 @@ Arayüz bilmez: `material`, `widgets`, Riverpod, `fl_chart` içe aktarılmaz. Ay
 ## Başlangıç sırası
 
 1. `main()` → `NamazBackend.create(config)`: ayarlar (`shared_preferences`), takip başlangıç günü, veritabanı, bildirim servisi, arka plan görevi kaydı. **İzin penceresi açmaz.**
-2. `ProviderScope(overrides: [backendProvider...])` ile `runApp`.
-3. İlk ekran çizildikten sonra `HomeScreen` izinleri sırayla ister: [[izinler]].
+2. `create` hata verirse (veritabanı açılamaz vb.) `StartupErrorApp` gösterilir ve "Tekrar dene" kurulumu yeniden çalıştırır; yakalanmayan hatalar `FlutterError.onError` ve `PlatformDispatcher.onError` ile günlüğe yazılır.
+3. Başarılıysa `ProviderScope(overrides: [backendProvider...])` ile `runApp`.
+4. İlk ekran çizildikten sonra `HomeScreen` izinleri sırayla ister: [[izinler]].
 
 ## Örnek veri akışı: bir vakti işaretlemek
 

@@ -4,7 +4,11 @@ Uygulama iki farklı "gün" kavramı kullanır ve sıradaki vakti saate göre he
 
 ## Takip günü
 
-Kullanıcı gece 00:30'da Yatsı'yı kılarsa bu hâlâ "dünün" namazıdır. Bu yüzden `prayerDay(now)` (`packages/namaz_backend/lib/src/domain/dates.dart`) saat **04:00'ten önce bir önceki günü** döner. Eşik `kLateNightCutoffHour = 4`'tür; sabah ezanı genelde 04:30'dan sonra olduğu için güvenli kabul edilir. Gerçek İslami gün akşam ezanıyla başlar; bu kural onun basit bir yaklaşımıdır ([[sozluk]]).
+Kullanıcı gece 00:30'da Yatsı'yı kılarsa bu hâlâ "dünün" namazıdır. Bu yüzden `prayerDay(now, fajrToday:)` (`packages/namaz_backend/lib/src/domain/dates.dart`) gün sınırını **`min(04:00, o günün Sabah vakti)`** olarak alır; sınırdan önce bir önceki günü döner. `kLateNightCutoffHour = 4` üst sınırdır.
+
+Neden Sabah vakti de sınıra giriyor: yazın Sabah 04:00'ten önce girer (İstanbul 21 Haziran 03:24). Eski sabit 04:00 kuralıyla 03:24–04:00 arasında işaretlenen Sabah **dünün** satırına yazılıyordu. Kışın Sabah geç girdiği (06:46) için sınır 04:00 kalır; yani kış davranışı değişmedi. Konum yoksa (`fajrToday` verilmez) yalnızca 04:00 kuralı uygulanır. Gerçek İslami gün akşam ezanıyla başlar; bu kural onun basit bir yaklaşımıdır ([[sozluk]]).
+
+Ön yüz `prayerDay`'i doğrudan çağırmaz; `NamazBackend.trackingDay([now])` Sabah vaktini bilen tek yerdir ([[backend-paketi]]).
 
 - İşaretlemeler takip gününe yazılır: [[namaz-isaretleme]].
 - Ana ekranda "BUGÜNÜN NAMAZLARI • tarih" başlığı takip gününü gösterir.
@@ -32,7 +36,9 @@ Doğrulama: emülatörde saat 19:34:30'a alınınca 19:35'te Yatsı bildirimi ge
 
 ## Test
 
-`packages/namaz_backend/test/domain_test.dart`: `prayerDay` (00:30, 03:59, 04:00, ay başı), `nextPrayer` (öğleden sonra, yatsıdan sonra, gece yarısından sonra).
+`packages/namaz_backend/test/domain_test.dart`: `prayerDay` (00:30, 03:59, 04:00, ay başı; Sabah vaktiyle: yazın 03:23/03:24/03:30, kışın 03:59/04:00/05:00, Sabah tam 04:00, yazın gece yarısı, Sabah verilmezse 04:00), `nextPrayer` (öğleden sonra, yatsıdan sonra, gece yarısından sonra).
+
+Emülatör doğrulaması: saat 21 Haziran 03:30'a alınınca ana ekran "21 Haziran 2026" gösterdi ve Sabah işareti veritabanına `2026-06-21|fajr|1` olarak yazıldı: [[emulator-test-notlari]].
 
 ## İlgili sayfalar
 

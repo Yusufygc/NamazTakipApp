@@ -29,7 +29,7 @@ Namaz Takip, günlük namazları takip eden ve kaza namazlarını otomatik liste
 
 ## Durum (2026-10-26)
 
-- Kod yazıldı, `flutter analyze` temiz, 55 test geçiyor (ön yüz 19, backend 36): [[test-stratejisi]].
+- Kod yazıldı, `flutter analyze` temiz, 78 test geçiyor (ön yüz 27, backend 51): [[test-stratejisi]].
 - Android emülatörde (Android 36) elle doğrulandı: [[emulator-test-notlari]].
 - Gerçek telefonda, iOS'ta ve dört ek temada görsel test yapılmadı: [[bilinen-sorunlar]], [[yol-haritasi]].
 - Eski React Native/Expo sürümü silindi, Flutter projesi depo köküne taşındı: [[gecis-gecmisi]], [[001-flutter-gecisi]].

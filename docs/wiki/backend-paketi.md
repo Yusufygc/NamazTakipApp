@@ -13,7 +13,7 @@ Paket, kök `pubspec.yaml`'daki `workspace:` bölümüyle uygulamaya bağlanır;
 | Arayüz | `NamazBackend`, `NamazBackendConfig` |
 | Port | `NotificationTexts` (bildirim metinleri) |
 | Modeller | `PrayerType`, `PrayerStatus`, `DayTimes`, `NextPrayer`, `PrayerRecord`, `QazaItem`, `DayCount`, `WeekComparison`, `GamificationData`, `AppSettings`, `AppLocation`, `CalcMethod`, `LocationMode`, `LocationFailure`, `LocationException`, `PrayerPrompt`, `StreakStats`, `Achievement`, `AchievementId` |
-| Saf yardımcılar | `prayerDay`, `nextPrayer`, `dateOnly`, `dateKey`, `parseDateKey`, `addDays`, `daysBetween`, `daysDiff`, `computeStreaks`, `buildAchievements` |
+| Saf yardımcılar | `prayerDay(now, {fajrToday})`, `nextPrayer`, `dateOnly`, `dateKey`, `parseDateKey`, `addDays`, `daysBetween`, `daysDiff`, `computeStreaks`, `buildAchievements` |
 
 `PrayerTimeService`, repository'ler, veritabanı, bildirim servisi, konum servisi **açılmaz**.
 
@@ -23,11 +23,11 @@ Paket, kök `pubspec.yaml`'daki `workspace:` bölümüyle uygulamaya bağlanır;
 |---|---|
 | Kurulum | `NamazBackend.create(config)`, `NamazBackend.handleBackgroundTasks(texts)` |
 | Ayarlar | `settings`, `setTheme`, `setNotificationsEnabled`, `setReminderMinutes`, `setCalcMethod`, `useManualLocation`, `useAutoLocation`, `cities` |
-| Konum ve vakit | `refreshLocation()`, `timesFor(day)` |
+| Konum ve vakit | `refreshLocation()`, `timesFor(day)`, `trackingDay([now])` (gün sınırı `min(04:00, Sabah)`) |
 | Takip | `recordsForDate`, `markPerformed`, `markMissed` (ikisi de bildirimleri yeniden planlar) |
 | Kaza | `qazaItems()`, `compensate(item)` |
 | İstatistik | `trackingStart`, `weekComparison()`, `dailyCounts(n)`, `monthCounts(ay)`, `radar(gün)`, `gamification()` |
-| Bildirim | `notificationPrompts`, `takeLaunchPrompt()`, `requestNotificationPermission()`, `rescheduleNotifications()` |
+| Bildirim | `notificationPrompts`, `takeLaunchPrompt()`, `requestNotificationPermission()`, `rescheduleNotifications()`, `notificationHealth()` (`NotificationHealth.exactAlarmsAllowed`), `openExactAlarmSettings()` |
 
 Arayüz yöntemleri düz Dart modelleri döner; SQL, eklenti sınıfı veya `Stream` dışında reaktif nesne sızmaz. Ön yüz bu arayüzün sahte (fake) bir uygulamasıyla test edilebilir.
 
@@ -78,7 +78,7 @@ Backend testleri portu basit bir sahte ile doldurur (`_TestTexts`), böylece bac
 
 ## Test
 
-Backend testleri paketin kendi klasöründe çalışır: `cd packages/namaz_backend && flutter test`. 36 test: tarih/seri/vakit mantığı, bellek içi SQLite repository'si, bildirim planı, mimari kuralları: [[test-stratejisi]].
+Backend testleri paketin kendi klasöründe çalışır: `cd packages/namaz_backend && flutter test`. 51 test: tarih/seri/vakit/gün sınırı mantığı, bellek içi SQLite repository'si, bildirim planı, planlayıcı kuyruğu (sahte `NotificationGateway`), saat dilimi anı, mimari kuralları: [[test-stratejisi]].
 
 ## İlgili sayfalar
 

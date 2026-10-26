@@ -2,6 +2,18 @@
 
 Elle yapılan testlerin kaydı ve bulunan hatalar. Yeni bir test turu eklendiğinde bu sayfanın başına tarihli bölüm eklenir. Test yöntemi ve komutlar: [[gelistirme-ortami]], kontrol listesi: [[test-stratejisi]].
 
+## Tur 3 — 2026-10-26, denetim bulguları #1–#7 düzeltmeleri (aynı emülatör)
+
+| Alan | Sonuç |
+|---|---|
+| Yedekleme (#1) | `aapt2`: `allowBackup=false`, `dataExtractionRules` bağlı; `dumpsys package` bayraklarında `ALLOW_BACKUP` yok |
+| İmzalama (#2) | Anahtarsız release hata verdi; `ALLOW_DEBUG_SIGNING=1` ile debug imzalı; geçici anahtarla `CN=Gecici Test` imzalı APK |
+| Başlatma hatası (#6) | Veritabanı yolu klasör yapılınca `StartupErrorApp` göründü ("DatabaseException(open_failed ...)"); sorun sürerken "Tekrar dene" ekranda kaldı; dosya geri konulunca normal açıldı |
+| Gün sınırı (#4) | Saat 21 Haziran 03:30: ana ekran "21 Haziran 2026"; Sabah işareti `2026-06-21\|fajr\|1` |
+| Alarm izni (#3) | `appops deny`: uyarı kartı göründü, alarmlar `window=+1h`; izin verilip dönülünce kart kalktı, alarmlar `window=0` oldu |
+
+**Beklenmedik bulgular:** (1) Bozuk (rastgele baytlı) veritabanı dosyası hata ekranı **vermedi**: Android `DefaultDatabaseErrorHandler` dosyayı sessizce silip boş veritabanı oluşturdu; kullanıcı geçmişini sessizce kaybeder. (2) Logda `yeniden planlama başarısız: Must be a date in the future`: plan uygulanırken geçmişe düşen bildirim kalan planı durduruyor. İkisi de [[bilinen-sorunlar]]'a işlendi. (3) Denetim bulgusu #7 (saat dilimi yedeği) kaynak kod okumasıyla **yanlış pozitif** çıktı: [[bildirimler]].
+
 ## Tur 2 — 2026-10-26, front/backend ayrımından sonra (aynı emülatör)
 
 Amaç: yeniden düzenlemenin davranışı bozmadığını doğrulamak. Test edilen sürüm: debug APK, **temiz kurulum** (uninstall + install).

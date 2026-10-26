@@ -54,6 +54,7 @@ Namaz Takip projesinin bilgi tabanı. Her işe buradan başlayın; kurallar içi
 - [[emulator-test-notlari]] — Elle test turlarının kaydı ve bulunan hatalar.
 - [[gecis-gecmisi]] — React Native/Expo'dan Flutter'a geçişin hikâyesi ve farkları.
 - [[bilinen-sorunlar]] — Çözülmemiş sorunlar, doğrulanmamış alanlar ve sınırlar.
+- [[denetim-raporu-2026-10-26]] — V2 denetim şablonu ve AI geliştirme metodolojisine göre yapılan analiz: 24 bulgu, ölçümler, aksiyon planı.
 
 ## Kararlar
 

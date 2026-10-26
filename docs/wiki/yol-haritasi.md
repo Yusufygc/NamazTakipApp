@@ -41,7 +41,7 @@ Bunlar yeni özellik değil, mevcut işin kanıtlanması içindir.
 
 - `workmanager_android` eski Kotlin eklentisini kullanıyor; Flutter ileride uyarıyı hataya çevirebilir: [[bagimliliklar]].
 - Çekmece başlığının üstünde durum çubuğu alanı beyaz kalıyor: [[bilinen-sorunlar]].
-- Widget testi yok, yalnızca birim ve veritabanı testi var: [[test-stratejisi]].
+- Widget testleri yalnızca başlangıç hata ekranı ve bildirim sağlığı kartını kapsıyor; ana ekranlar için yok: [[test-stratejisi]].
 
 ## İlgili sayfalar
 

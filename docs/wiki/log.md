@@ -2,6 +2,12 @@
 
 Kronolojik kayıt; en yeni kayıt en üsttedir. Biçim: `## [YYYY-AA-GG] [İŞLEM_TİPİ] | Kısa Açıklama`. İşlem tipleri: INGEST, QUERY, UPDATE, DECISION, LINT, SETUP. Kurallar: [[wiki-kullanim]]. Harita: [[index]].
 
+## [2026-10-26] REVIEW | Denetim raporunun yüksek öncelikli 7 bulgusu uygulandı
+#1 yedekleme kapatıldı; #2 release imzası anahtarsız derlemeyi durdurur; #3 tam zamanlı alarm izni yoksa ana ekranda uyarı kartı; #4 gün sınırı `min(04:00, Sabah)`; #5 bildirim planlayıcı sıraya alındı; #6 başlangıç hata ekranı ve hata kancaları. #7 yanlış alarm çıktı (saat dilimi ve eklenti kaynağıyla doğrulandı), rapordan geri çekildi. Testler: ön yüz 27, backend 51, `flutter analyze` temiz. Doğrulanmayanlar: gerçek release anahtarı üretilmedi, gerçek cihaz yok. Yeni iki bulgu çözülmedi (bozuk veritabanı sessizce siliniyor, geçmiş zamanlı bildirim planı durduruyor): [[bilinen-sorunlar]]. Sayfalar: [[denetim-raporu-2026-10-26]], [[bildirimler]], [[takip-gunu-ve-sayac]], [[derleme-ve-yayin]], [[test-stratejisi]], [[emulator-test-notlari]].
+
+## [2026-10-26] REVIEW | Denetim raporu hazırlandı (V2 şablonu + AI metodolojisi)
+Kod ve süreç iki kaynak dokümana göre ölçüldü ve incelendi: 24 bulgu (kritik yok, 7 yüksek), eşik ölçümleri, metodoloji uyum denetimi. Hiçbir düzeltme uygulanmadı; onay bekleniyor. Rapor: [[denetim-raporu-2026-10-26]]. İlgili: [[bilinen-sorunlar]], [[yol-haritasi]].
+
 ## [2026-10-26] DECISION | Ön yüz ve backend ayrı paketlere bölündü
 Backend `packages/namaz_backend/` paketine taşındı (pub workspace); ön yüz yalnızca `NamazBackend` arayüzünü ve sade modelleri kullanıyor. İş kuralları sağlayıcılardan backend'e taşındı, bildirim metinleri `NotificationTexts` portuna alındı, iki `architecture_test.dart` sınırı denetliyor. Wiki yolları ve mimari sayfaları güncellendi; temiz kurulumda tam zamanlı alarm izninin kapalı kalabildiği bulundu. Sayfalar: [[mimari-genel]], [[backend-paketi]], [[durum-yonetimi]], [[bildirimler]], [[test-stratejisi]], [[bilinen-sorunlar]]. Karar: [[011-front-backend-ayrimi]].
 

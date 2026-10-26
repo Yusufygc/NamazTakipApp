@@ -17,15 +17,34 @@ Komutlar depo kökünden (`pubspec.yaml`'ın olduğu klasör) çalıştırılır
 
 ## İmzalama durumu
 
-Release derlemesi şu an **debug anahtarıyla** imzalanır. Yan yükleme için yeterlidir. Play Store yayını için:
+`android/app/build.gradle.kts` release imzasını `android/key.properties` dosyasından okur. Dosya yoksa **release derlemesi bilerek durur** ve nedenini yazar; böylece debug imzalı bir sürüm yanlışlıkla üretilmez (denetim bulgusu #2: [[denetim-raporu-2026-10-26]]).
 
-1. Bir keystore üret (`keytool -genkey -v -keystore upload-keystore.jks ...`) ve güvenli yerde sakla; **depoya koyma**.
-2. `android/key.properties` dosyası oluştur (yine depoya koyma, `.gitignore`'a ekle).
-3. `android/app/build.gradle.kts` içinde `signingConfigs.release` bloğunu bu dosyadan okuyacak şekilde yaz ve `buildTypes.release.signingConfig`'i ona bağla.
-4. `flutter build appbundle --release`.
-5. Play Console'da uygulama kaydı, mağaza metinleri, gizlilik politikası (konum izni kullanıldığı için gerekir) ve test kanalı.
+| Durum | Sonuç |
+|---|---|
+| `android/key.properties` var | `assembleRelease`/`bundleRelease` gerçek anahtarla imzalar |
+| Yok, ortam değişkeni yok | Derleme hata verir: "Release imza anahtarı yok..." |
+| Yok, `ALLOW_DEBUG_SIGNING=1` | Debug anahtarıyla derler (yalnızca yan yükleme testi; mağazaya yüklenemez) |
 
-Henüz yapılmadı: [[yol-haritasi]].
+Yan yükleme testi için (PowerShell): `$env:ALLOW_DEBUG_SIGNING = "1"; flutter build apk --release`. Git Bash: `ALLOW_DEBUG_SIGNING=1 flutter build apk --release`.
+
+**Gerçek anahtarı üretmek (sen yaparsın; şifreleri ve keystore'u ben üretmem):**
+
+1. Keystore üret ve güvenli yerde yedekle; kaybolursa uygulamayı güncelleyemezsin, **depoya koyma**:
+   ```bash
+   keytool -genkeypair -v -keystore upload-keystore.jks -storetype JKS -keyalg RSA -keysize 2048 -validity 10000 -alias upload
+   ```
+   (`keytool`, Android Studio'nun `jbr/bin` klasöründedir.)
+2. `android/key.properties` dosyasını oluştur (`android/.gitignore` zaten yok sayar):
+   ```
+   storeFile=C:/yol/upload-keystore.jks
+   storePassword=...
+   keyAlias=upload
+   keyPassword=...
+   ```
+3. `flutter build appbundle --release`; imzayı `apksigner verify --print-certs` ile kontrol et (DN "Android Debug" olmamalı).
+4. Play Console'da uygulama kaydı, mağaza metinleri, **gizlilik politikası** (konum izni ve dini veri nedeniyle zorunlu), test kanalı.
+
+Doğrulama (2026-10-26): anahtarsız derleme hata verdi; `ALLOW_DEBUG_SIGNING=1` ile `CN=Android Debug` imzalı APK çıktı; geçici (depoya girmeyen) bir test anahtarıyla `CN=Gecici Test` imzalı APK çıktı. Gerçek anahtar henüz üretilmedi: [[yol-haritasi]].
 
 ## Sürüm numarası
 

@@ -16,6 +16,7 @@ Uygulamadaki tüm ikonlar tek yerdedir: `lib/core/icons/app_icons.dart`. Karar g
 | Grup | Örnekler |
 |---|---|
 | Marka | `app` (cami) |
+| Durum ve uyarı | `error`, `retry`, `warning` |
 | Gezinme | `navHome`, `navBadges`, `navQaza`, `navStats`, `navSettings`, `navAbout` |
 | Vakit kartı | `sunrise`, `prayerNext`, `prayerPerformed`, `prayerMissed`, `location`, `locationDetect`, `city`, `search`, `selected` |
 | Diyalog | `dialogHeader`, `confirmPerformed`, `confirmMissed` |

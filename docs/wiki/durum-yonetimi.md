@@ -21,9 +21,13 @@ Ekranlar `backendProvider`'ı yalnızca bir olay anında (izin isteme, bildirim 
 
 - `locationRefreshProvider` (`FutureProvider`): `backend.refreshLocation()` çağırır, sonra `settingsProvider.reload()` yapar (backend yeni GPS konumunu kaydetmiş olabilir). Elle mod, GPS, son konum yedeği ve hata davranışı backend'dedir: [[konum]].
 
+## Bildirim sağlığı
+
+- `notificationHealthProvider` (`FutureProvider.autoDispose`): `backend.notificationHealth()`; ana ekrana dönülünce ve ayar ekranından dönülünce yenilenir. `NotificationHealthCard` bunu izler; "izin yok → var" geçişinde bir kez `rescheduleNotifications()` çağırır.
+
 ## Takip günü ve vakitler
 
-- `trackingDayProvider` (`TrackingDayNotifier`): takip günü (`prayerDay`). `sync()` her saniye sayaç tarafından çağrılır; gün değiştiyse durumu günceller: [[takip-gunu-ve-sayac]].
+- `trackingDayProvider` (`TrackingDayNotifier`): takip günü; `backend.trackingDay()` değerini tutar (Sabah vaktini backend bilir). `sync()` her saniye sayaç tarafından çağrılır; gün değiştiyse durumu günceller: [[takip-gunu-ve-sayac]].
 - `todayTimesProvider`: `backend.timesFor(takipGünü)`; `settingsProvider`'ı izler, ayar veya konum değişince yeniden hesaplanır.
 - `upcomingDaysProvider`: dün, bugün, yarın; sıradaki vakit hesabı için.
 

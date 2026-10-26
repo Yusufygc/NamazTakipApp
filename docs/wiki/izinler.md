@@ -38,7 +38,7 @@ Ayarlarda bildirimler kapalıyken açılırsa (`setNotifications(true)`) bildiri
 |---|---|
 | Konum servisi kapalı / izin verilmedi / kalıcı reddedildi | Ana ekranda ilgili mesaj, "Tekrar dene" ve "Şehir seç" düğmeleri; elle şehir ile uygulama tam çalışır |
 | Bildirim izni verilmedi | Uygulama çalışır, bildirim gelmez; ayarlarda anahtar açık kalabilir |
-| Tam zamanlı alarm yok | Bildirimler `inexact` modda planlanır; emülatörde alarm penceresi `+1 saat` göründü, yani bildirim **bir saate kadar geç** gelebilir. Taze kurulumda izin varsayılan olarak kapalıdır ve kullanıcı ayarlar ekranında anahtarı açmalıdır: [[bilinen-sorunlar]] |
+| Tam zamanlı alarm yok | Bildirimler `inexact` modda planlanır; emülatörde alarm penceresi `+1 saat` göründü, yani bildirim **bir saate kadar geç** gelebilir. Taze kurulumda izin varsayılan olarak kapalıdır. Ana ekranda kalıcı uyarı kartı ve "Ayarları aç" düğmesi çıkar; kullanıcı izni verip dönünce kart kalkar ve alarmlar otomatik yeniden planlanıp tam zamanlı olur: [[bildirimler]], [[bilinen-sorunlar]] |
 
 ## İlgili sayfalar
 
