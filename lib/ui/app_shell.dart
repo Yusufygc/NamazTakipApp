@@ -8,6 +8,8 @@ import 'screens/home_screen.dart';
 import 'screens/qaza_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/stats_screen.dart';
+import '../core/icons/app_icons.dart';
+import '../core/strings/strings.dart';
 
 class _Destination {
   const _Destination(this.title, this.icon, this.builder);
@@ -18,12 +20,12 @@ class _Destination {
 }
 
 final List<_Destination> _destinations = [
-  _Destination('Namaz Takip', Icons.home_outlined, (_) => const HomeScreen()),
-  _Destination('Rozetler & Seri', Icons.emoji_events_outlined, (_) => const GamificationScreen()),
-  _Destination('Kaza Namazları', Icons.event_busy_outlined, (_) => const QazaScreen()),
-  _Destination('Süreç', Icons.insights_outlined, (_) => const StatsScreen()),
-  _Destination('Ayarlar', Icons.settings_outlined, (_) => const SettingsScreen()),
-  _Destination('Hakkında', Icons.info_outline, (_) => const AboutScreen()),
+  _Destination(NavStrings.home, AppIcons.navHome, (_) => const HomeScreen()),
+  _Destination(NavStrings.badges, AppIcons.navBadges, (_) => const GamificationScreen()),
+  _Destination(NavStrings.qaza, AppIcons.navQaza, (_) => const QazaScreen()),
+  _Destination(NavStrings.stats, AppIcons.navStats, (_) => const StatsScreen()),
+  _Destination(NavStrings.settings, AppIcons.navSettings, (_) => const SettingsScreen()),
+  _Destination(NavStrings.about, AppIcons.navAbout, (_) => const AboutScreen()),
 ];
 
 final selectedDestinationProvider =
@@ -63,12 +65,13 @@ class AppShell extends ConsumerWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Namaz Takip',
+                Text(CommonStrings.appName,
                     style: TextStyle(
                         color: p.isDark ? p.text : Colors.white,
                         fontSize: 22,
                         fontWeight: FontWeight.bold)),
-                const Text('🕌', style: TextStyle(fontSize: 28)),
+                Icon(AppIcons.app,
+                    size: 30, color: p.isDark ? p.text : Colors.white),
               ],
             ),
           ),

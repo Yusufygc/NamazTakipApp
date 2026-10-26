@@ -10,6 +10,7 @@ import 'providers/providers.dart';
 import 'services/background_service.dart';
 import 'services/notification_service.dart';
 import 'ui/app_shell.dart';
+import 'core/strings/strings.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,7 +46,7 @@ class NamazTakipApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final palette = ref.watch(paletteProvider);
     return MaterialApp(
-      title: 'Namaz Takip',
+      title: CommonStrings.appName,
       debugShowCheckedModeBanner: false,
       theme: buildTheme(palette),
       home: const AppShell(),

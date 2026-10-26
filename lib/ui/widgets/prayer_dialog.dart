@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../../core/app_theme.dart';
 import '../../core/date_utils.dart';
 import '../../core/prayer.dart';
+import '../../core/icons/app_icons.dart';
+import '../../core/strings/strings.dart';
 
 enum PrayerAnswer { performed, missed }
 
@@ -46,15 +48,15 @@ class _PrayerDialogState extends State<_PrayerDialog> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       title: Column(
         children: [
-          const Text('🕌', style: TextStyle(fontSize: 36)),
+          Icon(AppIcons.dialogHeader, size: 40, color: p.primary),
           const SizedBox(height: 8),
-          Text('${widget.prayer.trName.toUpperCase()} NAMAZINI',
+          Text(PrayerDialogStrings.title(widget.prayer.label),
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          Text('KILDINIZ MI?',
+          Text(PrayerDialogStrings.question,
               style: TextStyle(fontSize: 15, color: p.textLight)),
           if (widget.date != null && widget.date != dateOnly(DateTime.now()))
-            Text(formatDateTr(widget.date!),
+            Text(DateStrings.long(widget.date!),
                 style: TextStyle(fontSize: 13, color: p.textLight)),
         ],
       ),
@@ -63,7 +65,7 @@ class _PrayerDialogState extends State<_PrayerDialog> {
         onChanged: (v) => setState(() => _congregation = v ?? false),
         controlAffinity: ListTileControlAffinity.leading,
         contentPadding: EdgeInsets.zero,
-        title: const Text('Cemaatle kıldım'),
+        title: const Text(PrayerDialogStrings.congregation),
       ),
       actionsAlignment: MainAxisAlignment.center,
       actionsOverflowAlignment: OverflowBarAlignment.center,
@@ -75,19 +77,19 @@ class _PrayerDialogState extends State<_PrayerDialog> {
             context,
             PrayerDialogResult(PrayerAnswer.performed, congregation: _congregation),
           ),
-          icon: const Icon(Icons.check),
-          label: const Text('Kıldım'),
+          icon: const Icon(AppIcons.confirmPerformed),
+          label: const Text(PrayerDialogStrings.performed),
         ),
         FilledButton.icon(
           style: FilledButton.styleFrom(backgroundColor: p.danger),
           onPressed: () =>
               Navigator.pop(context, const PrayerDialogResult(PrayerAnswer.missed)),
-          icon: const Icon(Icons.close),
-          label: const Text('Kılmadım'),
+          icon: const Icon(AppIcons.confirmMissed),
+          label: const Text(PrayerDialogStrings.missed),
         ),
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text('Vazgeç', style: TextStyle(color: p.textLight)),
+          child: Text(CommonStrings.dismiss, style: TextStyle(color: p.textLight)),
         ),
       ],
     );

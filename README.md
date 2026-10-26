@@ -39,6 +39,8 @@ flutter build apk --debug
 ```
 lib/
   core/        saf mantık: tarih, seri, rozet, tema, vakit modelleri
+    icons/     merkezi ikon sistemi (AppIcons)
+    strings/   modüler merkezi metin sistemi
   data/        SQLite (sqflite), repository'ler, il listesi
   services/    vakit hesabı, konum, bildirim, arka plan görevi
   providers/   Riverpod durum yönetimi
@@ -46,6 +48,17 @@ lib/
 test/          birim testleri
 assets/icon/   uygulama ikonu kaynakları
 ```
+
+## İkon ve metin sistemi
+
+- **İkonlar:** `lib/core/icons/app_icons.dart`. Ekranlarda emoji veya `Icons.xxx` kullanılmaz,
+  anlamsal ad üzerinden `AppIcons.xxx` kullanılır (ör. `AppIcons.navQaza`).
+- **Metinler:** `lib/core/strings/`. Her modül kendi dosyasındadır (`home_strings.dart`,
+  `qaza_strings.dart`, `settings_strings.dart` ...); ekranlar yalnızca `strings.dart`'ı içe aktarır.
+  Yeni metni ilgili modüle ekleyin; ekranlara sabit metin yazmayın.
+- `test/central_system_test.dart` bu kuralları denetler: `lib/` içinde emoji, `app_icons.dart`
+  dışında `Icons.xxx` ve `lib/ui/` içinde Türkçe sabit metin bulunursa test başarısız olur.
+- Büyük harfe çevirme için `turkishUpper` (`İkindi` → `İKİNDİ`), arama için `foldTurkish` kullanın.
 
 ## Notlar
 

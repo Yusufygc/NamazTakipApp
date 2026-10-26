@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/app_theme.dart';
-import '../../core/date_utils.dart';
 import '../../data/prayer_repository.dart';
 import '../../providers/providers.dart';
+import '../../core/icons/app_icons.dart';
+import '../../core/strings/strings.dart';
 
 class QazaScreen extends ConsumerWidget {
   const QazaScreen({super.key});
@@ -16,7 +17,7 @@ class QazaScreen extends ConsumerWidget {
 
     return async.when(
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, _) => Center(child: Text('Hata: $e')),
+      error: (e, _) => Center(child: Text(CommonStrings.error(e))),
       data: (items) {
         if (items.isEmpty) {
           return Center(
@@ -25,12 +26,12 @@ class QazaScreen extends ConsumerWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text('🎉', style: TextStyle(fontSize: 56)),
+                  Icon(AppIcons.qazaEmpty, size: 64, color: p.primary),
                   const SizedBox(height: 12),
-                  const Text('Kaza namazınız yok',
+                  const Text(QazaStrings.emptyTitle,
                       style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 6),
-                  Text('Allah kabul etsin.', style: TextStyle(color: p.textLight)),
+                  Text(QazaStrings.emptySubtitle, style: TextStyle(color: p.textLight)),
                 ],
               ),
             ),
@@ -49,7 +50,7 @@ class QazaScreen extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(4, 4, 4, 10),
               child: Text(
-                'Toplam ${items.length} kaza namazı • ${days.length} gün',
+                QazaStrings.summary(items.length, days.length),
                 style: TextStyle(color: p.textLight, fontWeight: FontWeight.w600),
               ),
             ),
@@ -78,7 +79,7 @@ class _DayCard extends ConsumerWidget {
       child: Theme(
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(
-          title: Text(formatDateTr(date),
+          title: Text(DateStrings.long(date),
               style: const TextStyle(fontWeight: FontWeight.w600)),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
@@ -89,24 +90,26 @@ class _DayCard extends ConsumerWidget {
                   color: p.danger.withValues(alpha: 0.18),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Text('${items.length} Kaza',
+                child: Text(QazaStrings.badge(items.length),
                     style: TextStyle(
                         color: p.danger, fontWeight: FontWeight.bold, fontSize: 12)),
               ),
-              const Icon(Icons.expand_more),
+              const Icon(AppIcons.expand),
             ],
           ),
           children: [
             for (final item in items)
               ListTile(
                 dense: true,
-                leading: Icon(Icons.cancel, color: p.danger),
-                title: Text(item.prayer.trName),
-                subtitle: Text(item.isAutoDetected ? 'Otomatik tespit' : 'Kılınmadı olarak işaretlendi'),
+                leading: Icon(AppIcons.qazaItem, color: p.danger),
+                title: Text(item.prayer.label),
+                subtitle: Text(item.isAutoDetected
+                    ? QazaStrings.autoDetected
+                    : QazaStrings.markedMissed),
                 trailing: FilledButton(
                   style: FilledButton.styleFrom(backgroundColor: p.dark),
                   onPressed: () => _confirm(context, ref, item),
-                  child: const Text('Kaza Et'),
+                  child: const Text(QazaStrings.compensate),
                 ),
               ),
           ],
@@ -119,13 +122,13 @@ class _DayCard extends ConsumerWidget {
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Kaza Namazı'),
-        content: Text(
-            '${formatDateTr(item.date)} tarihli ${item.prayer.trName} namazını kaza ettiniz mi?'),
+        title: const Text(QazaStrings.confirmTitle),
+        content: Text(QazaStrings.confirmBody(
+            DateStrings.long(item.date), item.prayer.label)),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('İptal')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text(CommonStrings.cancel)),
           FilledButton(
-              onPressed: () => Navigator.pop(ctx, true), child: const Text('Evet, Kıldım')),
+              onPressed: () => Navigator.pop(ctx, true), child: const Text(QazaStrings.confirmYes)),
         ],
       ),
     );

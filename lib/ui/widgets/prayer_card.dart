@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../core/app_theme.dart';
+import '../../core/icons/app_icons.dart';
+import '../../core/strings/strings.dart';
 
 /// Ana ekrandaki tek vakit satırı.
 class PrayerCard extends StatelessWidget {
@@ -49,8 +51,8 @@ class PrayerCard extends StatelessWidget {
 
     return Semantics(
       button: !isDisplayOnly,
-      label: '$name $time'
-          '${isPerformed ? ', kılındı' : isMissed ? ', kılınmadı' : ''}',
+      label: HomeStrings.prayerSemantics(name, time,
+          performed: isPerformed, missed: isMissed),
       child: Card(
         margin: const EdgeInsets.symmetric(vertical: 6),
         elevation: 1.5,
@@ -116,7 +118,9 @@ class _StatusIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
-    if (isDisplayOnly) return const Text('☀️', style: TextStyle(fontSize: 24));
+    if (isDisplayOnly) {
+      return const Icon(AppIcons.sunrise, size: 28, color: Color(0xFFFFB300));
+    }
 
     Widget circle(Color color, {Widget? child, bool filled = true}) => Container(
           width: 32,
@@ -132,16 +136,17 @@ class _StatusIcon extends StatelessWidget {
 
     if (isPerformed) {
       return circle(p.secondary,
-          child: Icon(Icons.check, size: 20, color: p.isDark ? Colors.black : p.dark));
+          child: Icon(AppIcons.prayerPerformed,
+              size: 20, color: p.isDark ? Colors.black : p.dark));
     }
     if (isMissed) {
-      return circle(p.danger, child: const Icon(Icons.close, size: 20, color: Colors.white));
+      return circle(p.danger, child: const Icon(AppIcons.prayerMissed, size: 20, color: Colors.white));
     }
     return circle(
       isNext ? Colors.white : p.textLight,
       filled: false,
       child: isNext
-          ? const Icon(Icons.hourglass_top, size: 16, color: Colors.white)
+          ? const Icon(AppIcons.prayerNext, size: 16, color: Colors.white)
           : null,
     );
   }

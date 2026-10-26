@@ -16,6 +16,8 @@ import '../widgets/countdown_card.dart';
 import '../widgets/prayer_card.dart';
 import '../widgets/prayer_dialog.dart';
 import 'city_picker_screen.dart';
+import '../../core/icons/app_icons.dart';
+import '../../core/strings/strings.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -91,7 +93,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   String _locationText(AsyncValue<AppLocation?> refresh, AppSettings s) {
     if (s.location != null) return s.location!.label;
-    return refresh.isLoading ? 'Konum alınıyor...' : 'Konum bulunamadı';
+    return refresh.isLoading ? LocationStrings.loading : LocationStrings.notFound;
   }
 
   @override
@@ -120,7 +122,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.location_on, size: 18, color: p.primary),
+                Icon(AppIcons.location, size: 18, color: p.primary),
                 const SizedBox(width: 4),
                 Flexible(
                   child: Text(
@@ -139,7 +141,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             CountdownCard(onNextChanged: (t) => setState(() => _next = t)),
             const SizedBox(height: 16),
             Text(
-              'BUGÜNÜN NAMAZLARI  •  ${formatDateTr(day)}',
+              HomeStrings.todaysPrayers(DateStrings.long(day)),
               style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
@@ -149,7 +151,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             const SizedBox(height: 6),
             _card(PrayerType.fajr, times, records),
             PrayerCard(
-              name: 'Güneş',
+              name: PrayerStrings.sunrise,
               time: formatTime(times.sunrise),
               isDisplayOnly: true,
             ),
@@ -166,7 +168,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   Widget _card(PrayerType type, DayTimes times, Map<PrayerType, PrayerRecord> records) {
     final status = records[type]?.status;
     return PrayerCard(
-      name: type.trName,
+      name: type.label,
       time: formatTime(times.timeOf(type)),
       isPerformed: status == PrayerStatus.performed || status == PrayerStatus.compensated,
       isMissed: status == PrayerStatus.missed,
@@ -185,16 +187,15 @@ class _NoLocationCard extends ConsumerWidget {
   String get _message {
     switch (failure) {
       case LocationFailure.serviceDisabled:
-        return 'Cihazın konum servisi kapalı. Açın veya şehrinizi elle seçin.';
+        return LocationStrings.serviceDisabled;
       case LocationFailure.denied:
-        return 'Konum izni verilmedi. İzin verin veya şehrinizi elle seçin.';
+        return LocationStrings.denied;
       case LocationFailure.deniedForever:
-        return 'Konum izni kalıcı olarak reddedildi. Ayarlardan izin verin '
-            'veya şehrinizi elle seçin.';
+        return LocationStrings.deniedForever;
       case LocationFailure.unavailable:
-        return 'Konum alınamadı. Tekrar deneyin veya şehrinizi elle seçin.';
+        return LocationStrings.unavailable;
       case null:
-        return 'Namaz vakitleri için konumunuz gerekiyor.';
+        return LocationStrings.needed;
     }
   }
 
@@ -221,15 +222,15 @@ class _NoLocationCard extends ConsumerWidget {
               children: [
                 FilledButton.icon(
                   onPressed: () => ref.invalidate(locationRefreshProvider),
-                  icon: const Icon(Icons.my_location),
-                  label: const Text('Tekrar dene'),
+                  icon: const Icon(AppIcons.locationDetect),
+                  label: const Text(CommonStrings.retry),
                 ),
                 OutlinedButton.icon(
                   onPressed: () => Navigator.of(context).push(
                     MaterialPageRoute<void>(builder: (_) => const CityPickerScreen()),
                   ),
-                  icon: const Icon(Icons.location_city),
-                  label: const Text('Şehir seç'),
+                  icon: const Icon(AppIcons.city),
+                  label: const Text(LocationStrings.chooseCity),
                 ),
               ],
             ),

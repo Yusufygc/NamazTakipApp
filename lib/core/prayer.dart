@@ -1,14 +1,10 @@
 /// Günlük takip edilen beş vakit.
 enum PrayerType {
-  fajr('Sabah'),
-  dhuhr('Öğle'),
-  asr('İkindi'),
-  maghrib('Akşam'),
-  isha('Yatsı');
-
-  const PrayerType(this.trName);
-
-  final String trName;
+  fajr,
+  dhuhr,
+  asr,
+  maghrib,
+  isha;
 
   /// Veritabanında saklanan kararlı anahtar.
   String get key => name;

@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/achievements.dart';
 import '../../core/app_theme.dart';
 import '../../providers/providers.dart';
+import '../../core/icons/app_icons.dart';
+import '../../core/strings/strings.dart';
 
 class GamificationScreen extends ConsumerWidget {
   const GamificationScreen({super.key});
@@ -13,21 +15,30 @@ class GamificationScreen extends ConsumerWidget {
     final p = context.palette;
     return ref.watch(gamificationProvider).when(
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, _) => Center(child: Text('Hata: $e')),
+          error: (e, _) => Center(child: Text(CommonStrings.error(e))),
           data: (data) => ListView(
             padding: const EdgeInsets.all(16),
             children: [
               Row(
                 children: [
-                  _StatTile(label: 'Güncel Seri', value: data.streaks.currentStreak, icon: '🔥'),
+                  _StatTile(
+                      label: GamificationStrings.currentStreak,
+                      value: data.streaks.currentStreak,
+                      icon: AppIcons.streakCurrent),
                   const SizedBox(width: 10),
-                  _StatTile(label: 'En İyi Seri', value: data.streaks.bestStreak, icon: '🏆'),
+                  _StatTile(
+                      label: GamificationStrings.bestStreak,
+                      value: data.streaks.bestStreak,
+                      icon: AppIcons.streakBest),
                   const SizedBox(width: 10),
-                  _StatTile(label: 'Tam Gün', value: data.streaks.totalFullDays, icon: '📅'),
+                  _StatTile(
+                      label: GamificationStrings.fullDays,
+                      value: data.streaks.totalFullDays,
+                      icon: AppIcons.streakDays),
                 ],
               ),
               const SizedBox(height: 20),
-              Text('ROZETLER',
+              Text(GamificationStrings.badgesHeader,
                   style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
@@ -46,7 +57,7 @@ class _StatTile extends StatelessWidget {
 
   final String label;
   final int value;
-  final String icon;
+  final IconData icon;
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +69,7 @@ class _StatTile extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 16),
           child: Column(
             children: [
-              Text(icon, style: const TextStyle(fontSize: 26)),
+              Icon(icon, size: 30, color: p.primary),
               const SizedBox(height: 4),
               Text('$value',
                   style: TextStyle(
@@ -95,15 +106,20 @@ class _AchievementCard extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              Text(a.isUnlocked ? a.icon : '🔒', style: const TextStyle(fontSize: 34)),
+              Icon(
+                a.isUnlocked ? AppIcons.achievement(a.id) : AppIcons.locked,
+                size: 36,
+                color: a.isUnlocked ? p.dark : p.textLight,
+              ),
               const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(a.title,
+                    Text(GamificationStrings.achievementTitle(a.id),
                         style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                    Text(a.description, style: TextStyle(color: p.textLight, fontSize: 13)),
+                    Text(GamificationStrings.achievementDescription(a.id),
+                        style: TextStyle(color: p.textLight, fontSize: 13)),
                     const SizedBox(height: 8),
                     ClipRRect(
                       borderRadius: BorderRadius.circular(6),
@@ -115,7 +131,7 @@ class _AchievementCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Text('${a.progress} / ${a.target}',
+                    Text(GamificationStrings.progress(a.progress, a.target),
                         style: TextStyle(fontSize: 12, color: p.textLight)),
                   ],
                 ),

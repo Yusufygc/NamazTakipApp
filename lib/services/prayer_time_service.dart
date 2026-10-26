@@ -42,17 +42,17 @@ class AppLocation {
 
 /// Seçilebilir hesaplama yöntemleri.
 enum CalcMethod {
-  diyanet('diyanet', 'Diyanet (Türkiye)'),
-  mwl('mwl', 'Müslüman Dünya Birliği'),
-  egyptian('egyptian', 'Mısır Genel Otoritesi'),
-  karachi('karachi', 'Karaçi İslam Bilimleri Üniv.'),
-  ummAlQura('ummalqura', 'Ümmü\'l-Kura (Mekke)'),
-  northAmerica('isna', 'Kuzey Amerika (ISNA)');
+  diyanet('diyanet'),
+  mwl('mwl'),
+  egyptian('egyptian'),
+  karachi('karachi'),
+  ummAlQura('ummalqura'),
+  northAmerica('isna');
 
-  const CalcMethod(this.key, this.trName);
+  const CalcMethod(this.key);
 
+  /// Ayarlarda saklanan kararlı anahtar. Görünen ad `CalcMethodLabel.label`.
   final String key;
-  final String trName;
 
   static CalcMethod fromKey(String? key) => CalcMethod.values
       .firstWhere((m) => m.key == key, orElse: () => CalcMethod.diyanet);

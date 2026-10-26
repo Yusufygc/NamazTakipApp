@@ -6,6 +6,8 @@ import '../../data/settings_repository.dart';
 import '../../providers/providers.dart';
 import '../../services/prayer_time_service.dart';
 import 'city_picker_screen.dart';
+import '../../core/icons/app_icons.dart';
+import '../../core/strings/strings.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -29,27 +31,28 @@ class SettingsScreen extends ConsumerWidget {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        section('Bildirimler'),
+        section(SettingsStrings.sectionNotifications),
         Card(
           color: p.card,
           child: Column(
             children: [
               SwitchListTile(
-                title: const Text('Bildirimler'),
-                subtitle: const Text('Ezan vakti ve "kıldın mı" hatırlatmaları'),
+                title: const Text(SettingsStrings.notifications),
+                subtitle: const Text(SettingsStrings.notificationsSubtitle),
                 value: s.notificationsEnabled,
                 onChanged: notifier.setNotifications,
               ),
               ListTile(
                 enabled: s.notificationsEnabled,
-                title: const Text('Hatırlatma süresi'),
-                subtitle: const Text('Ezandan kaç dakika sonra'),
+                title: const Text(SettingsStrings.reminderDelay),
+                subtitle: const Text(SettingsStrings.reminderDelaySubtitle),
                 trailing: DropdownButton<int>(
                   value: s.reminderMinutes,
                   underline: const SizedBox.shrink(),
                   items: [
                     for (final m in [5, 10, 15, 20, 30, 45, 60])
-                      DropdownMenuItem(value: m, child: Text('$m dk')),
+                      DropdownMenuItem(
+                          value: m, child: Text(SettingsStrings.minutes(m))),
                   ],
                   onChanged: s.notificationsEnabled
                       ? (v) => v == null ? null : notifier.setReminderMinutes(v)
@@ -59,7 +62,7 @@ class SettingsScreen extends ConsumerWidget {
             ],
           ),
         ),
-        section('Konum ve Vakitler'),
+        section(SettingsStrings.sectionLocation),
         Card(
           color: p.card,
           child: Column(
@@ -78,11 +81,11 @@ class SettingsScreen extends ConsumerWidget {
                   children: [
                     const RadioListTile<LocationMode>(
                       value: LocationMode.auto,
-                      title: Text('Otomatik (GPS)'),
+                      title: Text(SettingsStrings.locationAuto),
                     ),
                     RadioListTile<LocationMode>(
                       value: LocationMode.manual,
-                      title: const Text('Elle şehir seç'),
+                      title: const Text(SettingsStrings.locationManual),
                       subtitle: s.manualLocation == null
                           ? null
                           : Text(s.manualLocation!.city),
@@ -92,18 +95,18 @@ class SettingsScreen extends ConsumerWidget {
               ),
               if (s.location != null)
                 ListTile(
-                  leading: const Icon(Icons.location_on),
+                  leading: const Icon(AppIcons.location),
                   title: Text(s.location!.label),
-                  subtitle: const Text('Vakit hesabında kullanılan konum'),
+                  subtitle: const Text(SettingsStrings.locationInUse),
                 ),
               ListTile(
-                title: const Text('Hesaplama yöntemi'),
+                title: const Text(SettingsStrings.calcMethod),
                 trailing: DropdownButton<CalcMethod>(
                   value: s.calcMethod,
                   underline: const SizedBox.shrink(),
                   items: [
                     for (final m in CalcMethod.values)
-                      DropdownMenuItem(value: m, child: Text(m.trName)),
+                      DropdownMenuItem(value: m, child: Text(m.label)),
                   ],
                   onChanged: (m) => m == null ? null : notifier.setCalcMethod(m),
                 ),
@@ -111,7 +114,7 @@ class SettingsScreen extends ConsumerWidget {
             ],
           ),
         ),
-        section('Tema'),
+        section(SettingsStrings.sectionTheme),
         Wrap(
           spacing: 10,
           runSpacing: 10,
@@ -126,7 +129,7 @@ class SettingsScreen extends ConsumerWidget {
         ),
         const SizedBox(height: 28),
         Center(
-          child: Text('Versiyon 1.0.0  •  Geliştirici: MYY',
+          child: Text(CommonStrings.footer,
               style: TextStyle(color: p.textLight, fontSize: 12)),
         ),
       ],
@@ -148,10 +151,11 @@ class _ThemeChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pal = def.palette;
+    final name = SettingsStrings.themeName(def.key);
     return Semantics(
       button: true,
       selected: selected,
-      label: 'Tema: ${def.name}',
+      label: SettingsStrings.themeSemantics(name),
       child: InkWell(
         borderRadius: BorderRadius.circular(14),
         onTap: onTap,
@@ -181,10 +185,18 @@ class _ThemeChip extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 8),
-              Text('${def.icon} ${def.name}',
-                  style: TextStyle(
-                      color: pal.text,
-                      fontWeight: selected ? FontWeight.bold : FontWeight.normal)),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(AppIcons.theme(def.key), size: 18, color: pal.primary),
+                  const SizedBox(width: 6),
+                  Text(name,
+                      style: TextStyle(
+                          color: pal.text,
+                          fontWeight:
+                              selected ? FontWeight.bold : FontWeight.normal)),
+                ],
+              ),
             ],
           ),
         ),

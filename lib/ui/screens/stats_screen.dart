@@ -7,6 +7,8 @@ import '../../core/date_utils.dart';
 import '../../core/prayer.dart';
 import '../../data/prayer_repository.dart';
 import '../../providers/providers.dart';
+import '../../core/icons/app_icons.dart';
+import '../../core/strings/strings.dart';
 
 /// Süreç: Performans (radar), Isı Haritası ve Karşılaştırma sekmeleri.
 class StatsScreen extends StatelessWidget {
@@ -26,9 +28,9 @@ class StatsScreen extends StatelessWidget {
               unselectedLabelColor: p.textLight,
               indicatorColor: p.primary,
               tabs: const [
-                Tab(icon: Icon(Icons.radar), text: 'Performans'),
-                Tab(icon: Icon(Icons.grid_view), text: 'Isı Haritası'),
-                Tab(icon: Icon(Icons.compare_arrows), text: 'Karşılaştırma'),
+                Tab(icon: Icon(AppIcons.statsRadar), text: StatsStrings.tabPerformance),
+                Tab(icon: Icon(AppIcons.statsHeatmap), text: StatsStrings.tabHeatmap),
+                Tab(icon: Icon(AppIcons.statsCompare), text: StatsStrings.tabComparison),
               ],
             ),
           ),
@@ -64,10 +66,10 @@ class _RadarTabState extends ConsumerState<_RadarTab> {
       children: [
         Center(
           child: SegmentedButton<int>(
-            segments: const [
-              ButtonSegment(value: 7, label: Text('7 Gün')),
-              ButtonSegment(value: 30, label: Text('30 Gün')),
-              ButtonSegment(value: 90, label: Text('90 Gün')),
+            segments: [
+              ButtonSegment(value: 7, label: Text(StatsStrings.days(7))),
+              ButtonSegment(value: 30, label: Text(StatsStrings.days(30))),
+              ButtonSegment(value: 90, label: Text(StatsStrings.days(90))),
             ],
             selected: {_days},
             onSelectionChanged: (s) => setState(() => _days = s.first),
@@ -76,7 +78,7 @@ class _RadarTabState extends ConsumerState<_RadarTab> {
         const SizedBox(height: 16),
         async.when(
           loading: () => const SizedBox(height: 300, child: Center(child: CircularProgressIndicator())),
-          error: (e, _) => Text('Hata: $e'),
+          error: (e, _) => Text(CommonStrings.error(e)),
           data: (data) {
             final values = [for (final t in PrayerType.values) (data[t] ?? 0).toDouble()];
             return Column(
@@ -92,7 +94,7 @@ class _RadarTabState extends ConsumerState<_RadarTab> {
                       gridBorderData: BorderSide(color: p.textLight.withValues(alpha: 0.3)),
                       radarBorderData: BorderSide(color: p.textLight.withValues(alpha: 0.3)),
                       titleTextStyle: TextStyle(color: p.text, fontSize: 13, fontWeight: FontWeight.w600),
-                      getTitle: (i, _) => RadarChartTitle(text: PrayerType.values[i].trName),
+                      getTitle: (i, _) => RadarChartTitle(text: PrayerType.values[i].label),
                       dataSets: [
                         RadarDataSet(
                           fillColor: p.primary.withValues(alpha: 0.35),
@@ -119,7 +121,7 @@ class _RadarTabState extends ConsumerState<_RadarTab> {
                     padding: const EdgeInsets.symmetric(vertical: 4),
                     child: Row(
                       children: [
-                        SizedBox(width: 70, child: Text(t.trName)),
+                        SizedBox(width: 70, child: Text(t.label)),
                         Expanded(
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(6),
@@ -133,7 +135,7 @@ class _RadarTabState extends ConsumerState<_RadarTab> {
                         ),
                         SizedBox(
                           width: 48,
-                          child: Text('%${data[t] ?? 0}', textAlign: TextAlign.end),
+                          child: Text(StatsStrings.percent(data[t] ?? 0), textAlign: TextAlign.end),
                         ),
                       ],
                     ),
@@ -188,25 +190,25 @@ class _HeatmapTabState extends ConsumerState<_HeatmapTab> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             IconButton.filledTonal(
-              tooltip: 'Önceki ay',
+              tooltip: StatsStrings.previousMonth,
               onPressed: () => setState(() => _month = DateTime(_month.year, _month.month - 1)),
-              icon: const Icon(Icons.chevron_left),
+              icon: const Icon(AppIcons.monthPrevious),
             ),
-            Text('${kMonthNamesTr[_month.month - 1]} ${_month.year}',
+            Text(DateStrings.monthAndYear(_month),
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: p.primary)),
             IconButton.filledTonal(
-              tooltip: 'Sonraki ay',
+              tooltip: StatsStrings.nextMonth,
               onPressed: isCurrent
                   ? null
                   : () => setState(() => _month = DateTime(_month.year, _month.month + 1)),
-              icon: const Icon(Icons.chevron_right),
+              icon: const Icon(AppIcons.monthNext),
             ),
           ],
         ),
         const SizedBox(height: 12),
         Row(
           children: [
-            for (final d in const ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'])
+            for (final d in DateStrings.weekdaysShort)
               Expanded(
                 child: Center(
                   child: Text(d, style: TextStyle(fontSize: 12, color: p.textLight)),
@@ -217,7 +219,7 @@ class _HeatmapTabState extends ConsumerState<_HeatmapTab> {
         const SizedBox(height: 6),
         async.when(
           loading: () => const SizedBox(height: 240, child: Center(child: CircularProgressIndicator())),
-          error: (e, _) => Text('Hata: $e'),
+          error: (e, _) => Text(CommonStrings.error(e)),
           data: (counts) => _grid(p, counts, today, install),
         ),
         const SizedBox(height: 16),
@@ -225,10 +227,10 @@ class _HeatmapTabState extends ConsumerState<_HeatmapTab> {
           alignment: WrapAlignment.center,
           spacing: 16,
           children: [
-            _legend(const Color(0xFF4CAF50), '5/5'),
-            _legend(const Color(0xFFFFC107), '3-4'),
-            _legend(const Color(0xFFFF9800), '1-2'),
-            _legend(const Color(0xFFEF5350), '0'),
+            _legend(const Color(0xFF4CAF50), StatsStrings.legendFull),
+            _legend(const Color(0xFFFFC107), StatsStrings.legendMost),
+            _legend(const Color(0xFFFF9800), StatsStrings.legendFew),
+            _legend(const Color(0xFFEF5350), StatsStrings.legendNone),
           ],
         ),
       ],
@@ -269,7 +271,7 @@ class _HeatmapTabState extends ConsumerState<_HeatmapTab> {
     final bg = tracked ? _color(p, c.performed) : p.card;
     final fg = tracked ? Colors.white : p.textLight;
     return Semantics(
-      label: '${formatDateTr(c.date)}: ${c.performed} / 5',
+      label: StatsStrings.cellSemantics(DateStrings.long(c.date), c.performed),
       child: Container(
         decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(8)),
         alignment: Alignment.center,
@@ -279,7 +281,7 @@ class _HeatmapTabState extends ConsumerState<_HeatmapTab> {
             Text('${c.date.day}',
                 style: TextStyle(color: fg, fontWeight: FontWeight.bold, fontSize: 14)),
             if (tracked)
-              Text('${c.performed}/5',
+              Text(StatsStrings.dayCount(c.performed),
                   style: TextStyle(color: fg.withValues(alpha: 0.9), fontSize: 10)),
           ],
         ),
@@ -314,20 +316,24 @@ class _ComparisonTabState extends ConsumerState<_ComparisonTab> {
             ? const Color(0xFFEF5350)
             : p.textLight;
     final IconData diffIcon = diff > 0
-        ? Icons.trending_up
+        ? AppIcons.trendUp
         : diff < 0
-            ? Icons.trending_down
-            : Icons.trending_flat;
-    final String diffText = diff > 0 ? 'Yükselişte' : diff < 0 ? 'Düşüşte' : 'Değişim yok';
+            ? AppIcons.trendDown
+            : AppIcons.trendFlat;
+    final String diffText = diff > 0
+        ? StatsStrings.trendUp
+        : diff < 0
+            ? StatsStrings.trendDown
+            : StatsStrings.trendFlat;
 
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
         Row(
           children: [
-            _statCard(p, 'Bu Hafta', cmp?.currentWeek ?? 0, Icons.calendar_view_week, p.primary),
+            _statCard(p, StatsStrings.thisWeek, cmp?.currentWeek ?? 0, AppIcons.weekCurrent, p.primary),
             const SizedBox(width: 10),
-            _statCard(p, 'Geçen Hafta', cmp?.previousWeek ?? 0, Icons.history, p.textLight),
+            _statCard(p, StatsStrings.lastWeek, cmp?.previousWeek ?? 0, AppIcons.weekPrevious, p.textLight),
           ],
         ),
         const SizedBox(height: 10),
@@ -341,8 +347,8 @@ class _ComparisonTabState extends ConsumerState<_ComparisonTab> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Gelişim Durumu', style: TextStyle(color: p.textLight)),
-                    Text('${diff > 0 ? '+' : ''}$diff Vakit',
+                    Text(StatsStrings.progress, style: TextStyle(color: p.textLight)),
+                    Text(StatsStrings.progressValue(diff),
                         style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
                   ],
                 ),
@@ -360,8 +366,8 @@ class _ComparisonTabState extends ConsumerState<_ComparisonTab> {
         Center(
           child: SegmentedButton<bool>(
             segments: const [
-              ButtonSegment(value: true, label: Text('Haftalık')),
-              ButtonSegment(value: false, label: Text('Aylık')),
+              ButtonSegment(value: true, label: Text(StatsStrings.weekly)),
+              ButtonSegment(value: false, label: Text(StatsStrings.monthly)),
             ],
             selected: {_weekly},
             onSelectionChanged: (s) => setState(() => _weekly = s.first),
@@ -372,7 +378,7 @@ class _ComparisonTabState extends ConsumerState<_ComparisonTab> {
           height: 240,
           child: counts.when(
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (e, _) => Text('Hata: $e'),
+            error: (e, _) => Text(CommonStrings.error(e)),
             data: (list) => _weekly ? _bar(p, list) : _line(p, list),
           ),
         ),
@@ -398,7 +404,7 @@ class _ComparisonTabState extends ConsumerState<_ComparisonTab> {
     );
   }
 
-  String _label(DateTime d) => '${d.day}/${d.month}';
+  String _label(DateTime d) => DateStrings.short(d);
 
   Widget _bar(AppPalette p, List<DayCount> list) {
     return BarChart(

@@ -7,6 +7,7 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest_all.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
+import '../core/strings/strings.dart';
 import 'notification_plan.dart';
 
 /// Arka plan izolatında da kullanılabilen, yalnızca eklenti çağıran ince katman.
@@ -16,7 +17,6 @@ class NotificationService {
   static final NotificationService instance = NotificationService._();
 
   static const _channelId = 'prayer_times';
-  static const _channelName = 'Namaz Vakitleri';
 
   final FlutterLocalNotificationsPlugin _plugin =
       FlutterLocalNotificationsPlugin();
@@ -103,8 +103,8 @@ class NotificationService {
     const details = NotificationDetails(
       android: AndroidNotificationDetails(
         _channelId,
-        _channelName,
-        channelDescription: 'Ezan vakti ve namaz hatırlatmaları',
+        NotificationStrings.channelName,
+        channelDescription: NotificationStrings.channelDescription,
         importance: Importance.high,
         priority: Priority.high,
       ),

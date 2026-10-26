@@ -1,5 +1,6 @@
 import '../core/date_utils.dart';
 import '../core/prayer.dart';
+import '../core/strings/strings.dart';
 
 /// Planlanan tek bir bildirim; platformdan bağımsız, saf veri.
 class PlannedNotification {
@@ -75,11 +76,10 @@ List<PlannedNotification> buildNotificationPlan({
         plan.add(PlannedNotification(
           id: notificationId(day.date, type, reminder: false),
           scheduledAt: adhanAt,
-          title: '${type.trName} Vakti 🕌',
+          title: NotificationStrings.adhanTitle(type.label),
           body: answered
-              ? '${type.trName} vakti girdi.'
-              : 'Selamünaleyküm! ${type.trName} ezanı okundu. '
-                  '${askType.trName} namazını kıldın mı?',
+              ? NotificationStrings.adhanBody(type.label)
+              : NotificationStrings.adhanAskBody(type.label, askType.label),
           payload: answered ? null : PrayerPrompt(askDate, askType).encode(),
         ));
       }
@@ -90,8 +90,8 @@ List<PlannedNotification> buildNotificationPlan({
         plan.add(PlannedNotification(
           id: notificationId(day.date, type, reminder: true),
           scheduledAt: remindAt,
-          title: '${type.trName} Namazını Kıldınız mı?',
-          body: 'Namazınızı işaretlemek için dokunun.',
+          title: NotificationStrings.reminderTitle(type.label),
+          body: NotificationStrings.reminderBody,
           payload: PrayerPrompt(day.date, type).encode(),
         ));
       }

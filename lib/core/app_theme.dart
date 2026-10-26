@@ -71,12 +71,12 @@ class AppPalette extends ThemeExtension<AppPalette> {
   }
 }
 
+/// Tema tanımı. Görünen ad `SettingsStrings.themeName(key)`, ikon
+/// `AppIcons.theme(key)` ile çözülür.
 class AppThemeDef {
-  const AppThemeDef(this.key, this.name, this.icon, this.palette);
+  const AppThemeDef(this.key, this.palette);
 
   final String key;
-  final String name;
-  final String icon;
   final AppPalette palette;
 }
 
@@ -85,8 +85,6 @@ const _danger = Color(0xFFFF8A80);
 const List<AppThemeDef> kThemes = [
   AppThemeDef(
     'default',
-    'Varsayılan',
-    '🌿',
     AppPalette(
       primary: Color(0xFFA5C89E),
       secondary: Color(0xFFD8E983),
@@ -102,8 +100,6 @@ const List<AppThemeDef> kThemes = [
   ),
   AppThemeDef(
     'dark',
-    'Koyu',
-    '🌙',
     AppPalette(
       primary: Color(0xFF5C8A6E),
       secondary: Color(0xFF8BC34A),
@@ -119,8 +115,6 @@ const List<AppThemeDef> kThemes = [
   ),
   AppThemeDef(
     'ocean',
-    'Okyanus',
-    '🌊',
     AppPalette(
       primary: Color(0xFF5B9BD5),
       secondary: Color(0xFF81D4FA),
@@ -136,8 +130,6 @@ const List<AppThemeDef> kThemes = [
   ),
   AppThemeDef(
     'rose',
-    'Gül Kurusu',
-    '🌹',
     AppPalette(
       primary: Color(0xFFC2727A),
       secondary: Color(0xFFF48FB1),
@@ -153,8 +145,6 @@ const List<AppThemeDef> kThemes = [
   ),
   AppThemeDef(
     'gold',
-    'Altın',
-    '✨',
     AppPalette(
       primary: Color(0xFFC9A94E),
       secondary: Color(0xFFFFD54F),

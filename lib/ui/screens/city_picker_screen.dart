@@ -4,6 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/app_theme.dart';
 import '../../data/turkish_cities.dart';
 import '../../providers/providers.dart';
+import '../../core/icons/app_icons.dart';
+import '../../core/strings/strings.dart';
+import '../../core/text_utils.dart';
 
 /// Elle şehir seçimi (GPS kullanılmak istenmediğinde).
 class CityPickerScreen extends ConsumerStatefulWidget {
@@ -16,31 +19,18 @@ class CityPickerScreen extends ConsumerStatefulWidget {
 class _CityPickerScreenState extends ConsumerState<CityPickerScreen> {
   String _query = '';
 
-  // Türkçe büyük/küçük harf farkını (I/ı, İ/i) yok sayan basit eşleştirme.
-  String _norm(String s) => s
-      .replaceAll('İ', 'i')
-      .replaceAll('I', 'ı')
-      .toLowerCase()
-      .replaceAll('ı', 'i')
-      .replaceAll('ş', 's')
-      .replaceAll('ğ', 'g')
-      .replaceAll('ü', 'u')
-      .replaceAll('ö', 'o')
-      .replaceAll('ç', 'c')
-      .replaceAll('â', 'a');
-
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
     final current = ref.watch(settingsProvider).manualLocation;
-    final q = _norm(_query.trim());
+    final q = foldTurkish(_query.trim());
     final cities = [
       for (final c in kTurkishCities)
-        if (q.isEmpty || _norm(c.city).contains(q)) c,
+        if (q.isEmpty || foldTurkish(c.city).contains(q)) c,
     ];
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Şehir Seç')),
+      appBar: AppBar(title: const Text(LocationStrings.cityPickerTitle)),
       body: Column(
         children: [
           Padding(
@@ -48,8 +38,8 @@ class _CityPickerScreenState extends ConsumerState<CityPickerScreen> {
             child: TextField(
               autofocus: false,
               decoration: InputDecoration(
-                prefixIcon: const Icon(Icons.search),
-                hintText: 'Şehir ara',
+                prefixIcon: const Icon(AppIcons.search),
+                hintText: LocationStrings.citySearchHint,
                 filled: true,
                 fillColor: p.card,
                 border: OutlineInputBorder(
@@ -68,7 +58,7 @@ class _CityPickerScreenState extends ConsumerState<CityPickerScreen> {
                 final selected = current?.city == c.city;
                 return ListTile(
                   title: Text(c.city),
-                  trailing: selected ? Icon(Icons.check_circle, color: p.primary) : null,
+                  trailing: selected ? Icon(AppIcons.selected, color: p.primary) : null,
                   onTap: () async {
                     await ref.read(settingsProvider.notifier).useManualLocation(c);
                     if (context.mounted) Navigator.pop(context);

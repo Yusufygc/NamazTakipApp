@@ -7,6 +7,7 @@ import '../../core/app_theme.dart';
 import '../../core/date_utils.dart';
 import '../../core/prayer.dart';
 import '../../providers/providers.dart';
+import '../../core/strings/strings.dart';
 
 /// Sıradaki vakte kalan süre. Saat tabanlıdır; sayfa yenilemeden Yatsı'dan
 /// sonra Sabah'a, gece yarısından sonra yeni güne kendiliğinden geçer.
@@ -66,15 +67,15 @@ class _CountdownCardState extends ConsumerState<CountdownCard> {
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 22, horizontal: 20),
         child: next == null
-            ? Text('Vakit bilgisi yok',
+            ? Text(HomeStrings.noTimes,
                 textAlign: TextAlign.center, style: TextStyle(color: onPrimary))
             : Semantics(
                 liveRegion: false,
-                label:
-                    '${next.type.trName} vaktine ${_format(next.time.difference(_now))} kaldı',
+                label: HomeStrings.countdownSemantics(
+                    next.type.label, _format(next.time.difference(_now))),
                 child: Column(
                   children: [
-                    Text('Sıradaki Namaz: ${next.type.trName}',
+                    Text(HomeStrings.nextPrayer(next.type.label),
                         style: TextStyle(
                             color: onPrimary.withValues(alpha: 0.9), fontSize: 16)),
                     const SizedBox(height: 6),
@@ -88,7 +89,7 @@ class _CountdownCardState extends ConsumerState<CountdownCard> {
                       ),
                     ),
                     const SizedBox(height: 2),
-                    Text('Vakit: ${formatTime(next.time)}',
+                    Text(HomeStrings.timeLabel(formatTime(next.time)),
                         style: TextStyle(color: onPrimary.withValues(alpha: 0.85))),
                   ],
                 ),

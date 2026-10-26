@@ -58,21 +58,3 @@ NextPrayer? nextPrayer(DateTime now, List<DayTimes> days) {
   }
   return best;
 }
-
-const List<String> kMonthNamesTr = [
-  'Ocak',
-  'Şubat',
-  'Mart',
-  'Nisan',
-  'Mayıs',
-  'Haziran',
-  'Temmuz',
-  'Ağustos',
-  'Eylül',
-  'Ekim',
-  'Kasım',
-  'Aralık',
-];
-
-/// `25 Ocak 2026`
-String formatDateTr(DateTime d) => '${d.day} ${kMonthNamesTr[d.month - 1]} ${d.year}';
