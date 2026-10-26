@@ -1,7 +1,33 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+}
+
+// Release imzası: android/key.properties (depoya girmez, bkz. android/.gitignore).
+// Gerekli alanlar: storeFile, storePassword, keyAlias, keyPassword.
+val keystoreProps = Properties().apply {
+    val file = rootProject.file("key.properties")
+    if (file.exists()) file.inputStream().use { load(it) }
+}
+val hasReleaseKey = keystoreProps.getProperty("storeFile") != null
+val allowDebugSigning = System.getenv("ALLOW_DEBUG_SIGNING") == "1"
+
+// Anahtarsız release derlemesi, debug imzalı bir sürümün yanlışlıkla üretilmesini
+// önlemek için durdurulur. Yan yükleme testi için ALLOW_DEBUG_SIGNING=1 verilir.
+gradle.taskGraph.whenReady {
+    val buildsRelease = allTasks.any {
+        it.name.matches(Regex("(assemble|bundle|package)Release"))
+    }
+    if (buildsRelease && !hasReleaseKey && !allowDebugSigning) {
+        throw GradleException(
+            "Release imza anahtarı yok: android/key.properties bulunamadı. " +
+                "Mağaza sürümü için anahtar üretin (docs/wiki/derleme-ve-yayin.md). " +
+                "Yalnızca yan yükleme testi için ALLOW_DEBUG_SIGNING=1 ile yeniden deneyin."
+        )
+    }
 }
 
 android {
@@ -31,11 +57,26 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        create("release") {
+            if (hasReleaseKey) {
+                keyAlias = keystoreProps.getProperty("keyAlias")
+                keyPassword = keystoreProps.getProperty("keyPassword")
+                storeFile = rootProject.file(keystoreProps.getProperty("storeFile"))
+                storePassword = keystoreProps.getProperty("storePassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = if (hasReleaseKey) {
+                signingConfigs.getByName("release")
+            } else {
+                // Buraya yalnızca ALLOW_DEBUG_SIGNING=1 ile gelinir (yukarıdaki kapı).
+                logger.warn("UYARI: release debug anahtarıyla imzalanıyor; mağazaya yüklenemez.")
+                signingConfigs.getByName("debug")
+            }
         }
     }
 }
