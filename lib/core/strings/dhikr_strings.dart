@@ -44,6 +44,8 @@ abstract final class DhikrStrings {
   static const addSheetTitle = 'Yeni Zikir veya Esma Ekle';
   static const sharedDetectedBanner =
       'Paylaşılan içerikten zikir, sayı ve vakit otomatik çıkarıldı. Kaydetmeden önce düzenleyebilirsiniz.';
+  static const sharedConsentBanner =
+      'Başka bir uygulamadan içerik geldi. Güvenlik için otomatik işlenmedi. "Videodan / Metinden Kazı"ya basarsanız bağlantı sayfası internetten okunur; Gemini anahtarı tanımlıysa metin Google\'a da gönderilir. İstemiyorsanız alanı silip zikri elle girin.';
   static const captionMissingBanner =
       'Bu bağlantının açıklaması okunamadı. Instagram gibi uygulamalar giriş yapmadan açıklama vermez. Videonun açıklamasını kopyalayıp aşağıdaki alana yapıştırın ve tekrar kazıyın; ya da zikri elle girin.';
   static const openSourceToCopy = 'Bağlantıyı aç ve açıklamayı kopyala';

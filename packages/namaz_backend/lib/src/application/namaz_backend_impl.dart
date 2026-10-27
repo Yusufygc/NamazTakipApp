@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../data/app_database.dart';
 import '../data/dhikr_repository.dart';
 import '../data/prayer_repository.dart';
+import '../data/secret_store.dart';
 import '../data/settings_repository.dart';
 import '../data/turkish_cities.dart';
 import '../domain/achievements.dart';
@@ -57,7 +58,8 @@ class NamazBackendImpl implements NamazBackend {
 
   static Future<NamazBackendImpl> create(NamazBackendConfig config) async {
     final prefs = await SharedPreferences.getInstance();
-    final settings = SettingsRepository(prefs);
+    final settings = SettingsRepository(prefs, secrets: const SecureSecretStore());
+    await settings.loadSecrets();
     await settings.ensureInstallDate(prayerDay(DateTime.now()));
     final database = await AppDatabase.open();
     if (database.corruptedBackupPath != null) {

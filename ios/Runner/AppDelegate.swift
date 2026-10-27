@@ -131,7 +131,8 @@ final class ShareChannelBridge {
         guard
           let args = call.arguments as? [String: Any],
           let rawUrl = args["url"] as? String,
-          let url = URL(string: rawUrl.trimmingCharacters(in: .whitespacesAndNewlines))
+          let url = URL(string: rawUrl.trimmingCharacters(in: .whitespacesAndNewlines)),
+          Self.isSafeWebUrl(url)
         else {
           result(false)
           return
@@ -144,6 +145,16 @@ final class ShareChannelBridge {
         result(FlutterMethodNotImplemented)
       }
     }
+  }
+
+  /// Yalnızca `http`/`https` ve ana makine adı olan bağlantılar dış uygulamada
+  /// açılır; `tel:`, `file:`, özel şemalar ve `javascript:` açılmaz (Dart ve
+  /// Android tarafıyla aynı kural).
+  static func isSafeWebUrl(_ url: URL) -> Bool {
+    guard let scheme = url.scheme?.lowercased(), scheme == "http" || scheme == "https" else {
+      return false
+    }
+    return !(url.host ?? "").isEmpty
   }
 
   /// App Group (`group.com.namaztakip.app`) içerisine Share Extension tarafından

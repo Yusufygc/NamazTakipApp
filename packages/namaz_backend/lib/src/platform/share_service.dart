@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import '../domain/dhikr.dart';
 import '../domain/dhikr_extractor.dart';
 import '../domain/prayer.dart';
+import 'url_guard.dart';
 
 /// Sosyal medya (Instagram, TikTok, YouTube Shorts vb.) paylaşım niyetlerini
 /// (Intent.ACTION_SEND) dinleyen, paylaşılan bağlantıların meta açıklamalarını
@@ -25,6 +26,18 @@ class ShareService {
       StreamController<String>.broadcast();
 
   bool _initialized = false;
+
+  /// Kazımada izinli hedef adres kuralı. Varsayılan: yalnızca genel internet
+  /// adresleri (SSRF koruması). Yalnızca testler değiştirir.
+  @visibleForTesting
+  static bool Function(InternetAddress) addressPolicy = isPublicAddress;
+
+  /// `true` ise `http` bağlantılar `https`e yükseltilmeden olduğu gibi çekilir.
+  /// Yalnızca testler (yerel sunucu) kullanır.
+  @visibleForTesting
+  static bool allowInsecureHttp = false;
+
+  static const int _maxRedirects = 4;
 
   /// Uygulama açıkken gelen paylaşımlar.
   Stream<String> get sharedTexts => _sharedController.stream;
@@ -118,20 +131,65 @@ class ShareService {
     return localDraft;
   }
 
+  /// Kazıma yalnızca `https` ile yapılır (`http` bağlantı yükseltilir).
+  Uri _scrapeUri(Uri uri) {
+    if (allowInsecureHttp || uri.scheme.toLowerCase() != 'http') return uri;
+    return uri.replace(
+      scheme: 'https',
+      port: uri.hasPort && uri.port != 80 ? uri.port : null,
+    );
+  }
+
+  /// Adı çözer, bütün adresler genel değilse bağlanmaz ve soketi çözülen
+  /// adrese sabitler; böylece denetimle bağlantı arasında DNS değişemez.
+  /// `https` için güvenli soket açılır; sertifika, çözülen adresin taşıdığı özgün
+  /// ana makine adına karşı doğrulanır (IP'ye değil).
+  Future<ConnectionTask<Socket>> _pinnedConnection(
+    Uri uri,
+    String? proxyHost,
+    int? proxyPort,
+  ) async {
+    final addresses = await InternetAddress.lookup(uri.host);
+    if (addresses.isEmpty || !addresses.every(addressPolicy)) {
+      throw SocketException('blocked address: ${uri.host}');
+    }
+    return uri.scheme.toLowerCase() == 'https'
+        ? SecureSocket.startConnect(addresses.first, uri.port)
+        : Socket.startConnect(addresses.first, uri.port);
+  }
+
   Future<String?> _scrapeOpenGraphCaption(String url) async {
     HttpClient? client;
     try {
-      final uri = Uri.parse(url);
+      var uri = Uri.parse(url);
       if (!isSafeWebUrl(url)) return null;
       client = HttpClient()
         ..connectionTimeout = const Duration(seconds: 5)
-        ..userAgent = 'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Mobile Safari/537.36';
-      final request = await client.getUrl(uri);
-      request.followRedirects = true;
-      request.maxRedirects = 4;
-      final response = await request.close().timeout(
-        const Duration(seconds: 6),
-      );
+        ..userAgent = 'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Mobile Safari/537.36'
+        ..findProxy = ((_) => 'DIRECT')
+        ..connectionFactory = _pinnedConnection;
+
+      // Yönlendirmeler elle izlenir: her atlama şema ve adres denetiminden
+      // yeniden geçer (dış adres iç adrese yönlendiremez).
+      HttpClientResponse? response;
+      for (var hop = 0; hop <= _maxRedirects; hop++) {
+        uri = _scrapeUri(uri);
+        final request = await client.getUrl(uri);
+        request.followRedirects = false;
+        final r = await request.close().timeout(const Duration(seconds: 6));
+        const redirects = {301, 302, 303, 307, 308};
+        if (!redirects.contains(r.statusCode)) {
+          response = r;
+          break;
+        }
+        final location = r.headers.value(HttpHeaders.locationHeader);
+        await r.drain<void>().timeout(const Duration(seconds: 6));
+        if (location == null) return null;
+        final next = uri.resolve(location);
+        if (!isSafeWebUrl(next.toString())) return null;
+        uri = next;
+      }
+      if (response == null) return null;
       if (response.statusCode < 200 || response.statusCode >= 400) {
         return null;
       }
@@ -156,7 +214,8 @@ class ShareService {
       }
       return parts.join(' — ').trim();
     } catch (e) {
-      debugPrint('[ShareService] URL kazıma bilgi: $e');
+      // Hata metni bağlantı (izleme parametreleri) taşıyabilir: yalnızca tür.
+      debugPrint('[ShareService] URL kazıma bilgi: ${e.runtimeType}');
       return null;
     } finally {
       client?.close(force: true);

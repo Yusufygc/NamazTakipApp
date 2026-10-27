@@ -6,12 +6,21 @@ import '../domain/dates.dart';
 import '../domain/models.dart';
 import '../domain/prayer.dart';
 import '../domain/prayer_time_service.dart';
+import 'secret_store.dart';
 
 /// Kullanıcı ayarları ve küçük kalıcı durumlar (SharedPreferences).
 class SettingsRepository {
-  SettingsRepository(this._prefs);
+  /// [secrets] verilmezse gizli değerler (Gemini anahtarı) hiç saklanmaz ve
+  /// okunmaz; arka plan görevi gibi anahtarı kullanmayan yerler böyle açar.
+  // Adlandırılmış parametre özel alana başlatıcı biçimle bağlanamaz.
+  // ignore: prefer_initializing_formals
+  SettingsRepository(this._prefs, {SecretStore? secrets}) : _secrets = secrets;
 
   final SharedPreferences _prefs;
+  final SecretStore? _secrets;
+
+  /// Anahtar deposundan açılışta okunan değer; getter eşzamanlı kalsın diye.
+  String? _geminiKey;
 
   static const _kTheme = 'theme';
   static const _kNotifications = 'notifications_enabled';
@@ -92,18 +101,47 @@ class SettingsRepository {
       ? _prefs.remove(_kCorruptedDbBackup)
       : _prefs.setString(_kCorruptedDbBackup, path);
 
-  /// Sosyal medya videoları/açıklamaları için isteğe bağlı Gemini API anahtarı.
-  String? get geminiApiKey {
-    final v = _prefs.getString(_kGeminiApiKey)?.trim();
-    return (v == null || v.isEmpty) ? null : v;
+  /// Açılışta bir kez çağrılır: anahtarı anahtar deposundan belleğe alır. Eski
+  /// sürümde `SharedPreferences`'a düz metin yazılmış anahtar varsa depoya
+  /// taşır ve düz kopyayı siler. Taşıma başarısız olursa düz kopya silinmez
+  /// (anahtar kaybolmaz) ve o oturumda kullanılır.
+  Future<void> loadSecrets() async {
+    final store = _secrets;
+    final legacy = _prefs.getString(_kGeminiApiKey)?.trim();
+    if (store == null) {
+      _geminiKey = null;
+      return;
+    }
+    try {
+      final stored = (await store.read(_kGeminiApiKey))?.trim();
+      if (stored != null && stored.isNotEmpty) {
+        _geminiKey = stored;
+      } else if (legacy != null && legacy.isNotEmpty) {
+        await store.write(_kGeminiApiKey, legacy);
+        _geminiKey = legacy;
+      }
+      if (legacy != null) await _prefs.remove(_kGeminiApiKey);
+    } catch (_) {
+      _geminiKey = (legacy == null || legacy.isEmpty) ? null : legacy;
+    }
   }
 
-  Future<void> setGeminiApiKey(String? key) {
+  /// Sosyal medya videoları/açıklamaları için isteğe bağlı Gemini API anahtarı.
+  String? get geminiApiKey => _geminiKey;
+
+  Future<void> setGeminiApiKey(String? key) async {
     final trimmed = key?.trim();
+    final store = _secrets;
+    if (store == null) return;
     if (trimmed == null || trimmed.isEmpty) {
-      return _prefs.remove(_kGeminiApiKey);
+      await store.delete(_kGeminiApiKey);
+      _geminiKey = null;
+    } else {
+      await store.write(_kGeminiApiKey, trimmed);
+      _geminiKey = trimmed;
     }
-    return _prefs.setString(_kGeminiApiKey, trimmed);
+    // Eski sürümden kalan düz metin kopya hiçbir durumda kalmasın.
+    await _prefs.remove(_kGeminiApiKey);
   }
 
   /// Geçmiş yıllardan kalan vakit bazlı toplu kaza borcu.

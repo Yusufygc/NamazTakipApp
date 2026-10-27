@@ -63,6 +63,7 @@ class _DhikrEditorSheetState extends ConsumerState<DhikrEditorSheet> {
   bool _analyzing = false;
   bool _wasScraped = false;
   bool _captionMissing = false;
+  bool _awaitingConsent = false;
 
   @override
   void initState() {
@@ -95,15 +96,12 @@ class _DhikrEditorSheetState extends ConsumerState<DhikrEditorSheet> {
       text: existing?.sourceUrl ?? draft?.sourceUrl ?? '',
     );
     _selectedPrayer = existing?.prayerTime ?? draft?.prayerTime;
-    _wasScraped = draft != null || widget.initialSharedText != null;
-
-    if (widget.initialSharedText != null &&
-        widget.initialSharedText!.trim().isNotEmpty &&
-        draft == null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _analyzeRawInput();
-      });
-    }
+    _wasScraped = draft != null;
+    // Başka bir uygulamadan gelen içerik kullanıcı onayı olmadan çözümlenmez:
+    // çözümleme bağlantıyı internetten çeker ve anahtar varsa metni Google'a
+    // gönderir. Kazıma yalnızca "Kazı" düğmesiyle başlar.
+    _awaitingConsent =
+        (widget.initialSharedText?.trim().isNotEmpty ?? false) && draft == null;
   }
 
   @override
@@ -122,7 +120,10 @@ class _DhikrEditorSheetState extends ConsumerState<DhikrEditorSheet> {
   Future<void> _analyzeRawInput() async {
     final raw = _rawInputCtrl.text.trim();
     if (raw.isEmpty) return;
-    setState(() => _analyzing = true);
+    setState(() {
+      _analyzing = true;
+      _awaitingConsent = false;
+    });
     try {
       final draft = await ref.read(dhikrProvider.notifier).analyzeShared(raw);
       if (!mounted) return;
@@ -294,6 +295,35 @@ class _DhikrEditorSheetState extends ConsumerState<DhikrEditorSheet> {
                         label: const Text(DhikrStrings.openSourceToCopy),
                       ),
                     ],
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+            ],
+            if (_awaitingConsent) ...[
+              Container(
+                key: const ValueKey('shared-consent-banner'),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: p.accent.withValues(alpha: 0.14),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: p.accent.withValues(alpha: 0.4)),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(AppIcons.warning, color: p.danger, size: 18),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        DhikrStrings.sharedConsentBanner,
+                        style: TextStyle(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w600,
+                          color: p.text,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),

@@ -2,6 +2,8 @@
 
 Ayarlar ve küçük durumlar `shared_preferences` ile saklanır; kod `packages/namaz_backend/lib/src/data/settings_repository.dart`. Büyük ve ilişkisel veri SQLite'tadır: [[veri-katmani]]. Depo backend'dedir; ön yüz ayarları `NamazBackend.settings` (`AppSettings`) ile görür, `settingsProvider` bu görüntüyü tutar: [[durum-yonetimi]], [[backend-paketi]]. `theme` anahtarı backend için anlamsız bir metindir; yalnızca kalıcılığı sağlar.
 
+> **Gizli değerler:** Gemini API anahtarı `SharedPreferences`'ta tutulmaz; `flutter_secure_storage` (Keystore/Keychain) kullanılır. `SettingsRepository.loadSecrets()` açılışta bir kez belleğe alır ve eski düz kopyayı taşıyıp siler. Ayrıntı: [[zikir-paylasim]].
+
 ## Anahtarlar
 
 Android'de bu anahtarlar `FlutterSharedPreferences` dosyasında `flutter.` önekiyle görünür.

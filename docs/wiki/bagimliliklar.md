@@ -21,6 +21,7 @@ Bağımlılıklar iki pakete bölünmüştür ([[011-front-backend-ayrimi]]). Ö
 | `sqflite` | ^2.4.5 | SQLite | [[veri-katmani]] |
 | `path` | ^1.9.1 | Veritabanı yolu | [[veri-katmani]] |
 | `shared_preferences` | ^2.5.6 | Ayarlar | [[ayarlar-ve-kalicilik]] |
+| `flutter_secure_storage` | ^11.2.0 | Gemini API anahtarı için Keystore/Keychain deposu (yalnızca backend `secret_store.dart`) | [[zikir-paylasim]], [[ayarlar-ve-kalicilik]] |
 | `adhan_dart` | ^2.0.1 | Cihazda vakit hesabı (Diyanet ve diğer yöntemler) | [[namaz-vakitleri]] |
 | `geolocator` | ^14.1.2 | GPS konumu, izin akışı | [[konum]] |
 | `geocoding` | ^5.0.0 | Koordinattan şehir adı | [[konum]] |

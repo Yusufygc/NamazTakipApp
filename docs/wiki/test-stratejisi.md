@@ -12,7 +12,7 @@ flutter test                                     # ön yüz testleri (kökte)
 (cd packages/namaz_backend && flutter test)      # backend testleri
 ```
 
-Durum (2026-10-27): `flutter analyze` temiz; ön yüz **42**, backend **107**, Android (Kotlin) **15**, toplam **164 test geçiyor**. Kotlin testi: `cd android && ./gradlew :app:testDebugUnitTest`.
+Durum (2026-10-27, güvenlik düzeltmelerinden sonra): `flutter analyze` temiz; ön yüz **46**, backend **124** test geçiyor. Android (Kotlin) 15 test bu turda yeniden çalıştırılmadı (önceki tur: geçti). `flutter build apk --debug` derlendi. Yeni testler: `url_guard_test.dart` (SSRF, yönlendirme), `gemini_key_storage_test.dart` (anahtar deposu, taşıma), `shared_consent_test.dart` (onay uyarısı), `native_url_guard_test.dart` (Kotlin/Swift şema denetimi kaynak düzeyinde). Kotlin testi: `cd android && ./gradlew :app:testDebugUnitTest`.
 
 ## Test dosyaları
 

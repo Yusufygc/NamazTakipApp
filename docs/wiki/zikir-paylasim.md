@@ -33,16 +33,18 @@ Bu durum artık açıkça ele alınır:
 Paylaşım kapısı dışa açıktır (`ACTION_SEND` süzgeci), bu yüzden gelen metin güvenilmez sayılır. Ayrıntılı analiz: [[guvenlik-ve-kalite-analizi]].
 
 - **Bağlantı açma:** yalnızca `http`/`https` ve ana makine adı olan bağlantılar dış uygulamada açılır (`isSafeWebUrl`, hem Dart'ta hem `MainActivity.kt`'de). `file:`, `tel:`, `intent:`, `javascript:` açılmaz.
-- **Kazıma:** yalnızca `http`/`https`; parçalar arası 6 sn, toplam 10 sn zaman aşımı, en çok 120 KB.
+- **Kazıma:** yalnızca `https` (`http` bağlantı otomatik `https`e yükseltilir); parçalar arası 6 sn, toplam 10 sn zaman aşımı, en çok 120 KB.
+- **SSRF koruması (`url_guard.dart`):** soket açılmadan önce ad çözülür ve bütün adresler genel internette değilse bağlanılmaz (loopback, `10/8`, `172.16/12`, `192.168/16`, `169.254/16` bulut metadata, CGNAT, çoklu yayın, IPv6 `::1`/`fc00::/7`/`fe80::/10` ve IPv6 içine gömülü iç IPv4). Soket çözülen adrese sabitlenir (`HttpClient.connectionFactory`), sertifika özgün ana makine adına karşı doğrulanır; denetimle bağlantı arasında DNS değişemez. Yönlendirmeler elle izlenir (en çok 4), her atlama şema ve adres denetiminden yeniden geçer. Sistem vekil sunucusu kullanılmaz.
+- **Kullanıcı onayı:** başka bir uygulamadan (Android `ACTION_SEND`, iOS `namaztakip://share`) gelen içerik otomatik çözümlenmez. Düzenleme sayfası metni gösterir ve "bağlantı internetten okunur, anahtar varsa Google'a gider" uyarısı verir; kazıma yalnızca "Videodan / Metinden Kazı" düğmesiyle başlar.
 - **Yapay zeka yanıtı:** hedef sayı `sanitizeTargetCount` ile 1-100000 arasına zorlanır; yanıt zaten kullanıcıya düzenlenebilir taslak olarak gösterilir, doğrudan kaydedilmez.
 - **Fazilet iddiası:** Gemini istemi "fazilet veya sevap iddiası ekleme" der; yapay zeka kaynaksız dinî iddia üretmesin diye anlam alanı yalnızca anlamdır: [[dini-icerik-onayi]].
-- **Kabul edilen risk:** kazıma yerel ağ adreslerine GET atabilir; yanıt saldırgana dönmez.
+- **Kalan risk:** kazınan sayfa metni Gemini isteminin içine girer (prompt injection); yanıttaki `targetCount` doğrulanır ama metin alanlarının uzunluğu sınırlı değil. Taslak kaydedilmeden önce kullanıcı görür.
 
 ## Gemini (isteğe bağlı)
 
 | Konu | Durum |
 |---|---|
-| Anahtar | Ayarlar → Sosyal Medya Zikir Kazıma. `SharedPreferences`'ta düz metin saklanır; yedekleme kapalı olduğu için buluta gitmez ([[android-yapilandirma]]) |
+| Anahtar | Ayarlar → Sosyal Medya Zikir Kazıma. Platform anahtar deposunda saklanır (`flutter_secure_storage`: Android Keystore, iOS Keychain `first_unlock_this_device`, iCloud'a eşitlenmez); `SharedPreferences`'ta tutulmaz. Eski sürümde düz yazılmış anahtar ilk açılışta depoya taşınır ve düz kopya silinir ([[ayarlar-ve-kalicilik]], [[android-yapilandirma]]) |
 | İstek | `gemini-2.5-flash`; anahtar **başlıkta** (`x-goog-api-key`) gider, URL'de değil |
 | Gizlilik | Anahtar girilirse paylaşılan metin ve kazınan açıklama Google'a gönderilir; ayar ekranındaki yardım metni bunu söyler |
 | Anahtarsız | Yerleşik sözlük ve düzenli ifadeler ücretsiz çalışır |

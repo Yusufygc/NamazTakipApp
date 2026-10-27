@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:namaz_backend/namaz_backend.dart';
 import 'package:namaz_backend/src/platform/share_service.dart';
+import 'package:namaz_backend/src/platform/url_guard.dart';
 
 import 'support/test_dhikr_content.dart';
 
@@ -31,6 +32,10 @@ void main() {
   setUpAll(() async {
     // flutter_test varsayılan olarak her HTTP isteğini 400 ile reddeder.
     HttpOverrides.global = null;
+    // Bu dosyadaki sunucu loopback'te ve düz http'dedir; SSRF koruması kendi
+    // testlerinde (url_guard_test.dart) varsayılan kurallarla denenir.
+    ShareService.addressPolicy = (_) => true;
+    ShareService.allowInsecureHttp = true;
     server = await _serve({
       // Instagram gibi: büyük sayfa, hiç og/description etiketi yok.
       '/giris-duvari':
@@ -45,6 +50,8 @@ void main() {
   });
 
   tearDownAll(() async {
+    ShareService.addressPolicy = isPublicAddress;
+    ShareService.allowInsecureHttp = false;
     await server.close(force: true);
   });
 
