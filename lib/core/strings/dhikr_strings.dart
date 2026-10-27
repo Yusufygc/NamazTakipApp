@@ -44,6 +44,9 @@ abstract final class DhikrStrings {
   static const fieldCustomGroupHint = 'Veya yeni grup adı yazın...';
   static const fieldPrayerTime = 'Tavsiye Edilen Vakit';
   static const prayerTimeAny = 'Her Vakit';
+  static const captionMissingBanner =
+      'Bu bağlantının açıklaması okunamadı. Instagram gibi uygulamalar giriş yapmadan açıklama vermez. Videonun açıklamasını kopyalayıp aşağıdaki alana yapıştırın ve tekrar kazıyın; ya da zikri elle girin.';
+  static const openSourceToCopy = 'Bağlantıyı aç ve açıklamayı kopyala';
   static const fieldSourceUrl = 'Kaynak Video Bağlantısı';
   static const saveButton = 'Zikir Defterine Kaydet';
   static const updateButton = 'Değişiklikleri Kaydet';

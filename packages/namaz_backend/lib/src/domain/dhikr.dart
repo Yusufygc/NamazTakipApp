@@ -104,6 +104,7 @@ class DhikrDraft {
     this.prayerTime,
     this.sourceUrl,
     this.rawCaption = '',
+    this.captionUnavailable = false,
   });
 
   final String title;
@@ -116,6 +117,11 @@ class DhikrDraft {
   final String? sourceUrl;
   final String rawCaption;
 
+  /// Paylaşımda yalnızca bağlantı vardı ve açıklaması okunamadı (örn.
+  /// Instagram giriş yapmamış istemciye açıklama vermez). Taslakta zikir
+  /// bilgisi yoktur; kullanıcıdan açıklamayı yapıştırması beklenir.
+  final bool captionUnavailable;
+
   DhikrDraft copyWith({
     String? title,
     String? arabic,
@@ -127,6 +133,7 @@ class DhikrDraft {
     bool clearPrayerTime = false,
     String? sourceUrl,
     String? rawCaption,
+    bool? captionUnavailable,
   }) {
     return DhikrDraft(
       title: title ?? this.title,
@@ -138,6 +145,7 @@ class DhikrDraft {
       prayerTime: clearPrayerTime ? null : (prayerTime ?? this.prayerTime),
       sourceUrl: sourceUrl ?? this.sourceUrl,
       rawCaption: rawCaption ?? this.rawCaption,
+      captionUnavailable: captionUnavailable ?? this.captionUnavailable,
     );
   }
 }

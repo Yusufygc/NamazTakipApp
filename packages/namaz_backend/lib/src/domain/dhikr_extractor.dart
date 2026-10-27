@@ -231,6 +231,16 @@ const List<DhikrCatalogEntry> kDhikrCatalog = [
     arabic: 'يَا مُجِيبُ',
     transliteration: 'Yâ Mucîb',
     meaning: 'Dualara ve yakarışlara icabet eden.',
+/// Paylaşımda bağlantı var ama zikir bilgisi taşıyan hiçbir metin yoksa `true`:
+/// kullanıcı metni (bağlantı çıkarıldıktan sonra) boştur ve bağlantıdan açıklama
+/// da okunamamıştır.
+bool isCaptionMissing(String rawInput, {String? scrapedCaption}) {
+  if (extractFirstUrl(rawInput) == null) return false;
+  final hasUserText = cleanSocialCaption(rawInput).isNotEmpty;
+  final hasScraped = scrapedCaption != null && scrapedCaption.trim().isNotEmpty;
+  return !hasUserText && !hasScraped;
+}
+
     defaultCount: 55,
     groupName: DhikrGroups.esma,
     keywords: ['ya mucib', 'yâ mucîb', 'el-mucib'],

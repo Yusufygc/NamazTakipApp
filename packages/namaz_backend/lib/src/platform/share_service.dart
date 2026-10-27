@@ -73,14 +73,22 @@ class ShareService {
     final url = extractFirstUrl(rawTextOrUrl);
     var combinedText = rawTextOrUrl.trim();
 
+    String? scrapedCaption;
+
     if (url != null) {
-      final scrapedCaption = await _scrapeOpenGraphCaption(url);
+      scrapedCaption = await _scrapeOpenGraphCaption(url);
       if (scrapedCaption != null && scrapedCaption.isNotEmpty) {
         combinedText = '$combinedText\n$scrapedCaption';
       }
     }
 
     final localDraft = extractDhikrDraft(combinedText, sourceUrl: url);
+
+    // Yalnızca bağlantı var ve açıklaması okunamadı: taslakta bilgi yok, yapay
+    // zekaya da gönderilecek metin yok (bağlantı Google'a gönderilmez).
+    if (isCaptionMissing(rawTextOrUrl, scrapedCaption: scrapedCaption)) {
+      return localDraft.copyWith(captionUnavailable: true);
+    }
 
     if (geminiApiKey != null && geminiApiKey.trim().isNotEmpty) {
       final aiDraft = await _analyzeWithGemini(
@@ -138,17 +146,19 @@ class ShareService {
   String? _extractMetaContent(String html, String propertyOrName) {
     final patterns = [
       RegExp(
-        '<meta[^>]+(?:property|name)=["\']$propertyOrName["\'][^>]+content=["\']([^"\']+)["\']',
+        '<meta[^>]+(?:property|name)=["\']$propertyOrName["\'][^>]+content=(?:"([^"]*)"|\'([^\']*)\')',
         caseSensitive: false,
       ),
       RegExp(
-        '<meta[^>]+content=["\']([^"\']+)["\'][^>]+(?:property|name)=["\']$propertyOrName["\']',
+        '<meta[^>]+content=(?:"([^"]*)"|\'([^\']*)\')[^>]+(?:property|name)=["\']$propertyOrName["\']',
         caseSensitive: false,
       ),
     ];
+    // İçerik çift tırnakla sarılıysa içindeki kesme işareti (Ya Rezzak'ın)
+    // değeri kesmemelidir.
     for (final p in patterns) {
       final m = p.firstMatch(html);
-      if (m != null) return m.group(1)?.trim();
+      if (m != null) return (m.group(1) ?? m.group(2))?.trim();
     }
     return null;
   }
@@ -183,12 +193,15 @@ class ShareService {
   }) async {
     HttpClient? client;
     try {
+      // Anahtar URL'ye değil başlığa konur; adres günlüklerde ve geçmişte
+      // anahtarı açığa çıkarmaz.
       final endpoint = Uri.parse(
-        'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=$apiKey',
+        'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent',
       );
       client = HttpClient()..connectionTimeout = const Duration(seconds: 7);
       final req = await client.postUrl(endpoint);
       req.headers.contentType = ContentType.json;
+      req.headers.set('x-goog-api-key', apiKey);
 
       final prompt = '''
 Aşağıdaki sosyal medya (Instagram vb.) dini video açıklamasından zikir, esma veya tesbihat bilgisini çıkar ve YALNIZCA geçerli bir JSON nesnesi döndür:

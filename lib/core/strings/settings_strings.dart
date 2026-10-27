@@ -31,7 +31,7 @@ abstract final class SettingsStrings {
   static const geminiDialogTitle = 'Gemini API Anahtarı';
   static const geminiDialogHint = 'AIzaSy... anahtarınızı yapıştırın';
   static const geminiDialogHelper =
-      'Boş bırakırsanız uygulama yerleşik Esmaül Hüsna sözlüğü ve OpenGraph kazıyıcı ile ücretsiz çalışır.';
+      'Boş bırakırsanız uygulama yerleşik Esmaül Hüsna sözlüğü ve OpenGraph kazıyıcı ile ücretsiz çalışır. Anahtar girerseniz paylaştığınız video açıklaması analiz için Google sunucularına gönderilir. Anahtar yalnızca bu cihazda saklanır ve yedeklenmez.';
   static const geminiSave = 'Kaydet';
   static const geminiClear = 'Temizle';
 

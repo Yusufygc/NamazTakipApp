@@ -61,6 +61,7 @@ class _DhikrEditorSheetState extends ConsumerState<DhikrEditorSheet> {
   PrayerType? _selectedPrayer;
   bool _analyzing = false;
   bool _wasScraped = false;
+  bool _captionMissing = false;
 
   @override
   void initState() {
@@ -135,7 +136,8 @@ class _DhikrEditorSheetState extends ConsumerState<DhikrEditorSheet> {
           _sourceUrlCtrl.text = draft.sourceUrl!;
         }
         _selectedPrayer = draft.prayerTime;
-        _wasScraped = true;
+        _wasScraped = !draft.captionUnavailable;
+        _captionMissing = draft.captionUnavailable;
       });
     } finally {
       if (mounted) setState(() => _analyzing = false);
@@ -253,6 +255,49 @@ class _DhikrEditorSheetState extends ConsumerState<DhikrEditorSheet> {
               ],
             ),
             const SizedBox(height: 12),
+            if (_captionMissing) ...[
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: p.accent.withValues(alpha: 0.14),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: p.accent.withValues(alpha: 0.4)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(AppIcons.warning, color: p.danger, size: 18),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            DhikrStrings.captionMissingBanner,
+                            style: TextStyle(
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w600,
+                              color: p.text,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (_sourceUrlCtrl.text.trim().isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      OutlinedButton.icon(
+                        onPressed: () => ref
+                            .read(dhikrProvider.notifier)
+                            .openUrl(_sourceUrlCtrl.text.trim()),
+                        icon: const Icon(AppIcons.externalLink, size: 16),
+                        label: const Text(DhikrStrings.openSourceToCopy),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+            ],
             if (_wasScraped) ...[
               Container(
                 padding: const EdgeInsets.all(12),

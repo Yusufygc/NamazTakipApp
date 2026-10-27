@@ -1,0 +1,131 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:flutter_test/flutter_test.dart';
+import 'package:namaz_backend/namaz_backend.dart';
+import 'package:namaz_backend/src/platform/share_service.dart';
+
+/// `/` yoluna verilen HTML'i döndüren yerel sunucu; sayfa başına istenen
+/// yanıt `pages` içinde tanımlanır.
+Future<HttpServer> _serve(Map<String, String> pages) async {
+  final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+  server.listen((request) {
+    final body = pages[request.uri.path];
+    request.response
+      ..statusCode = body == null ? 404 : 200
+      ..headers.contentType = ContentType.html
+      ..add(utf8.encode(body ?? ''))
+      ..close();
+  });
+  return server;
+}
+
+void main() {
+  late HttpServer server;
+  late String base;
+
+  setUpAll(() async {
+    // flutter_test varsayılan olarak her HTTP isteğini 400 ile reddeder.
+    HttpOverrides.global = null;
+    server = await _serve({
+      // Instagram gibi: büyük sayfa, hiç og/description etiketi yok.
+      '/giris-duvari': '<html><head><title>Instagram</title>'
+          '<meta name="viewport" content="width=device-width"></head></html>',
+      // Çift tırnaklı içerikte kesme işareti (Ya Rezzak'ın) değeri kesmemeli.
+      '/aciklama':
+          '<html><head><meta property="og:description" content="Sabah namazından sonra 100 defa Ya Rezzak\'ın zikrini çekin"></head></html>',
+      // Tek tırnaklı içerik ve ters öznitelik sırası.
+      '/tek-tirnak':
+          "<html><head><meta content='Her gün 33 defa Sübhanallah' property='og:description'></head></html>",
+    });
+    base = 'http://127.0.0.1:${server.port}';
+  });
+
+  tearDownAll(() async {
+    await server.close(force: true);
+  });
+
+  group('isCaptionMissing', () {
+    test('yalnızca bağlantı ve okunamayan açıklama: eksik', () {
+      expect(
+        isCaptionMissing('https://www.instagram.com/p/abc/?img_index=1'),
+        isTrue,
+      );
+      expect(
+        isCaptionMissing('https://x.example/p/abc', scrapedCaption: '  '),
+        isTrue,
+      );
+    });
+
+    test('kullanıcı metni veya kazınan açıklama varsa eksik değil', () {
+      expect(
+        isCaptionMissing('100 defa Ya Rezzak https://x.example/p/abc'),
+        isFalse,
+      );
+      expect(
+        isCaptionMissing(
+          'https://x.example/p/abc',
+          scrapedCaption: 'Sabah namazından sonra 100 defa',
+        ),
+        isFalse,
+      );
+    });
+
+    test('bağlantı yoksa eksik sayılmaz (düz metin paylaşımı)', () {
+      expect(isCaptionMissing('Ya Rezzak 100 defa'), isFalse);
+      expect(isCaptionMissing(''), isFalse);
+    });
+  });
+
+  group('ShareService.analyzeSharedContent (yerel sunucu)', () {
+    test('açıklaması olmayan sayfa: captionUnavailable true, zikir yok', () async {
+      final draft = await ShareService.instance
+          .analyzeSharedContent('$base/giris-duvari?img_index=1');
+      expect(draft.captionUnavailable, isTrue);
+      expect(draft.sourceUrl, '$base/giris-duvari?img_index=1');
+      expect(draft.title, 'Paylaşılan Zikir');
+    });
+
+    test('Gemini anahtarı olsa bile açıklama yoksa istek atılmaz', () async {
+      // Anahtar geçersiz; çağrı denenseydi ağ hatası/boş dönerdi. Sonuç yine
+      // yerel taslak ve captionUnavailable olmalıdır.
+      final draft = await ShareService.instance.analyzeSharedContent(
+        '$base/giris-duvari',
+        geminiApiKey: 'GECERSIZ',
+      );
+      expect(draft.captionUnavailable, isTrue);
+    });
+
+    test('og:description içindeki kesme işareti değeri kesmez', () async {
+      final draft =
+          await ShareService.instance.analyzeSharedContent('$base/aciklama');
+      expect(draft.captionUnavailable, isFalse);
+      expect(draft.title, 'Yâ Rezzâk');
+      expect(draft.targetCount, 100);
+      expect(draft.prayerTime, PrayerType.fajr);
+      // Kesme işaretinden sonraki kısım korunmuş olmalı.
+      expect(draft.rawCaption, contains('zikrini çekin'));
+    });
+
+    test('tek tırnaklı ve ters sıralı meta etiketi okunur', () async {
+      final draft =
+          await ShareService.instance.analyzeSharedContent('$base/tek-tirnak');
+      expect(draft.captionUnavailable, isFalse);
+      expect(draft.title, 'Sübhanallah');
+      expect(draft.targetCount, 33);
+    });
+
+    test('erişilemeyen bağlantı (404): captionUnavailable true', () async {
+      final draft = await ShareService.instance
+          .analyzeSharedContent('$base/yok-boyle-sayfa');
+      expect(draft.captionUnavailable, isTrue);
+    });
+
+    test('düz metin paylaşımı ağa çıkmadan ayıklanır', () async {
+      final draft = await ShareService.instance
+          .analyzeSharedContent('Rızık için 100 defa Ya Rezzak');
+      expect(draft.captionUnavailable, isFalse);
+      expect(draft.title, 'Yâ Rezzâk');
+    });
+  });
+}
