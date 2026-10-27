@@ -2,6 +2,9 @@
 
 Kronolojik kayıt; en yeni kayıt en üsttedir. Biçim: `## [YYYY-AA-GG] [İŞLEM_TİPİ] | Kısa Açıklama`. İşlem tipleri: INGEST, QUERY, UPDATE, DECISION, LINT, SETUP. Kurallar: [[wiki-kullanim]]. Harita: [[index]].
 
+## [2026-10-27] UPDATE | README'ye ekran görüntüleri ve gizlilik bölümü
+Emülatörde (1080x2400, İstanbul, Diyanet, varsayılan tema) sekiz ekran görüntüsü alındı ve `docs/screenshots/` altına konup README'de tabloyla gösterildi: Vakitler, namaz işaretleme, Kaza, Süreç, Rozetler, Ayarlar, Zikir Defteri, Kıble. README'ye gizlilik ve güvenlik bölümü, paylaşım onayı, kıble, Hicri takvim ve widget maddeleri eklendi; "fazileti" ifadesi "anlamı" yapıldı. Not: tam zamanlı alarm izni yeni kurulumda ilk açılışta Alarmlar ayar ekranını açıyor, görüntüler için `appops set ... SCHEDULE_EXACT_ALARM allow` verildi. Sayfalar: [[gelistirme-ortami]], [[ui-ekranlar]].
+
 ## [2026-10-27] UPDATE | Güvenlik denetimi ikinci tur: SSRF, paylaşım onayı, iOS openUrl, Gemini anahtarı
 Orta öncelikli dört bulgu düzeltildi. (1) Kazıma yalnızca genel internet adreslerine bağlanır, soket çözülen adrese sabitlenir, yönlendirmeler elle ve her atlamada denetlenir, `http` `https`e yükseltilir (`url_guard.dart`; gerçek `https` siteleriyle doğrulandı). (2) Başka uygulamadan gelen paylaşım artık otomatik çözümlenmez; uyarı ve "Kazı" düğmesi gerekir. (3) iOS `openUrl` `http`/`https` allowlist'i aldı (derlenmedi). (4) Gemini anahtarı `flutter_secure_storage` ile Keystore/Keychain'e taşındı; eski düz kopya otomatik taşınır. Kazıma günlüğü artık bağlantı yazmıyor. Ön yüz 46, backend 124 test geçiyor, debug APK derlendi; gerçek cihazda anahtar deposu ve iOS denenmedi. Sayfalar: [[guvenlik-ve-kalite-analizi]], [[zikir-paylasim]], [[bilinen-sorunlar]], [[bagimliliklar]], [[test-stratejisi]].
 
