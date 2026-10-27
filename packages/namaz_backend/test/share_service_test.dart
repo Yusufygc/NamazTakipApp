@@ -6,6 +6,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:namaz_backend/namaz_backend.dart';
 import 'package:namaz_backend/src/platform/share_service.dart';
 
+import 'support/test_dhikr_content.dart';
+
 /// `/` yoluna verilen HTML'i döndüren yerel sunucu; sayfa başına istenen
 /// yanıt `pages` içinde tanımlanır.
 Future<HttpServer> _serve(Map<String, String> pages) async {
@@ -31,14 +33,13 @@ void main() {
     HttpOverrides.global = null;
     server = await _serve({
       // Instagram gibi: büyük sayfa, hiç og/description etiketi yok.
-      '/giris-duvari': '<html><head><title>Instagram</title>'
+      '/giris-duvari':
+          '<html><head><title>Instagram</title>'
           '<meta name="viewport" content="width=device-width"></head></html>',
       // Çift tırnaklı içerikte kesme işareti (Ya Rezzak'ın) değeri kesmemeli.
-      '/aciklama':
-          '<html><head><meta property="og:description" content="Sabah namazından sonra 100 defa Ya Rezzak\'ın zikrini çekin"></head></html>',
+      '/aciklama': '<html><head><meta property="og:description" content="Sabah namazından sonra 100 defa Ya Rezzak\'ın zikrini çekin"></head></html>',
       // Tek tırnaklı içerik ve ters öznitelik sırası.
-      '/tek-tirnak':
-          "<html><head><meta content='Her gün 33 defa Sübhanallah' property='og:description'></head></html>",
+      '/tek-tirnak': "<html><head><meta content='Her gün 33 defa Sübhanallah' property='og:description'></head></html>",
     });
     base = 'http://127.0.0.1:${server.port}';
   });
@@ -97,36 +98,42 @@ void main() {
       }
     });
 
-    test('openExternalUrl güvenli olmayan şemayı kanala hiç göndermez',
-        () async {
-      final opened = <String>[];
-      const channel = MethodChannel('com.namaztakip.app/share');
-      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(channel, (call) async {
-        if (call.method == 'openUrl') {
-          opened.add((call.arguments as Map)['url'] as String);
-          return true;
-        }
-        return null;
-      });
-      addTearDown(() => TestDefaultBinaryMessengerBinding
-          .instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(channel, null));
+    test(
+      'openExternalUrl güvenli olmayan şemayı kanala hiç göndermez',
+      () async {
+        final opened = <String>[];
+        const channel = MethodChannel('com.namaztakip.app/share');
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockMethodCallHandler(channel, (call) async {
+              if (call.method == 'openUrl') {
+                opened.add((call.arguments as Map)['url'] as String);
+                return true;
+              }
+              return null;
+            });
+        addTearDown(
+          () => TestDefaultBinaryMessengerBinding
+              .instance
+              .defaultBinaryMessenger
+              .setMockMethodCallHandler(channel, null),
+        );
 
-      expect(await ShareService.instance.openExternalUrl('tel:112'), isFalse);
-      expect(
-        await ShareService.instance.openExternalUrl('file:///etc/hosts'),
-        isFalse,
-      );
-      expect(opened, isEmpty);
+        expect(await ShareService.instance.openExternalUrl('tel:112'), isFalse);
+        expect(
+          await ShareService.instance.openExternalUrl('file:///etc/hosts'),
+          isFalse,
+        );
+        expect(opened, isEmpty);
 
-      expect(
-        await ShareService.instance
-            .openExternalUrl(' https://www.instagram.com/p/abc/ '),
-        isTrue,
-      );
-      expect(opened, ['https://www.instagram.com/p/abc/']);
-    });
+        expect(
+          await ShareService.instance.openExternalUrl(
+            ' https://www.instagram.com/p/abc/ ',
+          ),
+          isTrue,
+        );
+        expect(opened, ['https://www.instagram.com/p/abc/']);
+      },
+    );
   });
 
   group('sanitizeTargetCount (yapay zeka yanıtı)', () {
@@ -149,13 +156,18 @@ void main() {
   });
 
   group('ShareService.analyzeSharedContent (yerel sunucu)', () {
-    test('açıklaması olmayan sayfa: captionUnavailable true, zikir yok', () async {
-      final draft = await ShareService.instance
-          .analyzeSharedContent('$base/giris-duvari?img_index=1');
-      expect(draft.captionUnavailable, isTrue);
-      expect(draft.sourceUrl, '$base/giris-duvari?img_index=1');
-      expect(draft.title, 'Paylaşılan Zikir');
-    });
+    test(
+      'açıklaması olmayan sayfa: captionUnavailable true, zikir yok',
+      () async {
+        final draft = await ShareService.instance.analyzeSharedContent(
+          '$base/giris-duvari?img_index=1',
+          content: testDhikrContent,
+        );
+        expect(draft.captionUnavailable, isTrue);
+        expect(draft.sourceUrl, '$base/giris-duvari?img_index=1');
+        expect(draft.title, 'Paylaşılan Zikir');
+      },
+    );
 
     test('Gemini anahtarı olsa bile açıklama yoksa istek atılmaz', () async {
       // Anahtar geçersiz; çağrı denenseydi ağ hatası/boş dönerdi. Sonuç yine
@@ -163,13 +175,16 @@ void main() {
       final draft = await ShareService.instance.analyzeSharedContent(
         '$base/giris-duvari',
         geminiApiKey: 'GECERSIZ',
+        content: testDhikrContent,
       );
       expect(draft.captionUnavailable, isTrue);
     });
 
     test('og:description içindeki kesme işareti değeri kesmez', () async {
-      final draft =
-          await ShareService.instance.analyzeSharedContent('$base/aciklama');
+      final draft = await ShareService.instance.analyzeSharedContent(
+        '$base/aciklama',
+        content: testDhikrContent,
+      );
       expect(draft.captionUnavailable, isFalse);
       expect(draft.title, 'Yâ Rezzâk');
       expect(draft.targetCount, 100);
@@ -179,22 +194,28 @@ void main() {
     });
 
     test('tek tırnaklı ve ters sıralı meta etiketi okunur', () async {
-      final draft =
-          await ShareService.instance.analyzeSharedContent('$base/tek-tirnak');
+      final draft = await ShareService.instance.analyzeSharedContent(
+        '$base/tek-tirnak',
+        content: testDhikrContent,
+      );
       expect(draft.captionUnavailable, isFalse);
       expect(draft.title, 'Sübhanallah');
       expect(draft.targetCount, 33);
     });
 
     test('erişilemeyen bağlantı (404): captionUnavailable true', () async {
-      final draft = await ShareService.instance
-          .analyzeSharedContent('$base/yok-boyle-sayfa');
+      final draft = await ShareService.instance.analyzeSharedContent(
+        '$base/yok-boyle-sayfa',
+        content: testDhikrContent,
+      );
       expect(draft.captionUnavailable, isTrue);
     });
 
     test('düz metin paylaşımı ağa çıkmadan ayıklanır', () async {
-      final draft = await ShareService.instance
-          .analyzeSharedContent('Rızık için 100 defa Ya Rezzak');
+      final draft = await ShareService.instance.analyzeSharedContent(
+        'Rızık için 100 defa Ya Rezzak',
+        content: testDhikrContent,
+      );
       expect(draft.captionUnavailable, isFalse);
       expect(draft.title, 'Yâ Rezzâk');
     });

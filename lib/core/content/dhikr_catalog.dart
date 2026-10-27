@@ -1,6 +1,12 @@
-import 'dhikr.dart';
-import 'dhikr_extractor.dart';
-import 'prayer.dart';
+import 'package:namaz_backend/namaz_backend.dart';
+
+import '../strings/strings.dart';
+
+// Zikir, esma ve tesbihat içeriği. Metin ve dil kararı ön yüzdedir; backend bu
+// veriyi bilmez, `main.dart` içinde `NamazBackendConfig.dhikrContent` ile alır.
+//
+// DİNÎ İÇERİK: Arapça yazılar, okunuşlar, anlamlar ve adetler dinî kaynakla
+// doğrulanmamıştır; bkz. docs/wiki/dini-icerik-onayi.md.
 
 /// Klasik namaz tesbihatının (33 Sübhanallah -> 33 Elhamdülillah -> 33 Allahü Ekber -> 1 Hatim)
 /// tek bir adımı.
@@ -979,3 +985,159 @@ const List<DhikrCatalogEntry> kEsmaAndDhikrCatalog = [
     keywords: ['ya safi', 'ya şafi', 'yâ şâfî', 'eş-şafi', 'es-safi'],
   ),
 ];
+
+/// Yaygın Esmaül Hüsna ve sahih tesbihat/zikir kataloğu.
+const List<DhikrCatalogEntry> _kBaseDhikrCatalog = [
+  DhikrCatalogEntry(
+    title: 'Sübhanallah',
+    arabic: 'سُبْحَانَ اللّٰهِ',
+    transliteration: 'Sübhânallâh',
+    meaning: 'Allah her türlü eksiklikten münezzehtir.',
+    defaultCount: 33,
+    groupName: DhikrGroups.prayerTesbihat,
+    prayerTime: PrayerType.fajr,
+    keywords: ['subhanallah', 'sübhanallah'],
+  ),
+  DhikrCatalogEntry(
+    title: 'Elhamdülillah',
+    arabic: 'اَلْحَمْدُ لِلّٰهِ',
+    transliteration: 'Elhamdülillâh',
+    meaning: 'Hamd ve övgü yalnızca Allah\'a mahsustur.',
+    defaultCount: 33,
+    groupName: DhikrGroups.prayerTesbihat,
+    prayerTime: PrayerType.dhuhr,
+    keywords: ['elhamdulillah', 'elhamdülillah'],
+  ),
+  DhikrCatalogEntry(
+    title: 'Allahü Ekber',
+    arabic: 'اَللّٰهُ اَكْبَرُ',
+    transliteration: 'Allâhü Ekber',
+    meaning: 'Allah en büyüktür.',
+    defaultCount: 33,
+    groupName: DhikrGroups.prayerTesbihat,
+    prayerTime: PrayerType.asr,
+    keywords: ['allahu ekber', 'allahü ekber', 'allahuekber'],
+  ),
+  DhikrCatalogEntry(
+    title: 'Sübhanallahi ve Bihamdihi',
+    arabic: 'سُبْحَانَ اللّٰهِ وَبِحَمْدِهِ سُبْحَانَ اللّٰهِ الْعَظِيمِ',
+    transliteration: 'Sübhânallâhi ve bihamdihî sübhânallâhil azîm',
+    meaning:
+        'Allah\'ı hamd ile tesbih ederim; Yüce Allah her kusurdan münezzehtir.',
+    defaultCount: 100,
+    groupName: DhikrGroups.morningEvening,
+    prayerTime: PrayerType.fajr,
+    keywords: [
+      'subhanallahi ve bihamdihi',
+      'sübhanallahi ve bihamdihi',
+      'subhanallahil azim',
+    ],
+  ),
+  DhikrCatalogEntry(
+    title: 'Estağfirullah el-Azîm',
+    arabic: 'أَسْتَغْفِرُ اللّٰهَ الْعَظِيمَ',
+    transliteration: 'Estağfirullâhel azîm',
+    meaning: 'Yüce Allah\'tan bağışlanma dilerim.',
+    defaultCount: 100,
+    groupName: DhikrGroups.morningEvening,
+    prayerTime: PrayerType.fajr,
+    keywords: ['estagfirullah', 'estağfirullah', 'istigfar', 'istiğfar'],
+  ),
+  DhikrCatalogEntry(
+    title: 'Lâ İlâhe İllallâh',
+    arabic: 'لَا إِلٰهَ إِلَّا اللّٰهُ',
+    transliteration: 'Lâ ilâhe illallâh',
+    meaning: 'Allah\'tan başka ilah yoktur.',
+    defaultCount: 100,
+    groupName: DhikrGroups.general,
+    prayerTime: PrayerType.maghrib,
+    keywords: ['la ilahe illallah', 'lâ ilâhe illallâh', 'kelime-i tevhid'],
+  ),
+  DhikrCatalogEntry(
+    title: 'Salavat-ı Şerife',
+    arabic: 'اَللّٰهُمَّ صَلِّ عَلٰى سَيِّدِنَا مُحَمَّدٍ',
+    transliteration: 'Allâhümme salli alâ seyyidinâ Muhammed',
+    meaning: 'Allah\'ım, Efendimiz Muhammed\'e salat ve selam eyle.',
+    defaultCount: 100,
+    groupName: DhikrGroups.general,
+    prayerTime: PrayerType.isha,
+    keywords: ['allahumme salli', 'allahümme salli', 'salavat', 'salâvat'],
+  ),
+  DhikrCatalogEntry(
+    title: 'Lâ Havle ve Lâ Kuvvete İllâ Billâh',
+    arabic: 'لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللّٰهِ',
+    transliteration: 'Lâ havle ve lâ kuvvete illâ billâhil aliyyil azîm',
+    meaning: 'Güç ve kuvvet ancak Yüce ve Büyük olan Allah\'ın yardımıyladır.',
+    defaultCount: 100,
+    groupName: DhikrGroups.sifa,
+    keywords: ['la havle', 'lâ havle', 'lahavle'],
+  ),
+  DhikrCatalogEntry(
+    title: 'Hasbünallâhü ve Ni\'mel Vekîl',
+    arabic: 'حَسْبُنَا اللّٰهُ وَنِعْمَ الْوَكِيلُ',
+    transliteration: 'Hasbünallâhü ve ni\'mel vekîl',
+    meaning: 'Allah bize yeter, O ne güzel vekildir.',
+    defaultCount: 450,
+    groupName: DhikrGroups.sifa,
+    keywords: ['hasbunallah', 'hasbünallah', 'nimel vekil'],
+  ),
+  DhikrCatalogEntry(
+    title: 'Yunus Peygamber Duası (Lâ İlâhe İllâ Ente)',
+    arabic:
+        'لَا إِلٰهَ إِلَّا أَنْتَ سُبْحَانَكَ إِنِّي كُنْتُ مِنَ الظَّالِمِينَ',
+    transliteration: 'Lâ ilâhe illâ ente sübhâneke innî küntü minez-zâlimîn',
+    meaning: 'Senden başka ilah yoktur, Seni tenzih ederim; gerçekten ben kendine yazık edenlerden oldum.',
+    defaultCount: 41,
+    groupName: DhikrGroups.sifa,
+    keywords: [
+      'la ilahe illa ente',
+      'inne kuntu minez zalimin',
+      'innî küntü minez',
+      'yunus duası',
+    ],
+  ),
+];
+
+/// Yaygın zikirler (10) ve Esmaül Hüsna kataloğu birlikte: paylaşım metni
+/// ayıklanırken bu sırayla taranır, ilk eşleşen kazanır.
+const List<DhikrCatalogEntry> kDhikrCatalog = [
+  ..._kBaseDhikrCatalog,
+  ...kEsmaAndDhikrCatalog,
+];
+
+/// İlk kurulumda deftere eklenen girdiler ([kDhikrCatalog] başlıklarıyla aynı olmalı).
+const List<String> kStarterDhikrTitles = [
+  'Sübhanallah',
+  'Elhamdülillah',
+  'Allahü Ekber',
+  'Estağfirullah el-Azîm',
+  'Yâ Rezzâk',
+  'Yâ Şâfî',
+];
+
+/// Yapay zekaya gönderilen istem (Gemini). Fazilet veya sevap iddiası üretmesi
+/// istenmez: bkz. docs/wiki/dini-icerik-onayi.md.
+const String kDhikrAiPrompt =
+    '''
+Aşağıdaki sosyal medya (Instagram vb.) dini video açıklamasından zikir, esma veya tesbihat bilgisini çıkar ve YALNIZCA geçerli bir JSON nesnesi döndür:
+{
+  "title": "Zikrin veya Esmanın kısa Türkçe başlığı (örn. Yâ Rezzâk, Sübhanallahi ve Bihamdihi)",
+  "arabic": "Arapça yazılışı",
+  "transliteration": "Türkçe okunuşu",
+  "meaning": "Türkçe anlamı (1-2 cümle; fazilet veya sevap iddiası ekleme)",
+  "targetCount": 100,
+  "groupName": "${DhikrGroups.esma} | ${DhikrGroups.morningEvening} | ${DhikrGroups.rizik} | ${DhikrGroups.sifa} | ${DhikrGroups.prayerTesbihat} | ${DhikrGroups.general}",
+  "prayerTime": "fajr | dhuhr | asr | maghrib | isha | null"
+}
+Metin:
+${DhikrContent.aiTextToken}
+''';
+
+/// Backend'e verilen zikir içeriği (`NamazBackendConfig.dhikrContent`).
+const DhikrContent kAppDhikrContent = DhikrContent(
+  catalog: kDhikrCatalog,
+  starterTitles: kStarterDhikrTitles,
+  fallbackTitle: DhikrStrings.sharedFallbackTitle,
+  fallbackMeaning: DhikrStrings.sharedFallbackMeaning,
+  aiPromptTemplate: kDhikrAiPrompt,
+);

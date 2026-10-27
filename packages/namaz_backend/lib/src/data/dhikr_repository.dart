@@ -1,7 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 
 import '../domain/dhikr.dart';
-import '../domain/dhikr_extractor.dart';
 import '../domain/prayer.dart';
 import 'app_database.dart';
 
@@ -14,24 +13,17 @@ class DhikrRepository {
   Database get _db => _database.db;
 
   /// İlk kullanımda tablo tamamen boşsa başlangıç tesbihat ve esmalarını ekler.
-  Future<void> seedDefaultsIfEmpty() async {
-    final count = Sqflite.firstIntValue(
+  Future<void> seedDefaultsIfEmpty(DhikrContent content) async {
+    final count =
+        Sqflite.firstIntValue(
           await _db.rawQuery('SELECT COUNT(*) FROM dhikrs'),
         ) ??
         0;
     if (count > 0) return;
 
     final nowIso = DateTime.now().toIso8601String();
-    final starterTitles = <String>[
-      'Sübhanallah',
-      'Elhamdülillah',
-      'Allahü Ekber',
-      'Estağfirullah el-Azîm',
-      'Yâ Rezzâk',
-      'Yâ Şâfî',
-    ];
-    for (final title in starterTitles) {
-      final entry = kDhikrCatalog.firstWhere((e) => e.title == title);
+    for (final title in content.starterTitles) {
+      final entry = content.catalog.firstWhere((e) => e.title == title);
       await _db.insert('dhikrs', {
         'title': entry.title,
         'arabic': entry.arabic,
@@ -128,10 +120,7 @@ class DhikrRepository {
     }
     await _db.update(
       'dhikrs',
-      {
-        'current_count': updatedCurrent,
-        'total_completed': nextTotal,
-      },
+      {'current_count': updatedCurrent, 'total_completed': nextTotal},
       where: 'id = ?',
       whereArgs: [id],
     );
@@ -176,7 +165,8 @@ class DhikrRepository {
       prayerTime: prayerTime,
       sourceUrl: row['source_url'] as String?,
       isFavorite: (row['is_favorite'] as int? ?? 0) == 1,
-      createdAt: DateTime.tryParse(row['created_at'] as String? ?? '') ??
+      createdAt:
+          DateTime.tryParse(row['created_at'] as String? ?? '') ??
           DateTime.now(),
     );
   }

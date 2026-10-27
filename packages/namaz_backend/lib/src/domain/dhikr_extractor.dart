@@ -1,153 +1,20 @@
 import 'dhikr.dart';
-import 'esma_catalog.dart';
 import 'prayer.dart';
-
-/// Yerleşik Esmaül Hüsna ve meşhur zikir/tesbihat sözlük girdisi.
-class DhikrCatalogEntry {
-  const DhikrCatalogEntry({
-    required this.title,
-    required this.arabic,
-    required this.transliteration,
-    required this.meaning,
-    required this.defaultCount,
-    required this.groupName,
-    required this.keywords,
-    this.prayerTime,
-  });
-
-  final String title;
-  final String arabic;
-  final String transliteration;
-  final String meaning;
-  final int defaultCount;
-  final String groupName;
-  final List<String> keywords;
-  final PrayerType? prayerTime;
-}
-
-/// Yaygın Esmaül Hüsna ve sahih tesbihat/zikir kataloğu.
-const List<DhikrCatalogEntry> kDhikrCatalog = [
-  DhikrCatalogEntry(
-    title: 'Sübhanallah',
-    arabic: 'سُبْحَانَ اللّٰهِ',
-    transliteration: 'Sübhânallâh',
-    meaning: 'Allah her türlü eksiklikten münezzehtir.',
-    defaultCount: 33,
-    groupName: DhikrGroups.prayerTesbihat,
-    prayerTime: PrayerType.fajr,
-    keywords: ['subhanallah', 'sübhanallah'],
-  ),
-  DhikrCatalogEntry(
-    title: 'Elhamdülillah',
-    arabic: 'اَلْحَمْدُ لِلّٰهِ',
-    transliteration: 'Elhamdülillâh',
-    meaning: 'Hamd ve övgü yalnızca Allah\'a mahsustur.',
-    defaultCount: 33,
-    groupName: DhikrGroups.prayerTesbihat,
-    prayerTime: PrayerType.dhuhr,
-    keywords: ['elhamdulillah', 'elhamdülillah'],
-  ),
-  DhikrCatalogEntry(
-    title: 'Allahü Ekber',
-    arabic: 'اَللّٰهُ اَكْبَرُ',
-    transliteration: 'Allâhü Ekber',
-    meaning: 'Allah en büyüktür.',
-    defaultCount: 33,
-    groupName: DhikrGroups.prayerTesbihat,
-    prayerTime: PrayerType.asr,
-    keywords: ['allahu ekber', 'allahü ekber', 'allahuekber'],
-  ),
-  DhikrCatalogEntry(
-    title: 'Sübhanallahi ve Bihamdihi',
-    arabic: 'سُبْحَانَ اللّٰهِ وَبِحَمْدِهِ سُبْحَانَ اللّٰهِ الْعَظِيمِ',
-    transliteration: 'Sübhânallâhi ve bihamdihî sübhânallâhil azîm',
-    meaning:
-        'Allah\'ı hamd ile tesbih ederim; Yüce Allah her kusurdan münezzehtir.',
-    defaultCount: 100,
-    groupName: DhikrGroups.morningEvening,
-    prayerTime: PrayerType.fajr,
-    keywords: [
-      'subhanallahi ve bihamdihi',
-      'sübhanallahi ve bihamdihi',
-      'subhanallahil azim',
-    ],
-  ),
-  DhikrCatalogEntry(
-    title: 'Estağfirullah el-Azîm',
-    arabic: 'أَسْتَغْفِرُ اللّٰهَ الْعَظِيمَ',
-    transliteration: 'Estağfirullâhel azîm',
-    meaning: 'Yüce Allah\'tan bağışlanma dilerim.',
-    defaultCount: 100,
-    groupName: DhikrGroups.morningEvening,
-    prayerTime: PrayerType.fajr,
-    keywords: ['estagfirullah', 'estağfirullah', 'istigfar', 'istiğfar'],
-  ),
-  DhikrCatalogEntry(
-    title: 'Lâ İlâhe İllallâh',
-    arabic: 'لَا إِلٰهَ إِلَّا اللّٰهُ',
-    transliteration: 'Lâ ilâhe illallâh',
-    meaning: 'Allah\'tan başka ilah yoktur.',
-    defaultCount: 100,
-    groupName: DhikrGroups.general,
-    prayerTime: PrayerType.maghrib,
-    keywords: ['la ilahe illallah', 'lâ ilâhe illallâh', 'kelime-i tevhid'],
-  ),
-  DhikrCatalogEntry(
-    title: 'Salavat-ı Şerife',
-    arabic: 'اَللّٰهُمَّ صَلِّ عَلٰى سَيِّدِنَا مُحَمَّدٍ',
-    transliteration: 'Allâhümme salli alâ seyyidinâ Muhammed',
-    meaning: 'Allah\'ım, Efendimiz Muhammed\'e salat ve selam eyle.',
-    defaultCount: 100,
-    groupName: DhikrGroups.general,
-    prayerTime: PrayerType.isha,
-    keywords: ['allahumme salli', 'allahümme salli', 'salavat', 'salâvat'],
-  ),
-  DhikrCatalogEntry(
-    title: 'Lâ Havle ve Lâ Kuvvete İllâ Billâh',
-    arabic: 'لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللّٰهِ',
-    transliteration: 'Lâ havle ve lâ kuvvete illâ billâhil aliyyil azîm',
-    meaning: 'Güç ve kuvvet ancak Yüce ve Büyük olan Allah\'ın yardımıyladır.',
-    defaultCount: 100,
-    groupName: DhikrGroups.sifa,
-    keywords: ['la havle', 'lâ havle', 'lahavle'],
-  ),
-  DhikrCatalogEntry(
-    title: 'Hasbünallâhü ve Ni\'mel Vekîl',
-    arabic: 'حَسْبُنَا اللّٰهُ وَنِعْمَ الْوَكِيلُ',
-    transliteration: 'Hasbünallâhü ve ni\'mel vekîl',
-    meaning: 'Allah bize yeter, O ne güzel vekildir.',
-    defaultCount: 450,
-    groupName: DhikrGroups.sifa,
-    keywords: ['hasbunallah', 'hasbünallah', 'nimel vekil'],
-  ),
-  DhikrCatalogEntry(
-    title: 'Yunus Peygamber Duası (Lâ İlâhe İllâ Ente)',
-    arabic: 'لَا إِلٰهَ إِلَّا أَنْتَ سُبْحَانَكَ إِنِّي كُنْتُ مِنَ الظَّالِمِينَ',
-    transliteration: 'Lâ ilâhe illâ ente sübhâneke innî küntü minez-zâlimîn',
-    meaning:
-        'Senden başka ilah yoktur, Seni tenzih ederim; gerçekten ben kendine yazık edenlerden oldum.',
-    defaultCount: 41,
-    groupName: DhikrGroups.sifa,
-    keywords: [
-      'la ilahe illa ente',
-      'inne kuntu minez zalimin',
-      'innî küntü minez',
-      'yunus duası',
-    ],
-  ),
-  ...kEsmaAndDhikrCatalog,
-];
 
 /// Paylaşılan metin veya video açıklamasından zikir bilgilerini çıkaran saf
 /// (pure Dart) analiz fonksiyonu.
-DhikrDraft extractDhikrDraft(String rawInput, {String? sourceUrl}) {
+DhikrDraft extractDhikrDraft(
+  String rawInput, {
+  String? sourceUrl,
+  required DhikrContent content,
+}) {
   final extractedUrl = sourceUrl ?? extractFirstUrl(rawInput);
   final cleaned = cleanSocialCaption(rawInput);
   final folded = _foldTurkish(cleaned);
 
   // 1) Sözlükten eşleşen Esma veya zikir var mı?
   DhikrCatalogEntry? matched;
-  for (final entry in kDhikrCatalog) {
+  for (final entry in content.catalog) {
     for (final keyword in entry.keywords) {
       if (folded.contains(_foldTurkish(keyword))) {
         matched = entry;
@@ -196,7 +63,7 @@ DhikrDraft extractDhikrDraft(String rawInput, {String? sourceUrl}) {
       title: formattedTitle,
       arabic: extractedArabic,
       transliteration: formattedTitle,
-      meaning: _extractSummaryMeaning(cleaned),
+      meaning: _extractSummaryMeaning(cleaned, content.fallbackMeaning),
       targetCount: explicitCount ?? 100,
       groupName: _inferGroup(folded, fallback: DhikrGroups.esma),
       prayerTime: explicitPrayer,
@@ -205,12 +72,12 @@ DhikrDraft extractDhikrDraft(String rawInput, {String? sourceUrl}) {
     );
   }
 
-  final fallbackTitle = _extractHeadlineTitle(cleaned);
+  final fallbackTitle = _extractHeadlineTitle(cleaned, content.fallbackTitle);
   return DhikrDraft(
     title: fallbackTitle,
     arabic: extractedArabic,
     transliteration: fallbackTitle,
-    meaning: _extractSummaryMeaning(cleaned),
+    meaning: _extractSummaryMeaning(cleaned, content.fallbackMeaning),
     targetCount: explicitCount ?? 33,
     groupName: _inferGroup(folded, fallback: DhikrGroups.general),
     prayerTime: explicitPrayer,
@@ -221,8 +88,10 @@ DhikrDraft extractDhikrDraft(String rawInput, {String? sourceUrl}) {
 
 /// Metin içerisindeki ilk `http://` veya `https://` bağlantısını bulur.
 String? extractFirstUrl(String text) {
-  final match = RegExp(r'https?://[^\s"<>]+', caseSensitive: false)
-      .firstMatch(text);
+  final match = RegExp(
+    r'https?://[^\s"<>]+',
+    caseSensitive: false,
+  ).firstMatch(text);
   if (match == null) return null;
   var url = match.group(0)!;
   while (url.isNotEmpty && '.,;:!?) fullwidth'.contains(url[url.length - 1])) {
@@ -289,10 +158,7 @@ int? extractTargetCount(String text) {
       r'\b(\d{1,5})\s*(?:defa|kere|kez|adet|tekrar|tesbih)\b',
       caseSensitive: false,
     ),
-    RegExp(
-      r"\b(\d{1,5})\s*['’]?\s*(?:er|ar|şer|şar)\b",
-      caseSensitive: false,
-    ),
+    RegExp(r"\b(\d{1,5})\s*['’]?\s*(?:er|ar|şer|şar)\b", caseSensitive: false),
     RegExp(
       r'\b(?:günde|her\s+gün|namazdan\s+sonra)\s+(\d{1,5})\b',
       caseSensitive: false,
@@ -383,23 +249,25 @@ String _foldTurkish(String input) {
 
 String _titleCaseTurkish(String input) {
   final words = input.trim().split(RegExp(r'\s+'));
-  return words.map((w) {
-    if (w.isEmpty) return w;
-    final first = w[0]
-        .replaceAll('i', 'İ')
-        .replaceAll('ı', 'I')
-        .replaceAll('ç', 'Ç')
-        .replaceAll('ğ', 'Ğ')
-        .replaceAll('ö', 'Ö')
-        .replaceAll('ş', 'Ş')
-        .replaceAll('ü', 'Ü')
-        .toUpperCase();
-    return '$first${w.substring(1).toLowerCase()}';
-  }).join(' ');
+  return words
+      .map((w) {
+        if (w.isEmpty) return w;
+        final first = w[0]
+            .replaceAll('i', 'İ')
+            .replaceAll('ı', 'I')
+            .replaceAll('ç', 'Ç')
+            .replaceAll('ğ', 'Ğ')
+            .replaceAll('ö', 'Ö')
+            .replaceAll('ş', 'Ş')
+            .replaceAll('ü', 'Ü')
+            .toUpperCase();
+        return '$first${w.substring(1).toLowerCase()}';
+      })
+      .join(' ');
 }
 
-String _extractHeadlineTitle(String cleaned) {
-  if (cleaned.isEmpty) return 'Paylaşılan Zikir';
+String _extractHeadlineTitle(String cleaned, String fallback) {
+  if (cleaned.isEmpty) return fallback;
   final firstSentence = cleaned
       .split(RegExp(r'[.!\n|•—–-]'))
       .map((s) => s.trim())
@@ -408,9 +276,9 @@ String _extractHeadlineTitle(String cleaned) {
   return '${firstSentence.substring(0, 34).trim()}…';
 }
 
-String _extractSummaryMeaning(String cleaned) {
+String _extractSummaryMeaning(String cleaned, String fallback) {
   if (cleaned.isEmpty) {
-    return 'Paylaşılan videodan kaydedilen zikir ve tesbihat.';
+    return fallback;
   }
   if (cleaned.length <= 180) return cleaned;
   return '${cleaned.substring(0, 177).trim()}...';

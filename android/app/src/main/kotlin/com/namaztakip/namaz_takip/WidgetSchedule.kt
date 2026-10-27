@@ -35,8 +35,6 @@ class WidgetState(
  * widget, saklanan program üzerinden kendisi hesaplar.
  */
 object WidgetSchedule {
-    val LABELS = arrayOf("Sabah", "Öğle", "İkindi", "Akşam", "Yatsı")
-
     /** Dart'ın gönderdiği `schedule` metnini ayrıştırır; bozuk satırlar atlanır. */
     fun parse(raw: String?): List<DaySchedule> {
         if (raw.isNullOrBlank()) return emptyList()

@@ -17,8 +17,9 @@ class ShareService {
 
   static final ShareService instance = ShareService._();
 
-  static const MethodChannel _channel =
-      MethodChannel('com.namaztakip.app/share');
+  static const MethodChannel _channel = MethodChannel(
+    'com.namaztakip.app/share',
+  );
 
   final StreamController<String> _sharedController =
       StreamController<String>.broadcast();
@@ -60,8 +61,9 @@ class ShareService {
   Future<bool> openExternalUrl(String url) async {
     if (!isSafeWebUrl(url)) return false;
     try {
-      final ok =
-          await _channel.invokeMethod<bool>('openUrl', {'url': url.trim()});
+      final ok = await _channel.invokeMethod<bool>('openUrl', {
+        'url': url.trim(),
+      });
       return ok ?? false;
     } catch (e) {
       debugPrint('[ShareService] openExternalUrl hata: $e');
@@ -73,6 +75,7 @@ class ShareService {
   Future<DhikrDraft> analyzeSharedContent(
     String rawTextOrUrl, {
     String? geminiApiKey,
+    required DhikrContent content,
   }) async {
     final url = extractFirstUrl(rawTextOrUrl);
     var combinedText = rawTextOrUrl.trim();
@@ -86,7 +89,11 @@ class ShareService {
       }
     }
 
-    final localDraft = extractDhikrDraft(combinedText, sourceUrl: url);
+    final localDraft = extractDhikrDraft(
+      combinedText,
+      sourceUrl: url,
+      content: content,
+    );
 
     // Yalnızca bağlantı var ve açıklaması okunamadı: taslakta bilgi yok, yapay
     // zekaya da gönderilecek metin yok (bağlantı Google'a gönderilmez).
@@ -100,6 +107,10 @@ class ShareService {
         sourceUrl: url,
         apiKey: geminiApiKey.trim(),
         fallback: localDraft,
+        prompt: content.aiPromptTemplate.replaceAll(
+          DhikrContent.aiTextToken,
+          combinedText,
+        ),
       );
       if (aiDraft != null) return aiDraft;
     }
@@ -114,13 +125,13 @@ class ShareService {
       if (!isSafeWebUrl(url)) return null;
       client = HttpClient()
         ..connectionTimeout = const Duration(seconds: 5)
-        ..userAgent =
-            'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Mobile Safari/537.36';
+        ..userAgent = 'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Mobile Safari/537.36';
       final request = await client.getUrl(uri);
       request.followRedirects = true;
       request.maxRedirects = 4;
-      final response =
-          await request.close().timeout(const Duration(seconds: 6));
+      final response = await request.close().timeout(
+        const Duration(seconds: 6),
+      );
       if (response.statusCode < 200 || response.statusCode >= 400) {
         return null;
       }
@@ -129,8 +140,7 @@ class ShareService {
       // arası ve toplam süre sınırlıdır.
       final bytes = <int>[];
       final deadline = DateTime.now().add(const Duration(seconds: 10));
-      await for (final chunk
-          in response.timeout(const Duration(seconds: 6))) {
+      await for (final chunk in response.timeout(const Duration(seconds: 6))) {
         bytes.addAll(chunk);
         if (bytes.length >= 120 * 1024) break;
         if (DateTime.now().isAfter(deadline)) break;
@@ -200,6 +210,7 @@ class ShareService {
     required String? sourceUrl,
     required String apiKey,
     required DhikrDraft fallback,
+    required String prompt,
   }) async {
     HttpClient? client;
     try {
@@ -212,21 +223,6 @@ class ShareService {
       final req = await client.postUrl(endpoint);
       req.headers.contentType = ContentType.json;
       req.headers.set('x-goog-api-key', apiKey);
-
-      final prompt = '''
-Aşağıdaki sosyal medya (Instagram vb.) dini video açıklamasından zikir, esma veya tesbihat bilgisini çıkar ve YALNIZCA geçerli bir JSON nesnesi döndür:
-{
-  "title": "Zikrin veya Esmanın kısa Türkçe başlığı (örn. Yâ Rezzâk, Sübhanallahi ve Bihamdihi)",
-  "arabic": "Arapça yazılışı",
-  "transliteration": "Türkçe okunuşu",
-  "meaning": "Türkçe anlamı (1-2 cümle; fazilet veya sevap iddiası ekleme)",
-  "targetCount": 100,
-  "groupName": "Esmaül Hüsna | Sabah & Akşam | Rızık & Bereket | Şifa & Huzur | Namaz Tesbihatı | Genel Zikirler",
-  "prayerTime": "fajr | dhuhr | asr | maghrib | isha | null"
-}
-Metin:
-$combinedText
-''';
 
       final payload = jsonEncode({
         'contents': [
@@ -250,7 +246,8 @@ $combinedText
       final candidates = decoded['candidates'] as List<dynamic>?;
       if (candidates == null || candidates.isEmpty) return null;
       final content =
-          (candidates.first as Map<String, dynamic>)['content'] as Map<String, dynamic>?;
+          (candidates.first as Map<String, dynamic>)['content']
+              as Map<String, dynamic>?;
       final parts = content?['parts'] as List<dynamic>?;
       if (parts == null || parts.isEmpty) return null;
       final textJson = (parts.first as Map<String, dynamic>)['text'] as String?;
@@ -276,8 +273,8 @@ $combinedText
             : fallback.arabic,
         transliteration:
             (item['transliteration'] as String?)?.trim().isNotEmpty == true
-                ? (item['transliteration'] as String).trim()
-                : fallback.transliteration,
+            ? (item['transliteration'] as String).trim()
+            : fallback.transliteration,
         meaning: (item['meaning'] as String?)?.trim().isNotEmpty == true
             ? (item['meaning'] as String).trim()
             : fallback.meaning,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:namaz_backend/namaz_backend.dart';
 
+import '../../core/content/dhikr_catalog.dart';
 import '../../core/icons/app_icons.dart';
 import '../../core/strings/strings.dart';
 import '../../core/theme/app_theme.dart';
@@ -243,8 +244,8 @@ class _DhikrEditorSheetState extends ConsumerState<DhikrEditorSheet> {
                     isEdit
                         ? DhikrStrings.editSheetTitle
                         : (widget.startWithScraper
-                            ? DhikrStrings.scrapeSheetTitle
-                            : DhikrStrings.addSheetTitle),
+                              ? DhikrStrings.scrapeSheetTitle
+                              : DhikrStrings.addSheetTitle),
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w800,
@@ -305,7 +306,8 @@ class _DhikrEditorSheetState extends ConsumerState<DhikrEditorSheet> {
                   color: p.secondary.withValues(alpha: 0.14),
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
-                      color: p.secondary.withValues(alpha: 0.35)),
+                    color: p.secondary.withValues(alpha: 0.35),
+                  ),
                 ),
                 child: Row(
                   children: [

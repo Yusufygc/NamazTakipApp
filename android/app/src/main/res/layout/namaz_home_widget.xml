@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/widget_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -21,7 +22,7 @@
             android:layout_weight="1"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="Namaz Takip"
+            tools:text="Namaz Takip"
             android:textColor="#FFFFFFFF"
             android:textSize="13sp"
             android:textStyle="bold" />
@@ -35,7 +36,7 @@
             android:paddingTop="3dp"
             android:paddingRight="8dp"
             android:paddingBottom="3dp"
-            android:text="0 / 5 Eda"
+            tools:text="0 / 5 Eda"
             android:textColor="#FFE5C98B"
             android:textSize="11sp"
             android:textStyle="bold" />
@@ -60,7 +61,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="SIRADAKİ VAKİT"
+                android:id="@+id/widget_next_tag"
+                tools:text="SIRADAKİ VAKİT"
                 android:textColor="#CCE5C98B"
                 android:textSize="10sp"
                 android:textStyle="bold" />
@@ -69,7 +71,7 @@
                 android:id="@+id/widget_next_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Sabah"
+                tools:text="Sabah"
                 android:textColor="#FFFFFFFF"
                 android:textSize="20sp"
                 android:textStyle="bold" />
@@ -79,7 +81,7 @@
             android:id="@+id/widget_next_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="05:50"
+            tools:text="05:50"
             android:textColor="#FFE5C98B"
             android:textSize="26sp"
             android:textStyle="bold" />
@@ -103,7 +105,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Sabah"
+                android:id="@+id/widget_label_fajr"
+                tools:text="Sabah"
                 android:textColor="#CCFFFFFF"
                 android:textSize="10sp" />
             <TextView
@@ -125,7 +128,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Güneş"
+                android:id="@+id/widget_label_sunrise"
+                tools:text="Güneş"
                 android:textColor="#CCFFFFFF"
                 android:textSize="10sp" />
             <TextView
@@ -147,7 +151,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Öğle"
+                android:id="@+id/widget_label_dhuhr"
+                tools:text="Öğle"
                 android:textColor="#CCFFFFFF"
                 android:textSize="10sp" />
             <TextView
@@ -169,7 +174,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="İkindi"
+                android:id="@+id/widget_label_asr"
+                tools:text="İkindi"
                 android:textColor="#CCFFFFFF"
                 android:textSize="10sp" />
             <TextView
@@ -191,7 +197,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Akşam"
+                android:id="@+id/widget_label_maghrib"
+                tools:text="Akşam"
                 android:textColor="#CCFFFFFF"
                 android:textSize="10sp" />
             <TextView
@@ -213,7 +220,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Yatsı"
+                android:id="@+id/widget_label_isha"
+                tools:text="Yatsı"
                 android:textColor="#CCFFFFFF"
                 android:textSize="10sp" />
             <TextView

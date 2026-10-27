@@ -1,6 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:namaz_backend/namaz_backend.dart';
 
+import 'support/test_dhikr_content.dart';
+
 DayTimes _day(int d) => DayTimes(
       date: DateTime(2026, 10, d),
       fajr: DateTime(2026, 10, d, 5, 45),
@@ -47,7 +49,7 @@ void main() {
       );
 
       expect(snapshot, isNotNull);
-      final map = snapshot!.toMap();
+      final map = snapshot!.toMap(const TestWidgetTexts());
       expect(map['doneDate'], '2026-10-27');
       final schedule = map['schedule']! as String;
       expect(schedule.split('\n'), hasLength(7));
@@ -61,7 +63,7 @@ void main() {
         upcomingDays: [_day(26), _day(27), _day(28)],
         todayRecords: const {},
       );
-      expect((snapshot!.toMap()['schedule']! as String).split('\n'), hasLength(3));
+      expect((snapshot!.toMap(const TestWidgetTexts())['schedule']! as String).split('\n'), hasLength(3));
     });
 
     test('konum yoksa anlık görüntü üretilmez', () {
@@ -74,5 +76,54 @@ void main() {
       );
       expect(snapshot, isNull);
     });
+
+    test('widget metinleri backend sabiti değil, ön yüzün verdiği metinlerdir', () {
+      final snapshot = buildHomeWidgetSnapshot(
+        now: DateTime(2026, 10, 27, 14, 0),
+        location: istanbul,
+        todayTimes: _day(27),
+        upcomingDays: [_day(26), _day(27), _day(28)],
+        todayRecords: const {},
+      );
+      final map = snapshot!.toMap(const _EnglishWidgetTexts());
+
+      expect((map['prayerLabels']! as String).split('\n'),
+          ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha']);
+      expect(map['sunriseLabel'], 'Sunrise');
+      expect(map['nextTag'], 'NEXT');
+      expect(map['nextPrayerLabel'], 'Asr');
+      // Şehir şablonda işaretle gelir; Android yerine koyar.
+      expect(map['headerTemplate'], 'App - $kWidgetCityToken');
+      final badges = (map['doneBadges']! as String).split('\n');
+      expect(badges, hasLength(6));
+      expect(badges.first, '0 of 5');
+      expect(badges.last, '5 of 5');
+    });
   });
+}
+
+/// Backend'in metinleri kendisinin üretmediğini göstermek için İngilizce sahte.
+class _EnglishWidgetTexts implements HomeWidgetTexts {
+  const _EnglishWidgetTexts();
+
+  @override
+  String prayerLabel(PrayerType prayer) => switch (prayer) {
+        PrayerType.fajr => 'Fajr',
+        PrayerType.dhuhr => 'Dhuhr',
+        PrayerType.asr => 'Asr',
+        PrayerType.maghrib => 'Maghrib',
+        PrayerType.isha => 'Isha',
+      };
+
+  @override
+  String get sunriseLabel => 'Sunrise';
+
+  @override
+  String get nextTag => 'NEXT';
+
+  @override
+  String header(String city) => 'App - $city';
+
+  @override
+  String doneBadge(int done) => '$done of 5';
 }

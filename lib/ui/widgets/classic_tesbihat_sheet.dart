@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:namaz_backend/namaz_backend.dart';
 
+import '../../core/content/dhikr_catalog.dart';
 import '../../core/icons/app_icons.dart';
 import '../../core/strings/strings.dart';
 import '../../core/theme/app_theme.dart';
@@ -112,11 +112,7 @@ class _ClassicTesbihatSheetState extends State<_ClassicTesbihatSheet> {
                       size: 38,
                       fillColor: Colors.white.withValues(alpha: 0.14),
                       borderColor: p.secondary,
-                      child: Icon(
-                        AppIcons.dhikr,
-                        size: 20,
-                        color: p.secondary,
-                      ),
+                      child: Icon(AppIcons.dhikr, size: 20, color: p.secondary),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -177,8 +173,8 @@ class _ClassicTesbihatSheetState extends State<_ClassicTesbihatSheet> {
                               color: i < _stepIndex || _completedAll
                                   ? p.accent
                                   : (i == _stepIndex
-                                      ? p.secondary
-                                      : Colors.white.withValues(alpha: 0.20)),
+                                        ? p.secondary
+                                        : Colors.white.withValues(alpha: 0.20)),
                               borderRadius: BorderRadius.circular(4),
                             ),
                           ),
@@ -299,8 +295,9 @@ class _ClassicTesbihatSheetState extends State<_ClassicTesbihatSheet> {
                             value: progress,
                             strokeWidth: 7,
                             color: p.secondary,
-                            backgroundColor:
-                                Colors.white.withValues(alpha: 0.14),
+                            backgroundColor: Colors.white.withValues(
+                              alpha: 0.14,
+                            ),
                           ),
                         ),
                         SeljukMedallion(

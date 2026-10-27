@@ -1,6 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:namaz_backend/namaz_backend.dart';
 import 'package:namaz_backend/src/data/app_database.dart';
+
+import 'support/test_dhikr_content.dart';
+
 import 'package:namaz_backend/src/data/dhikr_repository.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
@@ -17,7 +20,7 @@ void main() {
           '"Sabah namazından sonra 308 defa Ya Rezzak okuyan kimse rızık darlığı çekmez inşallah. #zikir #esmaulhusna" '
           'https://www.instagram.com/reel/C9abcDEF123/';
 
-      final draft = extractDhikrDraft(sharedText);
+      final draft = extractDhikrDraft(sharedText, content: testDhikrContent);
 
       expect(draft.title, 'Yâ Rezzâk');
       expect(draft.arabic, 'يَا رَزَّاقُ');
@@ -32,7 +35,7 @@ void main() {
           'Sıkıntı ve hastalık anında yatsı namazından sonra 41 kez '
           'La ilahe illa ente sübhaneke inni küntü minez zalimin okuyun.';
 
-      final draft = extractDhikrDraft(sharedText);
+      final draft = extractDhikrDraft(sharedText, content: testDhikrContent);
 
       expect(draft.title, 'Yunus Peygamber Duası (Lâ İlâhe İllâ Ente)');
       expect(draft.targetCount, 41);
@@ -44,7 +47,7 @@ void main() {
       const sharedText =
           'İkindi namazından sonra x100 Ya Mubarek يَا مُبَارَكُ zikri.';
 
-      final draft = extractDhikrDraft(sharedText);
+      final draft = extractDhikrDraft(sharedText, content: testDhikrContent);
 
       // Mübarek, 99 Esmaül Hüsna'da değildir; genel "Ya <Esma>" kalıbı çalışır.
       expect(draft.title, 'Ya Mubarek');
@@ -64,30 +67,33 @@ void main() {
       expect(detectSpecialDay(friday, hijri), SpecialDayId.friday);
     });
 
-    test('detectKerahat güneş doğuşu, istiva ve akşam öncesi kerahati bulur', () {
-      final day = DateTime(2026, 10, 26);
-      final times = DayTimes(
-        date: day,
-        fajr: DateTime(2026, 10, 26, 5, 45),
-        sunrise: DateTime(2026, 10, 26, 7, 15),
-        dhuhr: DateTime(2026, 10, 26, 12, 55),
-        asr: DateTime(2026, 10, 26, 15, 50),
-        maghrib: DateTime(2026, 10, 26, 18, 15),
-        isha: DateTime(2026, 10, 26, 19, 35),
-      );
+    test(
+      'detectKerahat güneş doğuşu, istiva ve akşam öncesi kerahati bulur',
+      () {
+        final day = DateTime(2026, 10, 26);
+        final times = DayTimes(
+          date: day,
+          fajr: DateTime(2026, 10, 26, 5, 45),
+          sunrise: DateTime(2026, 10, 26, 7, 15),
+          dhuhr: DateTime(2026, 10, 26, 12, 55),
+          asr: DateTime(2026, 10, 26, 15, 50),
+          maghrib: DateTime(2026, 10, 26, 18, 15),
+          isha: DateTime(2026, 10, 26, 19, 35),
+        );
 
-      final israk = detectKerahat(times, DateTime(2026, 10, 26, 7, 30));
-      expect(israk?.type, KerahatType.sunrise);
+        final israk = detectKerahat(times, DateTime(2026, 10, 26, 7, 30));
+        expect(israk?.type, KerahatType.sunrise);
 
-      final istiva = detectKerahat(times, DateTime(2026, 10, 26, 12, 30));
-      expect(istiva?.type, KerahatType.istiva);
+        final istiva = detectKerahat(times, DateTime(2026, 10, 26, 12, 30));
+        expect(istiva?.type, KerahatType.istiva);
 
-      final isfirar = detectKerahat(times, DateTime(2026, 10, 26, 17, 45));
-      expect(isfirar?.type, KerahatType.sunset);
+        final isfirar = detectKerahat(times, DateTime(2026, 10, 26, 17, 45));
+        expect(isfirar?.type, KerahatType.sunset);
 
-      final normal = detectKerahat(times, DateTime(2026, 10, 26, 14, 0));
-      expect(normal, isNull);
-    });
+        final normal = detectKerahat(times, DateTime(2026, 10, 26, 14, 0));
+        expect(normal, isNull);
+      },
+    );
 
     test('computeQibla İstanbul için Kâbe açısını ve mesafesini hesaplar', () {
       const istanbul = AppLocation(
@@ -102,10 +108,7 @@ void main() {
 
     test('QazaDebtPlan toplam borcu ve tahmini bitiş tarihini hesaplar', () {
       const plan = QazaDebtPlan(
-        backlogByPrayer: {
-          PrayerType.fajr: 10,
-          PrayerType.dhuhr: 10,
-        },
+        backlogByPrayer: {PrayerType.fajr: 10, PrayerType.dhuhr: 10},
         dailyTarget: 5,
       );
       expect(plan.totalBacklog, 20);
@@ -117,55 +120,61 @@ void main() {
       );
     });
 
-    test('buildHomeWidgetSnapshot telefon ana ekran widget verisini doğru üretir', () {
-      const istanbul = AppLocation(
-        latitude: 41.0082,
-        longitude: 28.9784,
-        city: 'İstanbul',
-      );
-      final day = DateTime(2026, 10, 26);
-      final times = DayTimes(
-        date: day,
-        fajr: DateTime(2026, 10, 26, 5, 45),
-        sunrise: DateTime(2026, 10, 26, 7, 15),
-        dhuhr: DateTime(2026, 10, 26, 12, 55),
-        asr: DateTime(2026, 10, 26, 15, 50),
-        maghrib: DateTime(2026, 10, 26, 18, 15),
-        isha: DateTime(2026, 10, 26, 19, 35),
-      );
-      final records = <PrayerType, PrayerRecord>{
-        PrayerType.fajr: PrayerRecord(
+    test(
+      'buildHomeWidgetSnapshot telefon ana ekran widget verisini doğru üretir',
+      () {
+        const istanbul = AppLocation(
+          latitude: 41.0082,
+          longitude: 28.9784,
+          city: 'İstanbul',
+        );
+        final day = DateTime(2026, 10, 26);
+        final times = DayTimes(
           date: day,
-          prayer: PrayerType.fajr,
-          status: PrayerStatus.performed,
-          isCongregation: false,
-        ),
-        PrayerType.dhuhr: PrayerRecord(
-          date: day,
-          prayer: PrayerType.dhuhr,
-          status: PrayerStatus.performed,
-          isCongregation: true,
-        ),
-      };
+          fajr: DateTime(2026, 10, 26, 5, 45),
+          sunrise: DateTime(2026, 10, 26, 7, 15),
+          dhuhr: DateTime(2026, 10, 26, 12, 55),
+          asr: DateTime(2026, 10, 26, 15, 50),
+          maghrib: DateTime(2026, 10, 26, 18, 15),
+          isha: DateTime(2026, 10, 26, 19, 35),
+        );
+        final records = <PrayerType, PrayerRecord>{
+          PrayerType.fajr: PrayerRecord(
+            date: day,
+            prayer: PrayerType.fajr,
+            status: PrayerStatus.performed,
+            isCongregation: false,
+          ),
+          PrayerType.dhuhr: PrayerRecord(
+            date: day,
+            prayer: PrayerType.dhuhr,
+            status: PrayerStatus.performed,
+            isCongregation: true,
+          ),
+        };
 
-      final snapshot = buildHomeWidgetSnapshot(
-        now: DateTime(2026, 10, 26, 14, 0),
-        location: istanbul,
-        todayTimes: times,
-        upcomingDays: [times],
-        todayRecords: records,
-      );
+        final snapshot = buildHomeWidgetSnapshot(
+          now: DateTime(2026, 10, 26, 14, 0),
+          location: istanbul,
+          todayTimes: times,
+          upcomingDays: [times],
+          todayRecords: records,
+        );
 
-      expect(snapshot, isNotNull);
-      expect(snapshot!.city, 'İstanbul');
-      expect(snapshot.nextPrayer, PrayerType.asr);
-      expect(snapshot.nextPrayerTime, '15:50');
-      expect(snapshot.completedCount, 2);
-      expect(snapshot.isPerformed(PrayerType.fajr), isTrue);
-      expect(snapshot.isPerformed(PrayerType.dhuhr), isTrue);
-      expect(snapshot.isPerformed(PrayerType.asr), isFalse);
-      expect(snapshot.toMap()['nextPrayerLabel'], 'İkindi');
-    });
+        expect(snapshot, isNotNull);
+        expect(snapshot!.city, 'İstanbul');
+        expect(snapshot.nextPrayer, PrayerType.asr);
+        expect(snapshot.nextPrayerTime, '15:50');
+        expect(snapshot.completedCount, 2);
+        expect(snapshot.isPerformed(PrayerType.fajr), isTrue);
+        expect(snapshot.isPerformed(PrayerType.dhuhr), isTrue);
+        expect(snapshot.isPerformed(PrayerType.asr), isFalse);
+        expect(
+          snapshot.toMap(const TestWidgetTexts())['nextPrayerLabel'],
+          'İkindi',
+        );
+      },
+    );
   });
 
   group('DhikrRepository (SQLite CRUD ve Zikirmatik Sayacı)', () {
@@ -182,54 +191,61 @@ void main() {
     });
 
     test('seedDefaultsIfEmpty başlangıç zikirlerini bir kez ekler', () async {
-      await repo.seedDefaultsIfEmpty();
+      final starters = testDhikrContent.starterTitles.length;
+      await repo.seedDefaultsIfEmpty(testDhikrContent);
       final first = await repo.allItems();
-      expect(first.length, 6);
+      expect(first.length, starters);
+      expect(first.map((e) => e.title), containsAll(testDhikrContent.starterTitles));
 
-      await repo.seedDefaultsIfEmpty();
+      await repo.seedDefaultsIfEmpty(testDhikrContent);
       final second = await repo.allItems();
-      expect(second.length, 6);
+      expect(second.length, starters);
     });
 
-    test('taslak ekleme, sayaç artırma, hedef tamamlama, sıfırlama ve silme', () async {
-      final created = await repo.insertDraft(
-        const DhikrDraft(
-          title: 'Yâ Fettâh',
-          arabic: 'يَا فَتَّاحُ',
-          transliteration: 'Yâ Fettâh',
-          meaning: 'Hayır kapılarını açan.',
-          targetCount: 3,
-          groupName: DhikrGroups.rizik,
-          prayerTime: PrayerType.fajr,
-          sourceUrl: 'https://www.instagram.com/reel/test/',
-        ),
-      );
+    test(
+      'taslak ekleme, sayaç artırma, hedef tamamlama, sıfırlama ve silme',
+      () async {
+        final created = await repo.insertDraft(
+          const DhikrDraft(
+            title: 'Yâ Fettâh',
+            arabic: 'يَا فَتَّاحُ',
+            transliteration: 'Yâ Fettâh',
+            meaning: 'Hayır kapılarını açan.',
+            targetCount: 3,
+            groupName: DhikrGroups.rizik,
+            prayerTime: PrayerType.fajr,
+            sourceUrl: 'https://www.instagram.com/reel/test/',
+          ),
+        );
 
-      expect(created.title, 'Yâ Fettâh');
-      expect(created.currentCount, 0);
-      expect(created.totalCompleted, 0);
+        expect(created.title, 'Yâ Fettâh');
+        expect(created.currentCount, 0);
+        expect(created.totalCompleted, 0);
 
-      final step1 = await repo.incrementCount(created.id);
-      expect(step1!.currentCount, 1);
-      expect(step1.isCompleted, isFalse);
+        final step1 = await repo.incrementCount(created.id);
+        expect(step1!.currentCount, 1);
+        expect(step1.isCompleted, isFalse);
 
-      await repo.incrementCount(created.id);
-      final step3 = await repo.incrementCount(created.id);
-      expect(step3!.currentCount, 3);
-      expect(step3.isCompleted, isTrue);
-      expect(step3.totalCompleted, 1);
+        await repo.incrementCount(created.id);
+        final step3 = await repo.incrementCount(created.id);
+        expect(step3!.currentCount, 3);
+        expect(step3.isCompleted, isTrue);
+        expect(step3.totalCompleted, 1);
 
-      final reset = await repo.resetCount(created.id);
-      expect(reset!.currentCount, 0);
-      expect(reset.totalCompleted, 1);
+        final reset = await repo.resetCount(created.id);
+        expect(reset!.currentCount, 0);
+        expect(reset.totalCompleted, 1);
 
-      await repo.update(reset.copyWith(title: 'Yâ Fettâh (Güncel)', isFavorite: true));
-      final updated = await repo.byId(created.id);
-      expect(updated!.title, 'Yâ Fettâh (Güncel)');
-      expect(updated.isFavorite, isTrue);
+        await repo.update(
+          reset.copyWith(title: 'Yâ Fettâh (Güncel)', isFavorite: true),
+        );
+        final updated = await repo.byId(created.id);
+        expect(updated!.title, 'Yâ Fettâh (Güncel)');
+        expect(updated.isFavorite, isTrue);
 
-      await repo.delete(created.id);
-      expect(await repo.byId(created.id), isNull);
-    });
+        await repo.delete(created.id);
+        expect(await repo.byId(created.id), isNull);
+      },
+    );
   });
 }

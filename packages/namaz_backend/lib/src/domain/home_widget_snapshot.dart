@@ -4,6 +4,27 @@ import 'models.dart';
 import 'prayer.dart';
 import 'prayer_time_service.dart';
 
+/// Widget'ta gösterilen metinler: ön yüz verir (metin ve dil kararı ön yüzdedir).
+abstract interface class HomeWidgetTexts {
+  /// Vakit adı (Sabah..Yatsı).
+  String prayerLabel(PrayerType prayer);
+
+  /// Güneş doğuşu satırının adı.
+  String get sunriseLabel;
+
+  /// "Sıradaki vakit" etiketi.
+  String get nextTag;
+
+  /// Başlık; şehir yerine [kWidgetCityToken] verilerek şablon alınır.
+  String header(String city);
+
+  /// "n / 5 Eda" rozeti; 0..5 için ayrı ayrı istenir.
+  String doneBadge(int done);
+}
+
+/// [HomeWidgetTexts.header] şablonunda şehrin yerine konan işaret.
+const String kWidgetCityToken = '{city}';
+
 /// Telefon ana ekran widget'ında (Android AppWidget / iOS WidgetKit)
 /// gösterilecek güncel vakit ve takip verisi özeti.
 class HomeWidgetSnapshot {
@@ -53,48 +74,47 @@ class HomeWidgetSnapshot {
   bool isPerformed(PrayerType prayer) =>
       (performedMask & (1 << prayer.index)) != 0;
 
-  Map<String, Object?> toMap() => {
-        'city': city,
-        'hijriDay': hijriDay,
-        'hijriMonth': hijriMonth,
-        'hijriYear': hijriYear,
-        'nextPrayerKey': nextPrayer.key,
-        'nextPrayerLabel': _turkishPrayerLabel(nextPrayer),
-        'nextPrayerTime': nextPrayerTime,
-        'completedCount': completedCount,
-        'fajrTime': fajrTime,
-        'sunriseTime': sunriseTime,
-        'dhuhrTime': dhuhrTime,
-        'asrTime': asrTime,
-        'maghribTime': maghribTime,
-        'ishaTime': ishaTime,
-        'performedMask': performedMask,
-        'doneDate': doneDate,
-        'schedule': encodeWidgetSchedule(scheduleDays),
-      };
-
-  static String _turkishPrayerLabel(PrayerType p) {
-    switch (p) {
-      case PrayerType.fajr:
-        return 'Sabah';
-      case PrayerType.dhuhr:
-        return 'Öğle';
-      case PrayerType.asr:
-        return 'İkindi';
-      case PrayerType.maghrib:
-        return 'Akşam';
-      case PrayerType.isha:
-        return 'Yatsı';
-    }
-  }
+  Map<String, Object?> toMap(HomeWidgetTexts texts) => {
+    'city': city,
+    'hijriDay': hijriDay,
+    'hijriMonth': hijriMonth,
+    'hijriYear': hijriYear,
+    'nextPrayerKey': nextPrayer.key,
+    'nextPrayerLabel': texts.prayerLabel(nextPrayer),
+    // Android widget'ı bu metinleri saklar ve kendi hesabına göre seçer.
+    'prayerLabels': [for (final p in PrayerType.values) texts.prayerLabel(p)]
+        .join('\n'),
+    'sunriseLabel': texts.sunriseLabel,
+    'nextTag': texts.nextTag,
+    'headerTemplate': texts.header(kWidgetCityToken),
+    'doneBadges': [for (var i = 0; i <= 5; i++) texts.doneBadge(i)].join('\n'),
+    'nextPrayerTime': nextPrayerTime,
+    'completedCount': completedCount,
+    'fajrTime': fajrTime,
+    'sunriseTime': sunriseTime,
+    'dhuhrTime': dhuhrTime,
+    'asrTime': asrTime,
+    'maghribTime': maghribTime,
+    'ishaTime': ishaTime,
+    'performedMask': performedMask,
+    'doneDate': doneDate,
+    'schedule': encodeWidgetSchedule(scheduleDays),
+  };
 }
 
 /// Widget için gün programı: her satır bir gün, `Sabah,Güneş,Öğle,İkindi,Akşam,
 /// Yatsı` vakitlerinin epoch milisaniyesi (virgülle ayrılmış).
 String encodeWidgetSchedule(List<DayTimes> days) => days
-    .map((d) => [d.fajr, d.sunrise, d.dhuhr, d.asr, d.maghrib, d.isha]
-        .map((t) => t.millisecondsSinceEpoch)
-        .join(','))
+    .map(
+      (d) => [
+        d.fajr,
+        d.sunrise,
+        d.dhuhr,
+        d.asr,
+        d.maghrib,
+        d.isha,
+      ].map((t) => t.millisecondsSinceEpoch).join(','),
+    )
     .join('\n');
 
 String _fmtHm(DateTime dt) {

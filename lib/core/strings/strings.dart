@@ -10,6 +10,7 @@ export 'date_strings.dart';
 export 'dhikr_strings.dart';
 export 'gamification_strings.dart';
 export 'home_strings.dart';
+export 'home_widget_texts_adapter.dart';
 export 'location_strings.dart';
 export 'nav_strings.dart';
 export 'notification_health_strings.dart';

@@ -56,12 +56,18 @@ class NamazHomeWidgetProvider : AppWidgetProvider() {
         fun saveSnapshotAndRefresh(context: Context, args: Map<*, *>) {
             val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             prefs.edit().apply {
-                putString("city", args["city"] as? String ?: "Namaz Takip")
+                putString("city", args["city"] as? String ?: "")
                 putString("schedule", args["schedule"] as? String ?: "")
+                // Metinler Dart'tan gelir (metin ve dil kararı ön yüzdedir).
+                putString("prayerLabels", args["prayerLabels"] as? String ?: "")
+                putString("sunriseLabel", args["sunriseLabel"] as? String ?: "")
+                putString("nextTag", args["nextTag"] as? String ?: "")
+                putString("headerTemplate", args["headerTemplate"] as? String ?: "")
+                putString("doneBadges", args["doneBadges"] as? String ?: "")
                 putString("doneDate", args["doneDate"] as? String ?: "")
                 putInt("completedCount", (args["completedCount"] as? Number)?.toInt() ?: 0)
                 // Program yoksa (eski veri) gösterilecek son bilinen değerler.
-                putString("nextPrayerLabel", args["nextPrayerLabel"] as? String ?: "Sabah")
+                putString("nextPrayerLabel", args["nextPrayerLabel"] as? String ?: "")
                 putString("nextPrayerTime", args["nextPrayerTime"] as? String ?: "--:--")
                 putString("fajrTime", args["fajrTime"] as? String ?: "--:--")
                 putString("sunriseTime", args["sunriseTime"] as? String ?: "--:--")
@@ -140,7 +146,11 @@ class NamazHomeWidgetProvider : AppWidgetProvider() {
         ) {
             val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             val tz = TimeZone.getDefault()
-            val city = prefs.getString("city", "Namaz Takip") ?: "Namaz Takip"
+            val city = prefs.getString("city", "") ?: ""
+            // Vakit adları, başlık şablonu ve rozetler Dart'tan gelir; Kotlin metin üretmez.
+            val labels = (prefs.getString("prayerLabels", "") ?: "").split('\n')
+            val doneBadges = (prefs.getString("doneBadges", "") ?: "").split('\n')
+            val headerTemplate = prefs.getString("headerTemplate", "") ?: ""
             val days = WidgetSchedule.parse(prefs.getString("schedule", ""))
 
             val nextName: String
@@ -155,7 +165,7 @@ class NamazHomeWidgetProvider : AppWidgetProvider() {
 
             if (days.isNotEmpty()) {
                 val state = WidgetSchedule.compute(System.currentTimeMillis(), days, tz)
-                nextName = if (state.nextIndex >= 0) WidgetSchedule.LABELS[state.nextIndex] else "--"
+                nextName = if (state.nextIndex >= 0) labels.getOrElse(state.nextIndex) { "" } else "--"
                 nextTime = if (state.nextIndex >= 0) formatHm(state.nextTimeMs, tz) else "--:--"
                 val today = state.today
                 fajr = today?.let { formatHm(it.fajr, tz) } ?: "--:--"
@@ -169,7 +179,7 @@ class NamazHomeWidgetProvider : AppWidgetProvider() {
                     done = prefs.getInt("completedCount", 0)
                 }
             } else {
-                nextName = prefs.getString("nextPrayerLabel", "Sabah") ?: "Sabah"
+                nextName = prefs.getString("nextPrayerLabel", "") ?: ""
                 nextTime = prefs.getString("nextPrayerTime", "--:--") ?: "--:--"
                 fajr = prefs.getString("fajrTime", "--:--") ?: "--:--"
                 sunrise = prefs.getString("sunriseTime", "--:--") ?: "--:--"
@@ -181,8 +191,15 @@ class NamazHomeWidgetProvider : AppWidgetProvider() {
             }
 
             val views = RemoteViews(context.packageName, R.layout.namaz_home_widget)
-            views.setTextViewText(R.id.widget_city, "Namaz Takip • $city")
-            views.setTextViewText(R.id.widget_done_badge, "$done / 5 Eda")
+            views.setTextViewText(R.id.widget_city, headerTemplate.replace("{city}", city))
+            views.setTextViewText(R.id.widget_done_badge, doneBadges.getOrElse(done) { "" })
+            views.setTextViewText(R.id.widget_next_tag, prefs.getString("nextTag", "") ?: "")
+            views.setTextViewText(R.id.widget_label_fajr, labels.getOrElse(0) { "" })
+            views.setTextViewText(R.id.widget_label_sunrise, prefs.getString("sunriseLabel", "") ?: "")
+            views.setTextViewText(R.id.widget_label_dhuhr, labels.getOrElse(1) { "" })
+            views.setTextViewText(R.id.widget_label_asr, labels.getOrElse(2) { "" })
+            views.setTextViewText(R.id.widget_label_maghrib, labels.getOrElse(3) { "" })
+            views.setTextViewText(R.id.widget_label_isha, labels.getOrElse(4) { "" })
             views.setTextViewText(R.id.widget_next_name, nextName)
             views.setTextViewText(R.id.widget_next_time, nextTime)
             views.setTextViewText(R.id.widget_time_fajr, fajr)

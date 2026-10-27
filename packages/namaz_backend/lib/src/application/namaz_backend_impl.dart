@@ -32,18 +32,22 @@ class NamazBackendImpl implements NamazBackend {
     required PrayerRepository prayers,
     required this._dhikrs,
     required NotificationTexts texts,
-  })  : _settings = settings,
-        _prayers = prayers,
-        _scheduler = NotificationScheduler(
-          settings: settings,
-          prayers: prayers,
-          texts: texts,
-        );
+    required this._widgetTexts,
+    required this._dhikrContent,
+  }) : _settings = settings,
+       _prayers = prayers,
+       _scheduler = NotificationScheduler(
+         settings: settings,
+         prayers: prayers,
+         texts: texts,
+       );
 
   final SettingsRepository _settings;
   final PrayerRepository _prayers;
   final DhikrRepository _dhikrs;
   final NotificationScheduler _scheduler;
+  final HomeWidgetTexts _widgetTexts;
+  final DhikrContent _dhikrContent;
 
   final PrayerTimeService _timeService = const PrayerTimeService();
   final LocationService _location = const LocationService();
@@ -61,7 +65,7 @@ class NamazBackendImpl implements NamazBackend {
     }
 
     final dhikrs = DhikrRepository(database);
-    await dhikrs.seedDefaultsIfEmpty();
+    await dhikrs.seedDefaultsIfEmpty(config.dhikrContent);
 
     await NotificationService.instance.init();
     ShareService.instance.init();
@@ -78,6 +82,8 @@ class NamazBackendImpl implements NamazBackend {
       prayers: PrayerRepository(database),
       dhikrs: dhikrs,
       texts: config.notificationTexts,
+      widgetTexts: config.homeWidgetTexts,
+      dhikrContent: config.dhikrContent,
     );
     unawaited(instance.syncHomeWidget());
     return instance;
@@ -89,15 +95,15 @@ class NamazBackendImpl implements NamazBackend {
 
   @override
   AppSettings get settings => AppSettings(
-        themeKey: _settings.themeKey,
-        notificationsEnabled: _settings.notificationsEnabled,
-        reminderMinutes: _settings.reminderMinutes,
-        calcMethod: _settings.calcMethod,
-        locationMode: _settings.locationMode,
-        manualLocation: _settings.manualLocation,
-        location: _settings.effectiveLocation,
-        hasGeminiApiKey: _settings.geminiApiKey != null,
-      );
+    themeKey: _settings.themeKey,
+    notificationsEnabled: _settings.notificationsEnabled,
+    reminderMinutes: _settings.reminderMinutes,
+    calcMethod: _settings.calcMethod,
+    locationMode: _settings.locationMode,
+    manualLocation: _settings.manualLocation,
+    location: _settings.effectiveLocation,
+    hasGeminiApiKey: _settings.geminiApiKey != null,
+  );
 
   /// Ayar değişince bildirimleri tazeler.
   Future<void> _afterSettingsChange() async => _rescheduleQuietly();
@@ -194,8 +200,11 @@ class NamazBackendImpl implements NamazBackend {
       _prayers.recordsForDate(date);
 
   @override
-  Future<void> markPerformed(DateTime date, PrayerType prayer,
-      {required bool congregation}) async {
+  Future<void> markPerformed(
+    DateTime date,
+    PrayerType prayer, {
+    required bool congregation,
+  }) async {
     await _prayers.markPerformed(date, prayer, congregation: congregation);
     _rescheduleQuietly();
   }
@@ -218,9 +227,9 @@ class NamazBackendImpl implements NamazBackend {
 
   @override
   QazaDebtPlan get qazaDebtPlan => QazaDebtPlan(
-        backlogByPrayer: _settings.qazaBacklog,
-        dailyTarget: _settings.qazaDailyTarget,
-      );
+    backlogByPrayer: _settings.qazaBacklog,
+    dailyTarget: _settings.qazaDailyTarget,
+  );
 
   @override
   Future<void> setQazaBacklog(Map<PrayerType, int> counts) =>
@@ -268,8 +277,10 @@ class NamazBackendImpl implements NamazBackend {
   @override
   Future<Map<PrayerType, int>> radar(int days) async {
     final today = _today;
-    final performed =
-        await _prayers.performedByPrayer(addDays(today, -(days - 1)), today);
+    final performed = await _prayers.performedByPrayer(
+      addDays(today, -(days - 1)),
+      today,
+    );
     final span = daysDiff(today, trackingStart) + 1;
     final denom = span < days ? span : days;
     return {
@@ -317,6 +328,7 @@ class NamazBackendImpl implements NamazBackend {
       _shareService.analyzeSharedContent(
         textOrUrl,
         geminiApiKey: _settings.geminiApiKey,
+        content: _dhikrContent,
       );
 
   @override
@@ -351,10 +363,12 @@ class NamazBackendImpl implements NamazBackend {
 
   @override
   Future<NotificationHealth> notificationHealth() async => NotificationHealth(
-      exactAlarmsAllowed: await _notifications.canScheduleExactAlarms());
+    exactAlarmsAllowed: await _notifications.canScheduleExactAlarms(),
+  );
 
   @override
-  Future<void> openExactAlarmSettings() => _notifications.openExactAlarmSettings();
+  Future<void> openExactAlarmSettings() =>
+      _notifications.openExactAlarmSettings();
 
   // ---- Veritabanı sağlığı --------------------------------------------------------
 
@@ -393,7 +407,7 @@ class NamazBackendImpl implements NamazBackend {
       scheduleDays: schedule,
     );
     if (snapshot == null) return false;
-    return _homeWidget.updateWidget(snapshot);
+    return _homeWidget.updateWidget(snapshot, _widgetTexts);
   }
 
   @override
@@ -405,8 +419,10 @@ class NamazBackendImpl implements NamazBackend {
   /// Planlama hatası kullanıcıya yansımasın ve işaretlemeyi bozmasın.
   void _rescheduleQuietly() {
     unawaited(syncHomeWidget());
-    unawaited(_scheduler.reschedule().catchError((Object e) {
-      debugPrint('[Notifications] yeniden planlama başarısız: $e');
-    }));
+    unawaited(
+      _scheduler.reschedule().catchError((Object e) {
+        debugPrint('[Notifications] yeniden planlama başarısız: $e');
+      }),
+    );
   }
 }

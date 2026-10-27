@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:namaz_backend/namaz_backend.dart';
 
 import '../../core/format/text_utils.dart';
+import '../../core/content/dhikr_catalog.dart';
 import '../../core/icons/app_icons.dart';
 import '../../core/strings/strings.dart';
 import '../../core/theme/app_theme.dart';
@@ -41,7 +42,9 @@ class _EsmaCatalogSheetState extends ConsumerState<_EsmaCatalogSheet> {
   }
 
   Future<void> _addAndStart(DhikrCatalogEntry entry) async {
-    final saved = await ref.read(dhikrProvider.notifier).saveDraft(
+    final saved = await ref
+        .read(dhikrProvider.notifier)
+        .saveDraft(
           DhikrDraft(
             title: entry.title,
             arabic: entry.arabic,
@@ -102,11 +105,7 @@ class _EsmaCatalogSheetState extends ConsumerState<_EsmaCatalogSheet> {
                       size: 36,
                       fillColor: p.primary.withValues(alpha: 0.14),
                       borderColor: p.secondary,
-                      child: Icon(
-                        AppIcons.sparkle,
-                        size: 18,
-                        color: p.primary,
-                      ),
+                      child: Icon(AppIcons.sparkle, size: 18, color: p.primary),
                     ),
                     const SizedBox(width: 10),
                     Expanded(

@@ -1,5 +1,6 @@
 import 'application/namaz_backend_impl.dart';
 import 'domain/dhikr.dart';
+import 'domain/home_widget_snapshot.dart';
 import 'domain/models.dart';
 import 'domain/notification_plan.dart';
 import 'domain/prayer.dart';
@@ -11,11 +12,19 @@ import 'application/background_service.dart' as bg;
 class NamazBackendConfig {
   const NamazBackendConfig({
     required this.notificationTexts,
+    required this.homeWidgetTexts,
+    required this.dhikrContent,
     required this.backgroundEntryPoint,
   });
 
   /// Bildirim metinleri (ön yüzün metin sisteminden gelir).
   final NotificationTexts notificationTexts;
+
+  /// Ana ekran widget'ının metinleri (ön yüzden gelir).
+  final HomeWidgetTexts homeWidgetTexts;
+
+  /// Zikir kataloğu ve varsayılan metinler (ön yüzden gelir).
+  final DhikrContent dhikrContent;
 
   /// Arka plan görevinin giriş noktası: `@pragma('vm:entry-point')` ile işaretli
   /// üst düzey bir fonksiyon. İçinde [NamazBackend.handleBackgroundTasks] çağrılmalıdır.
@@ -79,8 +88,11 @@ abstract interface class NamazBackend {
   Future<Map<PrayerType, PrayerRecord>> recordsForDate(DateTime date);
 
   /// Kaydeder ve bildirimleri yeniden planlar.
-  Future<void> markPerformed(DateTime date, PrayerType prayer,
-      {required bool congregation});
+  Future<void> markPerformed(
+    DateTime date,
+    PrayerType prayer, {
+    required bool congregation,
+  });
 
   /// Kaydeder ve bildirimleri yeniden planlar.
   Future<void> markMissed(DateTime date, PrayerType prayer);

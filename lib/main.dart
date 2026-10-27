@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:namaz_backend/namaz_backend.dart';
 
+import 'core/content/dhikr_catalog.dart';
 import 'core/strings/strings.dart';
 import 'core/theme/app_theme.dart';
 import 'providers/providers.dart';
@@ -29,20 +30,26 @@ Future<void> _start() async {
   final NamazBackend backend;
   try {
     // İzin pencereleri ilk ekran çizildikten sonra, HomeScreen'de sırayla istenir.
-    backend = await NamazBackend.create(const NamazBackendConfig(
-      notificationTexts: AppNotificationTexts(),
-      backgroundEntryPoint: namazBackgroundEntryPoint,
-    ));
+    backend = await NamazBackend.create(
+      const NamazBackendConfig(
+        notificationTexts: AppNotificationTexts(),
+        homeWidgetTexts: AppHomeWidgetTexts(),
+        dhikrContent: kAppDhikrContent,
+        backgroundEntryPoint: namazBackgroundEntryPoint,
+      ),
+    );
   } catch (error, stack) {
     debugPrint('[Startup] başlatılamadı: $error\n$stack');
     runApp(StartupErrorApp(error: error, onRetry: _start));
     return;
   }
 
-  runApp(ProviderScope(
-    overrides: [backendProvider.overrideWithValue(backend)],
-    child: const NamazTakipApp(),
-  ));
+  runApp(
+    ProviderScope(
+      overrides: [backendProvider.overrideWithValue(backend)],
+      child: const NamazTakipApp(),
+    ),
+  );
 }
 
 /// Yakalanmayan hatalar sessiz kalmasın. Yapısal günlükleme ayrı bir iştir;

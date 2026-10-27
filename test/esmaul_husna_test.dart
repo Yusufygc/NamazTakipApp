@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:namaz_backend/namaz_backend.dart';
+import 'package:namaz_takip/core/content/dhikr_catalog.dart';
 
 /// 99 Esmaül Hüsna: (başlık, geleneksel ebced değeri). Sıra Diyanet/ilmihal
 /// sırasıdır (Rahmân .. Sabûr). Değerler Türkçe kaynaklarda yaygın olandır; dinî
@@ -208,7 +209,10 @@ void main() {
         // Başka bir girdinin anahtar kelimesi bir ismi gölgelememeli.
         for (final x in _expected) {
           final e = _entry(x.$1);
-          final draft = extractDhikrDraft('${e.keywords.first} 100 defa');
+          final draft = extractDhikrDraft(
+            '${e.keywords.first} 100 defa',
+            content: kAppDhikrContent,
+          );
           expect(draft.title, e.title, reason: e.keywords.first);
         }
       },
@@ -217,6 +221,7 @@ void main() {
     test('yeni eklenen isimler paylaşım metninden ayıklanır', () {
       final draft = extractDhikrDraft(
         'Sabah namazından sonra 66 defa Ya Kabid',
+        content: kAppDhikrContent,
       );
       expect(draft.title, 'Yâ Kâbıd');
       expect(draft.targetCount, 66);

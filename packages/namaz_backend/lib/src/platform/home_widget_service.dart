@@ -7,16 +7,20 @@ import '../domain/home_widget_snapshot.dart';
 class HomeWidgetService {
   const HomeWidgetService();
 
-  static const MethodChannel _channel =
-      MethodChannel('com.namaztakip.app/home_widget');
+  static const MethodChannel _channel = MethodChannel(
+    'com.namaztakip.app/home_widget',
+  );
 
   /// Güncel vakit ve takip özetini yerel depoya (Android SharedPreferences /
   /// iOS App Group UserDefaults) yazar ve sistem widget'ını yeniler.
-  Future<bool> updateWidget(HomeWidgetSnapshot snapshot) async {
+  Future<bool> updateWidget(
+    HomeWidgetSnapshot snapshot,
+    HomeWidgetTexts texts,
+  ) async {
     try {
       final ok = await _channel.invokeMethod<bool>(
         'updateWidget',
-        snapshot.toMap(),
+        snapshot.toMap(texts),
       );
       return ok ?? false;
     } catch (_) {

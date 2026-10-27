@@ -149,3 +149,55 @@ class DhikrDraft {
     );
   }
 }
+
+/// Yerleşik Esmaül Hüsna ve meşhur zikir/tesbihat sözlük girdisi.
+class DhikrCatalogEntry {
+  const DhikrCatalogEntry({
+    required this.title,
+    required this.arabic,
+    required this.transliteration,
+    required this.meaning,
+    required this.defaultCount,
+    required this.groupName,
+    required this.keywords,
+    this.prayerTime,
+  });
+
+  final String title;
+  final String arabic;
+  final String transliteration;
+  final String meaning;
+  final int defaultCount;
+  final String groupName;
+  final List<String> keywords;
+  final PrayerType? prayerTime;
+}
+
+/// Zikir içeriği: katalog ve kullanıcıya görünecek varsayılan metinler ön
+/// yüzden gelir (metin ve dil kararı ön yüzdedir, backend bunları bilmez).
+class DhikrContent {
+  const DhikrContent({
+    required this.catalog,
+    required this.starterTitles,
+    required this.fallbackTitle,
+    required this.fallbackMeaning,
+    required this.aiPromptTemplate,
+  });
+
+  /// Paylaşım metni ayıklanırken bu sırayla taranır; ilk eşleşen kazanır.
+  final List<DhikrCatalogEntry> catalog;
+
+  /// İlk kurulumda deftere eklenecek girdilerin başlıkları ([catalog] içinden).
+  final List<String> starterTitles;
+
+  /// Paylaşımdan hiçbir bilgi çıkarılamazsa taslağın başlığı.
+  final String fallbackTitle;
+
+  /// Paylaşımdan anlam çıkarılamazsa taslağın anlamı.
+  final String fallbackMeaning;
+
+  /// Yapay zekaya gönderilen istem; [aiTextToken] yerine paylaşılan metin konur.
+  final String aiPromptTemplate;
+
+  static const String aiTextToken = '{text}';
+}

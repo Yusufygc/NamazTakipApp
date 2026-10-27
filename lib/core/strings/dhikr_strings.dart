@@ -50,6 +50,9 @@ abstract final class DhikrStrings {
   static const rawInputLabel = 'Instagram Bağlantısı veya Video Açıklaması';
   static const rawInputHint =
       'https://www.instagram.com/reel/... veya açıklama metni yapıştırın';
+  static const sharedFallbackTitle = 'Paylaşılan Zikir';
+  static const sharedFallbackMeaning =
+      'Paylaşılan videodan kaydedilen zikir ve tesbihat.';
   static const analyzeButton = 'Videodan / Metinden Kazı';
   static const analyzing = 'İçerik kazınıyor...';
   static const catalogQuickPick = 'Hazır Esma / Tesbihat Seç';

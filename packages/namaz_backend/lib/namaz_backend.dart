@@ -9,7 +9,6 @@ export 'src/domain/achievements.dart';
 export 'src/domain/dates.dart';
 export 'src/domain/dhikr.dart';
 export 'src/domain/dhikr_extractor.dart';
-export 'src/domain/esma_catalog.dart';
 export 'src/domain/home_widget_snapshot.dart';
 export 'src/domain/islamic_calendar.dart';
 export 'src/domain/models.dart';
