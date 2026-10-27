@@ -2,6 +2,9 @@
 
 Kronolojik kayıt; en yeni kayıt en üsttedir. Biçim: `## [YYYY-AA-GG] [İŞLEM_TİPİ] | Kısa Açıklama`. İşlem tipleri: INGEST, QUERY, UPDATE, DECISION, LINT, SETUP. Kurallar: [[wiki-kullanim]]. Harita: [[index]].
 
+## [2026-10-27] UPDATE | README yeniden yazıldı: tanıtım ve teknik bilgi
+README kullanıcıya ve geliştiriciye ayrı hitap edecek şekilde yeniden düzenlendi: başlık bandı ve rozetler, "Neden Namaz Takip?", ekran görüntüleri, gruplanmış özellikler, gizlilik tablosu, kurulum, Mermaid mimari şeması, teknoloji tablosu, tasarım kararları, dürüst proje durumu (gerçek telefon, iOS ve dinî içerik onayı doğrulanmadı), belge haritası ve katkı kuralları. Instagram'ın açıklama vermemesi ve konum adının cihaz geocoder'ından gelmesi gibi sınırlar açıkça yazıldı. Sayfalar: [[proje-ozeti]], [[bilinen-sorunlar]].
+
 ## [2026-10-27] UPDATE | README'ye ekran görüntüleri ve gizlilik bölümü
 Emülatörde (1080x2400, İstanbul, Diyanet, varsayılan tema) sekiz ekran görüntüsü alındı ve `docs/screenshots/` altına konup README'de tabloyla gösterildi: Vakitler, namaz işaretleme, Kaza, Süreç, Rozetler, Ayarlar, Zikir Defteri, Kıble. README'ye gizlilik ve güvenlik bölümü, paylaşım onayı, kıble, Hicri takvim ve widget maddeleri eklendi; "fazileti" ifadesi "anlamı" yapıldı. Not: tam zamanlı alarm izni yeni kurulumda ilk açılışta Alarmlar ayar ekranını açıyor, görüntüler için `appops set ... SCHEDULE_EXACT_ALARM allow` verildi. Sayfalar: [[gelistirme-ortami]], [[ui-ekranlar]].
 

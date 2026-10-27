@@ -1,10 +1,33 @@
+<div align="center">
+
+<img src="assets/icon/icon_full.png" width="112" alt="Namaz Takip simgesi">
+
 # Namaz Takip
 
-Günlük namazları takip eden, kaza namazlarını otomatik listeleyen ve sosyal medyadan (Instagram vb.) paylaşılan zikir/esma videolarını yakalayıp akıllı tesbihat sunan Flutter uygulaması (Android ve iOS).
+**Namazlarınızı takip edin, kazalarınızı unutmayın, zikrinizi yanınızda taşıyın.**
+
+Vakitleri cihazınızda hesaplayan, kılınmayan namazları kendiliğinden kaza listesine alan ve sosyal medyada karşılaştığınız zikirleri tek dokunuşla deftere ekleyen, internetsiz çalışan bir namaz arkadaşı.
+
+![Flutter](https://img.shields.io/badge/Flutter-3.47-02569B?logo=flutter&logoColor=white)
+![Dart](https://img.shields.io/badge/Dart-3.13-0175C2?logo=dart&logoColor=white)
+![Android](https://img.shields.io/badge/Android-hazır-3DDC84?logo=android&logoColor=white)
+![iOS](https://img.shields.io/badge/iOS-kod%20hazır%2C%20derlenmedi-lightgrey?logo=apple&logoColor=white)
+![Testler](https://img.shields.io/badge/test-185%20geçiyor-success)
+
+[Özellikler](#özellikler) · [Ekran görüntüleri](#ekran-görüntüleri) · [Gizlilik](#gizlilik-ve-güvenlik) · [Kurulum](#kurulum-ve-çalıştırma) · [Mimari](#mimari) · [Durum](#proje-durumu)
+
+</div>
+
+---
+
+## Neden Namaz Takip?
+
+- **İnternetsiz ve hızlı.** Vakitler konumunuza göre cihazda hesaplanır; sunucuya, hesaba ya da üyeliğe ihtiyaç yoktur.
+- **Hiçbir namaz kaybolmaz.** İşaretlemediğiniz günler kaza listenize otomatik düşer. Kaza namazlarını vakit vakit, sizin hızınızda kapatırsınız.
+- **Zikir defteri cebinizde.** Instagram, TikTok ya da YouTube Shorts'ta gördüğünüz bir zikri **Paylaş → Namaz Takip** ile yakalar; Arapça metin, okunuş, hedef sayı ve vakit önerisi taslağa kendiliğinden dolar.
+- **Verileriniz sizde kalır.** Kayıtlar yalnızca telefonunuzdadır; bulut yedeği kapalıdır.
 
 ## Ekran görüntüleri
-
-Android emülatöründe (Pixel sınıfı, 1080x2400, İstanbul konumu, Diyanet yöntemi, varsayılan tema) alındı.
 
 <table>
   <tr>
@@ -21,81 +44,193 @@ Android emülatöründe (Pixel sınıfı, 1080x2400, İstanbul konumu, Diyanet y
   </tr>
 </table>
 
-Ekran görüntüsünü yenilemek için emülatörde uygulamayı açıp `adb exec-out screencap -p > docs/screenshots/<ad>.png` çalıştırın. Emülatör kurulumu: `docs/wiki/gelistirme-ortami.md`.
+<sub>Görüntüler Android emülatöründe alındı (İstanbul konumu, Diyanet yöntemi, varsayılan tema).</sub>
 
 ## Özellikler
 
-- Konuma göre namaz vakitleri, cihazda hesaplanır (`adhan_dart`, varsayılan Diyanet yöntemi). İnternet gerekmez.
-- Güneşin doğuşu vaktinde kerahat/işrak sınırına karşı **1.5 dakika (90 saniye)** erken ihtiyat payı uygulanır.
-- Vakte dokunarak kıldım (tek başına / cemaatle) veya kılmadım işaretleme; namaz kılındığında vakte uygun tesbihat önerisi.
-- **Zikir & Esma Defteri + Instagram Paylaşım Yakalayıcı:**
-  - Instagram, TikTok veya YouTube Shorts'ta karşılaşılan dini videolar **"Paylaş -> Namaz Takip (Zikir Yakala)"** ile doğrudan uygulamaya gönderilebilir.
-  - Video bağlantısı ve açıklamasından Esmaül Hüsna / zikir adı, Arapça metni, okunuşu, anlamı, hedef sayısı (`100 defa`, `308 kere`, `41 kez`) ve tavsiye edilen namaz vakti otomatik çıkarılır (isteğe bağlı Gemini AI desteği ile).
-  - Kullanıcı zikirleri gruplayabilir (`Esmaül Hüsna`, `Sabah & Akşam`, `Rızık & Bereket`, `Şifa & Huzur`, `Namaz Tesbihatı`, `Genel Zikirler` veya özel grup), arayabilir, düzenleyebilir, silebilir ve dokunmatik **Selçuklu Zikirmatik** ile titreşimli olarak çekebilir.
-  - Başka bir uygulamadan gelen içerik **otomatik işlenmez**; uyarı çıkar ve kazıma yalnızca "Kazı" düğmesiyle başlar.
-- Kıble pusulası (manyetik sapma düzeltmeli), Hicri takvim ile kandil ve bayram günleri, Android ana ekran widget'ı.
-- İşaretlenmeyen geçmiş günler kaza listesine otomatik düşer; vakit vakit kaza edilebilir.
-- Ezan vaktinde "önceki namazı kıldın mı?" bildirimi ve ezandan sonra hatırlatma.
-- Süreç: performans radarı, aylık ısı haritası, haftalık/aylık karşılaştırma.
-- Seri ve rozetler.
-- 5 İslami sanat teması (`Selçuklu Zümrüdü`, `Gece Kubbesi`, `İznik Çinisi`, `Bordo & Gül`, `Tezhip Altını`), elle şehir seçimi (81 il), hesaplama yöntemi ve hatırlatma süresi ayarı.
+### Vakitler ve takip
+
+- Konuma göre beş vakit ile güneş vakti; sıradaki vakte canlı geri sayım ve Hicri tarih.
+- Altı hesaplama yöntemi: **Diyanet (varsayılan)**, Müslüman Dünya Birliği, Mısır, Karaçi, Ümmü'l-Kurâ ve Kuzey Amerika.
+- Otomatik konum (GPS) ya da 81 il arasından elle şehir seçimi.
+- Güneş doğuşunda kerahat sınırına karşı 90 saniyelik ihtiyat payı.
+- Vakte dokunup **kıldım (tek başına / cemaatle)** ya da **kılmadım** diye işaretleme; kıldıktan sonra vakte uygun tesbihat önerisi.
+- Gün sınırı gece yarısı değil, **en geç 04:00**'tür (yazın sabah vakti daha erken girerse o vakit): gece 00:30'da kıldığınız yatsı hâlâ dünün namazı olarak kaydedilir.
+
+### Kaza namazları
+
+- İşaretlenmeyen geçmiş günler kaza listesine kendiliğinden düşer; vakit vakit kaza edilir.
+- Uygulamayı kurmadan önceki yıllardan kalan borcu yıl/ay/gün olarak hesaplayabilir ya da vakit sayılarını doğrudan girebilirsiniz; günlük hedefinize göre tahmini bitiş tarihi gösterilir.
+
+### Süreç, seri ve rozetler
+
+- Vakit bazlı **performans radarı** (7 / 30 / 90 gün), aylık **ısı haritası**, haftalık ve aylık karşılaştırma.
+- Güncel seri, en iyi seri ve tam gün sayısı; beş rozet: *İlk Hafta*, *Ay Tamamlayıcı*, *100 Gün*, *Cemaat Dostu*, *Sabah Kahramanı*.
+
+### Bildirimler
+
+- Ezan vaktinde "önceki namazı kıldınız mı?" sorusu, ezandan sonra ayarladığınız sürede hatırlatma.
+- Bildirime dokunmak doğrudan ilgili vaktin işaretleme penceresini açar.
+- Telefon yeniden başlasa da, uygulama bir süre açılmasa da bildirimler arka planda yenilenir.
+
+### Zikir ve Esma Defteri
+
+- **Zikir yakalayıcı:** Başka uygulamadan **Paylaş → Namaz Takip** ya da bağlantı/açıklama yapıştırma. Zikir adı, Arapça metin, okunuş, anlam, hedef sayı (`100 defa`, `308 kere`, `41 kez`) ve önerilen vakit ayıklanır. İsteğe bağlı Gemini desteğiyle daha zengin sonuç alınır.
+  <br><sub>Not: Instagram, giriş yapmamış istemcilere video açıklamasını vermez. Bu durumda uygulama sizi uyarır; açıklamayı kopyalayıp yapıştırmanız yeterlidir.</sub>
+- Gruplama (Esmaül Hüsna, Sabah & Akşam, Rızık & Bereket, Şifa & Huzur, Namaz Tesbihatı, özel gruplar), arama, favori, düzenleme.
+- Titreşimli **Zikirmatik**, hazır **33x3 namaz tesbihatı** ve **99 Esmaül Hüsna kataloğu**.
+
+### Araçlar ve kişiselleştirme
+
+- **Kıble pusulası:** Manyetik sapma düzeltmeli gerçek kuzey, Kıble açısı ve Kâbe'ye mesafe; sensörü olmayan cihazda açıkça uyarır.
+- **Hicri takvim:** Diyanet ay başı tablosuna göre tarih, kandil ve bayram günleri.
+- **Android ana ekran widget'ı:** Sıradaki vakit ve günün saatleri; uygulama açılmasa da vakit geçince kendiliğinden güncellenir.
+- **Beş İslami sanat teması:** Selçuklu Zümrüdü, Gece Kubbesi, İznik Çinisi, Bordo & Gül, Tezhip Altını.
 
 ## Gizlilik ve güvenlik
 
-- Namaz kayıtları cihazdan çıkmaz; Android bulut yedeği ve cihazdan cihaza aktarım kapalıdır (dini inanç verisi, KVKK m.6).
-- Konum yalnızca vakit hesabı içindir. Vakitler cihazda hesaplanır.
-- Bağlantı kazıma yalnızca `https` ile ve genel internet adreslerine yapılır; yerel ağ, loopback ve bulut metadata adresleri engellenir, yönlendirmeler her adımda yeniden denetlenir.
-- Gemini API anahtarı isteğe bağlıdır ve platform anahtar deposunda (Android Keystore, iOS Keychain) saklanır. Anahtar girilirse paylaşılan metin Google'a gönderilir.
-- Release derlemesi imza anahtarı olmadan bilerek durur. Ayrıntı: `docs/wiki/guvenlik-ve-kalite-analizi.md`.
+Dini inanç bilgisi hassas veridir; uygulama buna göre tasarlandı.
 
-## Çalıştırma
+| Konu | Nasıl ele alınıyor |
+|---|---|
+| Namaz kayıtları | Yalnızca cihazdaki SQLite veritabanında durur. Android bulut yedeği ve cihazdan cihaza aktarım kapalıdır. |
+| Konum | Vakit hesabı cihazda yapılır; konum bilgisi bir sunucuya gönderilmez. Şehir adı, cihazın kendi geocoder servisinden alınır (Google hizmetleri yoksa koordinat gösterilir). |
+| Hesap / reklam / izleme | Yoktur. |
+| Bağlantı kazıma | Yalnızca `https` ve genel internet adreslerine yapılır. Yerel ağ, loopback ve bulut metadata adresleri engellenir; yönlendirmeler her adımda yeniden denetlenir. |
+| Paylaşım onayı | Başka bir uygulamadan gelen içerik **otomatik işlenmez**; kazıma yalnızca siz düğmeye basınca başlar. |
+| Gemini API anahtarı | İsteğe bağlıdır; Android Keystore / iOS Keychain'de saklanır. Anahtar girerseniz paylaşılan metin Google'a gönderilir, girmezseniz yerleşik sözlük çalışır. |
+| Sürüm imzası | Release derlemesi imza anahtarı olmadan bilerek durur; yanlışlıkla debug imzalı sürüm üretilmez. |
 
-Flutter SDK 3.47 veya üzeri gerekir.
+Ayrıntılı denetim kaydı: [`docs/wiki/guvenlik-ve-kalite-analizi.md`](docs/wiki/guvenlik-ve-kalite-analizi.md).
+
+## Kurulum ve çalıştırma
+
+> Uygulama henüz mağazada yayınlanmadı; şimdilik kaynaktan derlenir.
+
+**Gereksinimler:** Flutter SDK 3.47 (Dart 3.13) veya üzeri, Android SDK. Windows kurulum adımları: [`docs/wiki/gelistirme-ortami.md`](docs/wiki/gelistirme-ortami.md).
 
 ```bash
+git clone https://github.com/Yusufygc/NamazTakipApp.git
+cd NamazTakipApp
 flutter pub get
 flutter run
 ```
 
-Test ve analiz:
+Cihaza kurulabilir APK üretmek için:
+
+```bash
+flutter build apk --debug                                  # debug APK
+ALLOW_DEBUG_SIGNING=1 flutter build apk --release          # yan yükleme testi (mağazaya yüklenemez)
+```
+
+PowerShell'de ikinci komut için: `$env:ALLOW_DEBUG_SIGNING = "1"; flutter build apk --release`.
+
+Mağaza sürümü için `android/key.properties` ile gerçek imza anahtarı gerekir; adımlar [`derleme-ve-yayin.md`](docs/wiki/derleme-ve-yayin.md) sayfasındadır.
+
+**Test ve analiz:**
 
 ```bash
 flutter analyze
-flutter test
-cd packages/namaz_backend && flutter test
+flutter test                                  # ön yüz
+cd packages/namaz_backend && flutter test     # backend
+cd android && ./gradlew :app:testDebugUnitTest   # Kotlin (widget ve pusula mantığı)
 ```
 
-Debug APK:
+## Mimari
 
-```bash
-flutter build apk --debug
+Uygulama iki pakettir: **ön yüz** yalnızca görünümü ve metni bilir, **backend** iş kurallarını ve platform erişimini taşır. Aralarındaki tek köprü `NamazBackend` arayüzüdür; sınır, iki `architecture_test.dart` ile otomatik denetlenir.
+
+```mermaid
+flowchart LR
+    UI["<b>lib/</b> · ön yüz<br/>Ekranlar · Riverpod · Tema<br/>İkon ve metin sistemi"]
+    subgraph BE["packages/namaz_backend"]
+        direction TB
+        APP["application<br/>NamazBackend · bildirim planlayıcı"]
+        DOM["domain<br/>vakit · seri · Hicri · kıble · zikir ayrıştırıcı"]
+        DATA["data<br/>SQLite · SharedPreferences · güvenli depo"]
+        PLAT["platform<br/>konum · bildirim · paylaşım · widget"]
+        APP --> DOM
+        APP --> DATA
+        APP --> PLAT
+    end
+    UI -- "NamazBackend arayüzü" --> APP
 ```
 
-## Proje yapısı
+### Teknoloji
+
+| Katman | Seçim |
+|---|---|
+| Çatı | Flutter 3.47, Dart 3.13, Material 3 |
+| Durum yönetimi | Riverpod 3 |
+| Vakit hesabı | `adhan_dart` (cihazda, internetsiz) |
+| Veri | `sqflite` (SQLite) ve `shared_preferences` |
+| Gizli veri | `flutter_secure_storage` (Keystore / Keychain) |
+| Konum | `geolocator`, `geocoding` |
+| Bildirim ve arka plan | `flutter_local_notifications`, `timezone`, `workmanager` |
+| Grafik | `fl_chart` |
+| Yerel kod | Kotlin (widget, pusula, paylaşım), Swift (iOS köprüsü, widget, paylaşım uzantısı) |
+
+### Tasarım kararları
+
+- **Vakitler cihazda hesaplanır.** Sunucu yok, kota yok, çevrimdışı çalışır. Aladhan ile karşılaştırmada Diyanet yöntemi ≤ 2 dakika fark verdi.
+- **Kaza listesi türetilir.** Ayrı bir kaza tablosu yoktur; işaretlenmemiş geçmiş vakitlerden hesaplanır, bu yüzden tutarsız kalamaz.
+- **Tarihler `yyyy-MM-dd` metni.** `ORDER BY` ve `BETWEEN` doğrudan çalışır, saat dilimi kayması olmaz.
+- **Sabit bildirim kimlikleri.** Kimlik tarih ve vakitten türetilir; yeniden planlama çift bildirim üretmez, üzerine yazar.
+- **Bozuk veritabanı kurtarma.** Dosya silinmeden önce yedeklenir ve kullanıcı uyarılır.
+- **Merkezi ikon ve metin sistemi.** Ekranlarda emoji, `Icons.xxx` ya da sabit Türkçe metin bulunmaz; `test/central_system_test.dart` bunu denetler.
+
+### Proje yapısı
 
 ```
-lib/
-  core/        tema, biçimlendirme, merkezi ikon ve metin sistemi
-    icons/     merkezi ikon sistemi (AppIcons)
-    strings/   modüler merkezi metin sistemi
-  providers/   Riverpod durum yönetimi
-  ui/          ekranlar ve Selçuklu/Osmanlı desenli widget'lar
-packages/
-  namaz_backend/
-    lib/src/
-      domain/      saf Dart modelleri, vakit hesabı, zikir/esma kazıyıcı (dhikr_extractor)
-      data/        SQLite (prayers ve dhikrs tabloları), SharedPreferences
-      platform/    konum, bildirim ve sosyal medya paylaşım (ShareService) kanalları
-      application/ NamazBackend uygulaması ve bildirim zamanlayıcı
+lib/                    ön yüz: ekranlar, sağlayıcılar, tema, ikon ve metin sistemi
+packages/namaz_backend/ backend: domain · data · platform · application
+android/, ios/          platform projeleri ve yerel köprüler
+test/                   ön yüz testleri
+tool/                   emülatör başlatma betiği
+docs/wiki/              proje bilgi tabanı (mimari, kararlar, test notları)
+docs/screenshots/       README görselleri
 ```
 
-## İkon ve metin sistemi
+## Proje durumu
 
-- **İkonlar:** `lib/core/icons/app_icons.dart`. Ekranlarda emoji veya `Icons.xxx` kullanılmaz,
-  anlamsal ad üzerinden `AppIcons.xxx` kullanılır (ör. `AppIcons.navQaza`).
-- **Metinler:** `lib/core/strings/`. Her modül kendi dosyasındadır (`home_strings.dart`,
-  `dhikr_strings.dart`, `qaza_strings.dart`, `settings_strings.dart` ...); ekranlar yalnızca `strings.dart`'ı içe aktarır.
-  Yeni metni ilgili modüle ekleyin; ekranlara sabit metin yazmayın.
-- `test/central_system_test.dart` bu kuralları denetler: `lib/` içinde emoji, `app_icons.dart`
-  dışında `Icons.xxx` ve `lib/ui/` içinde Türkçe sabit metin bulunursa test başarısız olur.
-- Büyük harfe çevirme için `turkishUpper` (`İkindi` → `İKİNDİ`), arama için `foldTurkish` kullanın.
+| | |
+|---|---|
+| Sürüm | 1.0.0 (henüz yayınlanmadı) |
+| Kalite | `flutter analyze` temiz; 185 test geçiyor (ön yüz 46, backend 124, Kotlin 15) |
+| Doğrulanan | Android emülatörü (bildirim, konum, widget, paylaşım, pusula) |
+| Doğrulanmayan | Gerçek telefonda pil kısıtlamaları ve bildirim güvenilirliği; iOS derlemesi (Mac gerekir); dört ek temanın görsel testi |
+| Dini içerik | Esmaül Hüsna, zikir ve kerahat metinleri iç tutarlılık açısından test edildi; **dini uzman onayı bekliyor**: [`dini-icerik-onayi.md`](docs/wiki/dini-icerik-onayi.md) |
+| Hicri takvim | Diyanet tablosu 7 Mayıs 2027'ye kadar; sonrası algoritmik tahmindir |
+
+Açık işlerin tamamı: [`bilinen-sorunlar.md`](docs/wiki/bilinen-sorunlar.md) ve [`yol-haritasi.md`](docs/wiki/yol-haritasi.md).
+
+## Belgeler
+
+Proje bilgisi `docs/wiki/` altında birbirine bağlı sayfalarda tutulur; başlangıç noktası [`docs/wiki/index.md`](docs/wiki/index.md).
+
+| Konu | Sayfa |
+|---|---|
+| Genel bakış | [`proje-ozeti.md`](docs/wiki/proje-ozeti.md) |
+| Mimari | [`mimari-genel.md`](docs/wiki/mimari-genel.md), [`backend-paketi.md`](docs/wiki/backend-paketi.md) |
+| Veri | [`veri-katmani.md`](docs/wiki/veri-katmani.md) |
+| Bildirimler | [`bildirimler.md`](docs/wiki/bildirimler.md), [`izinler.md`](docs/wiki/izinler.md) |
+| Zikir paylaşımı | [`zikir-paylasim.md`](docs/wiki/zikir-paylasim.md) |
+| Test | [`test-stratejisi.md`](docs/wiki/test-stratejisi.md) |
+| Kararlar | [`kararlar.md`](docs/wiki/kararlar.md) |
+
+## Katkı
+
+Hata bildirimi ve öneriler için bir *issue* açabilirsiniz. Kod katkısından önce şu kurallara göz atın:
+
+1. İş kuralı backend'e, görünüm ve metin ön yüze yazılır; `packages/namaz_backend/lib/src/` ön yüzden içe aktarılmaz.
+2. İkonlar `lib/core/icons/app_icons.dart`, metinler `lib/core/strings/` altındadır; ekranlara sabit metin yazılmaz.
+3. Değişiklikten sonra `flutter analyze` temiz olmalı, iki pakette `flutter test` geçmelidir.
+4. Kullanıcıya görünen metinler Türkçedir; kod yorumları ve commit mesajları tam cümlelerle yazılır.
+
+---
+
+<div align="center">
+
+MYY tarafından geliştirildi · [GitHub: Yusufygc](https://github.com/Yusufygc/NamazTakipApp) · Namazlarınız kabul olsun.
+
+</div>
