@@ -4,7 +4,7 @@ Kullanıcı bir sosyal medya gönderisini "Paylaş → Namaz Takip" ile uygulama
 
 ## Akış
 
-1. **Android:** `AndroidManifest.xml` içindeki `ACTION_SEND` (`text/plain`) süzgeci, `MainActivity.kt` metni alır. Uygulama kapalıyken ilk metin `takeInitialSharedText` ile, açıkken `onSharedText` ile Dart'a gider (kanal `com.namaztakip.app/share`). iOS tarafı `ShareExtension` ve `namaztakip://share` URL şemasıyla yapılmıştır; iOS bu sayfada doğrulanmış sayılmaz.
+1. **Android:** `AndroidManifest.xml` içindeki `ACTION_SEND` (`text/plain`) süzgeci, `MainActivity.kt` metni alır. Uygulama kapalıyken ilk metin `takeInitialSharedText` ile, açıkken `onSharedText` ile Dart'a gider (kanal `com.namaztakip.app/share`). iOS için kaynak dosyalar yazılmıştır ama uzantı hedefleri Xcode projesine eklenmemiştir; iOS'ta paylaşım şu an çalışmaz: [[ios-yapilandirma]].
 2. **`ShareService`** (`packages/namaz_backend/lib/src/platform/share_service.dart`): metindeki ilk bağlantıyı bulur, sayfayı çekip `og:description`, `og:title` ve `description` etiketlerini okur (ilk 120 KB, 5-6 sn zaman aşımı).
 3. **`extractDhikrDraft`** (saf Dart, `domain/dhikr_extractor.dart`): Esmaül Hüsna ve tesbihat kataloğundan eşleşme, "Ya <Esma>" kalıbı, "100 defa" gibi hedef sayı, "sabah namazından sonra" gibi vakit, Arapça blok, grup tahmini.
 4. İsteğe bağlı **Gemini** zenginleştirmesi (anahtar girilmişse).
@@ -27,6 +27,15 @@ Bu durum artık açıkça ele alınır:
 ## Kazıma hatası düzeltildi
 
 `og:description` içeriği çift tırnakla sarılıysa içindeki kesme işareti (`Ya Rezzak'ın`) eski düzenli ifadede değeri kesiyordu; Türkçe metinde çok sık görülür. Tek ve çift tırnak artık ayrı yakalanır. `share_service_test.dart` bunu denetler (eski ifadeyle düştüğü elle doğrulandı).
+
+## Güvenlik önlemleri
+
+Paylaşım kapısı dışa açıktır (`ACTION_SEND` süzgeci), bu yüzden gelen metin güvenilmez sayılır. Ayrıntılı analiz: [[guvenlik-ve-kalite-analizi]].
+
+- **Bağlantı açma:** yalnızca `http`/`https` ve ana makine adı olan bağlantılar dış uygulamada açılır (`isSafeWebUrl`, hem Dart'ta hem `MainActivity.kt`'de). `file:`, `tel:`, `intent:`, `javascript:` açılmaz.
+- **Kazıma:** yalnızca `http`/`https`; parçalar arası 6 sn, toplam 10 sn zaman aşımı, en çok 120 KB.
+- **Yapay zeka yanıtı:** hedef sayı `sanitizeTargetCount` ile 1-100000 arasına zorlanır; yanıt zaten kullanıcıya düzenlenebilir taslak olarak gösterilir, doğrudan kaydedilmez.
+- **Kabul edilen risk:** kazıma yerel ağ adreslerine GET atabilir; yanıt saldırgana dönmez.
 
 ## Gemini (isteğe bağlı)
 

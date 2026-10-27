@@ -36,6 +36,10 @@ Namaz Takip projesinin bilgi tabanı. Her işe buradan başlayın; kurallar içi
 
 - [[ui-ekranlar]] — Kabuk, altı ekran ve şehir seçici.
 - [[zikir-paylasim]] — Sosyal medyadan zikir yakalama, açıklaması okunamayan bağlantılar, Gemini.
+- [[hicri-takvim]] — Hicri tarih (Diyanet ay başı tablosu), kandil ve bayram günleri, kerahat.
+- [[kible-pusulasi]] — Kıble açısı hesabı, konum yokken davranış, pusula sınırları.
+- [[ana-ekran-widget]] — Android ana ekran widget'ı: program, alarm, bayatlama düzeltmesi.
+- [[guvenlik-ve-kalite-analizi]] — Antigravity kodunun güvenlik ve kalite analizi (2026-10-27).
 - [[tema-sistemi]] — Beş tema, `AppPalette` ve doğrulama durumu.
 - [[ikon-sistemi]] — `AppIcons` kuralları ve gruplar.
 - [[metin-sistemi]] — Modüler `strings` sistemi, Türkçe yardımcılar.

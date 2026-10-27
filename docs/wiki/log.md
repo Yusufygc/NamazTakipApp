@@ -2,6 +2,9 @@
 
 Kronolojik kayıt; en yeni kayıt en üsttedir. Biçim: `## [YYYY-AA-GG] [İŞLEM_TİPİ] | Kısa Açıklama`. İşlem tipleri: INGEST, QUERY, UPDATE, DECISION, LINT, SETUP. Kurallar: [[wiki-kullanim]]. Harita: [[index]].
 
+## [2026-10-27] REVIEW | Antigravity kodunun güvenlik ve kalite analizi; widget, Hicri, kıble düzeltmeleri; iOS durumu
+Commit edilmemiş çalışma (widget, kıble, Hicri/kerahat, kaza borcu, esma, tesbihat) incelendi: [[guvenlik-ve-kalite-analizi]]. Düzeltilenler: Android widget bayatlıyordu, artık 7 günlük programdan kendisi hesaplıyor ve AlarmManager ile yenileniyor ([[ana-ekran-widget]]); Hicri tarih bayramları 1 gün erken veriyordu, Diyanet ay başı tablosuna geçildi, Regaip kuralı düzeltildi ([[hicri-takvim]]); Kıble konum yokken sahte 151° gösteriyordu ([[kible-pusulasi]]); `openUrl` her şemayı açıyordu, kazıma süre sınırsızdı, Gemini sayısı doğrulanmıyordu ([[zikir-paylasim]]). iOS uzantı hedefleri Xcode projesinde yok; önceki "iOS entegrasyonu kuruldu" kaydı yanlıştı, düzeltildi: [[ios-yapilandirma]]. 145 test geçiyor (ön yüz 32, backend 103, Kotlin 10). Açık: dinî içerik onayı, pusula sapması, Hicri tablosu 1448'de bitiyor: [[bilinen-sorunlar]].
+
 ## [2026-10-27] UPDATE | Zikir paylaşımında açıklaması okunamayan bağlantılar ele alındı, Gemini anahtarı başlığa taşındı
 Instagram açıklama vermediği için yalnızca bağlantı paylaşılınca boş taslak çıkıyordu; `DhikrDraft.captionUnavailable` ve `isCaptionMissing` eklendi, düzenleme sayfası uyarı ve "Bağlantıyı aç" düğmesi gösteriyor, bu durumda Gemini'ye istek atılmıyor. `og:description` içindeki kesme işareti değeri kesiyordu, düzeltildi. Gemini anahtarı URL'den `x-goog-api-key` başlığına taşındı, ayar metnine gizlilik notu eklendi. 9 yeni test (toplam 105), emülatörde doğrulandı. Yeni sayfa: [[zikir-paylasim]]. Ayrıca emülatör saat dilimi betiği: [[gelistirme-ortami]]; SDK yolu ve NDK 28.2 düzeltmesi. Test: [[test-stratejisi]], [[emulator-test-notlari]]; sınırlar: [[bilinen-sorunlar]].
 

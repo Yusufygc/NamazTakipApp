@@ -12,6 +12,12 @@ Henüz çözülmemiş sorunlar, doğrulanmamış alanlar ve bilinçli sınırlar
 | Düşük | Gizlilik politikası ve veri silme/dışa aktarma yok | Yedekleme kapatıldı; mağaza yayını için yasal metin ve kullanıcı eylemleri gerekir: [[android-yapilandirma]], [[yol-haritasi]] |
 | Orta | Instagram bağlantısından zikir çıkarılamaz | Instagram giriş yapmamış istemciye açıklama vermez; kullanıcı açıklamayı yapıştırmalıdır (uyarı ve yönlendirme var). Gerçek Instagram paylaşımı ve iOS paylaşım uzantısı denenmedi: [[zikir-paylasim]] |
 | Düşük | Gemini anahtarı düz metin saklanıyor | `SharedPreferences`, yedekleme kapalı; güvenli depolama (Keystore) kullanılmıyor: [[zikir-paylasim]] |
+| Orta | iOS paylaşım ve widget uzantıları Xcode projesinde yok | `project.pbxproj`'da iki hedef ve `Runner.entitlements` bağlantısı bulunmuyor; iOS'ta paylaşım ve widget çalışmaz. Mac ve Xcode gerekir: [[ios-yapilandirma]] |
+| Orta | Hicri tablo 7 Mayıs 2027'de bitiyor | Sonrası Kuveyt algoritmasına düşer ve bayram/kandil bir gün kayabilir; 1449 Diyanet ilanıyla `hijri_month_starts.dart`'a eklenmeli. Tablo Diyanet'e dayanan yayınlardan derlendi, resmî tablo değil: [[hicri-takvim]] |
+| Orta | Dinî içerik doğrulanmadı | Esma kataloğu (44 giriş), fazilet metinleri, ebced sayıları, kerahat süreleri (45/30/40 dk) ve kandil kuralları dinî kaynaktan onay bekliyor: [[hicri-takvim]], [[guvenlik-ve-kalite-analizi]] |
+| Orta | Pusula manyetik kuzeyi kullanıyor | Manyetik sapma (Türkiye'de ~5°) düzeltilmiyor, tolerans ±5°; sensör yoksa sessiz. Gerçek cihazda denenmedi: [[kible-pusulasi]] |
+| Orta | Backend ve Kotlin'de sabit Türkçe metin | `home_widget_snapshot.dart`, esma kataloğu, varsayılan başlık, widget Kotlin metinleri metin sistemi dışında; koruma testi `lib/ui`'ı tarıyor: [[guvenlik-ve-kalite-analizi]] |
+| Düşük | Widget Doze'da birkaç dakika gecikebilir, durdurulmuş uygulamada yenilenmez | Yaklaşık zamanlı alarm kullanılıyor (tam zamanlı alarm izni istenmedi). Gerçek cihazda üretici başlatıcıları denenmedi: [[ana-ekran-widget]] |
 | Yüksek | Gerçek telefonda test yok | Bildirim zamanlaması, pil kısıtlamaları (agresif tasarruf yapan üreticiler), GPS ve performans yalnızca emülatörde görüldü: [[bildirimler]] |
 | Orta | Dört tema görsel test edilmedi | Koyu, Okyanus, Gül, Altın; kontrast sorunları çıkabilir: [[tema-sistemi]] |
 | Orta | Arka plan görevinin periyodik tetiklenmesi gözlenmedi | 12 saatlik görev emülatör oturumuna sığmadı: [[arka-plan-gorevleri]] |

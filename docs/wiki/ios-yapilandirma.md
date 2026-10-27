@@ -35,6 +35,25 @@ Bu, uygulama açıkken de yerel bildirimlerin gösterilmesini sağlar (`flutter_
 - **Bildirim izni:** Çalışma zamanında istenir (uyarı ve ses): [[izinler]].
 - Tam zamanlı alarm kavramı yoktur; iOS planlanan yerel bildirimi zamanında gösterir.
 
+## Uzantılar ve eksik Xcode hedefleri (2026-10-27 denetimi)
+
+Depoda iOS için şunlar yazılmıştır: `ios/ShareExtension/` (paylaşım menüsü: `ShareViewController.swift`, `Info.plist`, `ShareExtension.entitlements`), `ios/NamazWidgetExtension/` (`NamazWidget.swift`, `Info.plist`), `AppDelegate.swift` içinde paylaşım, widget ve pusula köprüleri, `Info.plist` içinde `namaztakip` URL şeması, `Runner.entitlements` (App Group `group.com.namaztakip.app`).
+
+**Ama bunlar derlemeye girmiyor.** `project.pbxproj` içinde:
+
+- `ShareExtension` ve `NamazWidget` için **sıfır referans**: iki uzantı hedefi (target) yok. Dosyalar yalnızca klasörde duruyor.
+- `Runner.entitlements` için ve `CODE_SIGN_ENTITLEMENTS` için **sıfır referans**: App Group etkin değil, `UserDefaults(suiteName:)` uygulama ile uzantı arasında veri paylaşamaz.
+
+Sonuç: iOS'ta paylaşım menüsünde "Zikir Yakala" görünmez ve ana ekran widget'ı eklenemez; Android'de ikisi de çalışır. Ana uygulama bu eksikler olmadan derlenir. Eski günlük kaydındaki "iOS paylaşım menüsü entegrasyonu kuruldu" ifadesi yanlıştı. Swift kodu hiç derlenmedi, çalıştırılmadı. Hedefleri el ile `project.pbxproj` içine yazmak güvenli değildir (Windows'ta doğrulanamaz); Xcode'da eklenmelidir:
+
+1. Xcode'da Runner projesine **Share Extension** hedefi ekle (örn. bundle id `com.namaztakip.namazTakip.ShareExtension`); üretilen şablon `ShareViewController`/`Info.plist` yerine depodaki dosyaları bağla.
+2. **Widget Extension** hedefi ekle (örn. `com.namaztakip.namazTakip.NamazWidgetExtension`); `NamazWidget.swift` ve `Info.plist` dosyalarını bağla; `@main` giriş noktasını kontrol et.
+3. Üç hedefte (Runner, ShareExtension, widget) **App Groups** yeteneğini `group.com.namaztakip.app` ile aç; Runner için `CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements`.
+4. Apple Developer hesabında App Group kimliğini kaydet; bundle id kararını ver (`com.namaztakip.namazTakip` mi, Android'deki `com.namaztakip.app` mi): grup kimliği ve URL şeması adı `com.namaztakip.app` ailesini kullanıyor.
+5. `flutter build ios --no-codesign`, sonra cihazda: paylaşımın uygulamayı `namaztakip://share?text=...` ile açması, widget'ın veriyi App Group'tan okuması.
+
+İlgili: [[zikir-paylasim]], [[ana-ekran-widget]], [[guvenlik-ve-kalite-analizi]].
+
 ## Proje dosyası tuzağı
 
 `flutter_launcher_icons` aracı `project.pbxproj` içinde `ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES` ayarını `AppIcon` yapıp bozuyor. İkon üretildikten sonra iki satır `YES`'e geri alınmalıdır: [[uygulama-ikonu]].
