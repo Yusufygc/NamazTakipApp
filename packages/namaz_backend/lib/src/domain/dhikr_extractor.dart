@@ -1,4 +1,5 @@
 import 'dhikr.dart';
+import 'esma_catalog.dart';
 import 'prayer.dart';
 
 /// Yerleşik Esmaül Hüsna ve meşhur zikir/tesbihat sözlük girdisi.
@@ -134,127 +135,7 @@ const List<DhikrCatalogEntry> kDhikrCatalog = [
       'yunus duası',
     ],
   ),
-  DhikrCatalogEntry(
-    title: 'Yâ Rezzâk',
-    arabic: 'يَا رَزَّاقُ',
-    transliteration: 'Yâ Rezzâk',
-    meaning: 'Bütün mahlukatın rızkını bolca veren.',
-    defaultCount: 308,
-    groupName: DhikrGroups.rizik,
-    prayerTime: PrayerType.fajr,
-    keywords: ['ya rezzak', 'yâ rezzâk', 'el-rezzak', 'er-rezzak', 'rezzak'],
-  ),
-  DhikrCatalogEntry(
-    title: 'Yâ Fettâh',
-    arabic: 'يَا فَتَّاحُ',
-    transliteration: 'Yâ Fettâh',
-    meaning: 'Hayır kapılarını açan, müşkülleri çözen.',
-    defaultCount: 489,
-    groupName: DhikrGroups.rizik,
-    prayerTime: PrayerType.fajr,
-    keywords: ['ya fettah', 'yâ fettâh', 'el-fettah', 'fettah'],
-  ),
-  DhikrCatalogEntry(
-    title: 'Yâ Şâfî',
-    arabic: 'يَا شَافِي',
-    transliteration: 'Yâ Şâfî',
-    meaning: 'Maddi ve manevi hastalıklara şifa veren.',
-    defaultCount: 391,
-    groupName: DhikrGroups.sifa,
-    keywords: ['ya safi', 'ya şafi', 'yâ şâfî', 'eş-şafi', 'es-safi'],
-  ),
-  DhikrCatalogEntry(
-    title: 'Yâ Vedûd',
-    arabic: 'يَا وَدُودُ',
-    transliteration: 'Yâ Vedûd',
-    meaning: 'Kullarını çok seven ve sevilmeye en layık olan.',
-    defaultCount: 400,
-    groupName: DhikrGroups.esma,
-    keywords: ['ya vedud', 'yâ vedûd', 'el-vedud', 'vedud'],
-  ),
-  DhikrCatalogEntry(
-    title: 'Yâ Latîf',
-    arabic: 'يَا لَطِيفُ',
-    transliteration: 'Yâ Latîf',
-    meaning: 'Sonsuz lütuf ve incelik sahibi, işleri kolaylaştıran.',
-    defaultCount: 129,
-    groupName: DhikrGroups.esma,
-    keywords: ['ya latif', 'yâ latîf', 'el-latif', 'latif'],
-  ),
-  DhikrCatalogEntry(
-    title: 'Yâ Vehhâb',
-    arabic: 'يَا وَهَّابُ',
-    transliteration: 'Yâ Vehhâb',
-    meaning: 'Karşılıksız bolca ihsan ve ikramda bulunan.',
-    defaultCount: 14,
-    groupName: DhikrGroups.rizik,
-    keywords: ['ya vehhab', 'yâ vehhâb', 'el-vehhab', 'vehhab'],
-  ),
-  DhikrCatalogEntry(
-    title: 'Yâ Ğaniyy Yâ Muğnî',
-    arabic: 'يَا غَنِيُّ يَا مُغْنِي',
-    transliteration: 'Yâ Ğaniyy, Yâ Muğnî',
-    meaning: 'Gerçek zenginlik sahibi ve dilediğini zengin kılan.',
-    defaultCount: 1060,
-    groupName: DhikrGroups.rizik,
-    keywords: ['ya ganiyy', 'ya ğaniyy', 'ya mugni', 'ya muğni', 'el-ganiyy'],
-  ),
-  DhikrCatalogEntry(
-    title: 'Yâ Sabûr',
-    arabic: 'يَا صَبُورُ',
-    transliteration: 'Yâ Sabûr',
-    meaning: 'Çok sabırlı olan ve kullarına sabır ihsan eden.',
-    defaultCount: 298,
-    groupName: DhikrGroups.sifa,
-    keywords: ['ya sabur', 'yâ sabûr', 'es-sabur', 'sabur'],
-  ),
-  DhikrCatalogEntry(
-    title: 'Yâ Selâm',
-    arabic: 'يَا سَلَامُ',
-    transliteration: 'Yâ Selâm',
-    meaning: 'Kullarını selamete çıkaran ve esenlik veren.',
-    defaultCount: 131,
-    groupName: DhikrGroups.sifa,
-    keywords: ['ya selam', 'yâ selâm', 'es-selam'],
-  ),
-  DhikrCatalogEntry(
-    title: 'Yâ Vekîl',
-    arabic: 'يَا وَكِيلُ',
-    transliteration: 'Yâ Vekîl',
-    meaning: 'Kendisine tevekkül edenlerin işlerini en güzel yoluna koyan.',
-    defaultCount: 66,
-    groupName: DhikrGroups.esma,
-    keywords: ['ya vekil', 'yâ vekîl', 'el-vekil'],
-  ),
-  DhikrCatalogEntry(
-    title: 'Yâ Mucîb',
-    arabic: 'يَا مُجِيبُ',
-    transliteration: 'Yâ Mucîb',
-    meaning: 'Dualara ve yakarışlara icabet eden.',
-/// Paylaşımda bağlantı var ama zikir bilgisi taşıyan hiçbir metin yoksa `true`:
-/// kullanıcı metni (bağlantı çıkarıldıktan sonra) boştur ve bağlantıdan açıklama
-/// da okunamamıştır.
-bool isCaptionMissing(String rawInput, {String? scrapedCaption}) {
-  if (extractFirstUrl(rawInput) == null) return false;
-  final hasUserText = cleanSocialCaption(rawInput).isNotEmpty;
-  final hasScraped = scrapedCaption != null && scrapedCaption.trim().isNotEmpty;
-  return !hasUserText && !hasScraped;
-}
-
-    defaultCount: 55,
-    groupName: DhikrGroups.esma,
-    keywords: ['ya mucib', 'yâ mucîb', 'el-mucib'],
-  ),
-  DhikrCatalogEntry(
-    title: 'Yâ Hayyu Yâ Kayyûm',
-    arabic: 'يَا حَيُّ يَا قَيُّومُ',
-    transliteration: 'Yâ Hayyu Yâ Kayyûm',
-    meaning: 'Ezeli ve ebedi diri olan, her şeyi ayakta tutan.',
-    defaultCount: 184,
-    groupName: DhikrGroups.esma,
-    prayerTime: PrayerType.fajr,
-    keywords: ['ya hayyu', 'ya kayyum', 'yâ kayyûm', 'el-hayy', 'el-kayyum'],
-  ),
+  ...kEsmaAndDhikrCatalog,
 ];
 
 /// Paylaşılan metin veya video açıklamasından zikir bilgilerini çıkaran saf
@@ -350,12 +231,39 @@ String? extractFirstUrl(String text) {
   return url;
 }
 
+/// Dış kaynaktan (yapay zeka yanıtı vb.) gelen hedef sayıyı doğrular: 1..100000
+/// arası bir tam sayı değilse `null`.
+int? sanitizeTargetCount(Object? value) {
+  if (value is! num || !value.isFinite) return null;
+  final n = value.toInt();
+  if (n < 1 || n > 100000) return null;
+  return n;
+}
+
+/// Yalnızca `http`/`https` ve ana makine adı olan bağlantılar güvenlidir; dış
+/// uygulamada açılmadan ve ağdan çekilmeden önce denetlenir.
+bool isSafeWebUrl(String url) {
+  final uri = Uri.tryParse(url.trim());
+  if (uri == null) return false;
+  final scheme = uri.scheme.toLowerCase();
+  return (scheme == 'http' || scheme == 'https') && uri.host.isNotEmpty;
+}
+
+/// Paylaşımda bağlantı var ama zikir bilgisi taşıyan hiçbir metin yoksa `true`:
+/// kullanıcı metni (bağlantı çıkarıldıktan sonra) boştur ve bağlantıdan açıklama
+/// da okunamamıştır.
+bool isCaptionMissing(String rawInput, {String? scrapedCaption}) {
+  if (extractFirstUrl(rawInput) == null) return false;
+  final hasUserText = cleanSocialCaption(rawInput).isNotEmpty;
+  final hasScraped = scrapedCaption != null && scrapedCaption.trim().isNotEmpty;
+  return !hasUserText && !hasScraped;
+}
+
 /// Instagram/TikTok/YouTube paylaşım metinlerindeki kalıp sarmalayıcıları ve
 /// URL'leri temizler.
 String cleanSocialCaption(String raw) {
   var text = raw.replaceAll(RegExp(r'https?://[^\s"<>]+'), ' ').trim();
 
-  // Instagram "12K likes, 45 comments - user on Instagram: "caption"" kalıbı
   final igMatch = RegExp(
     r'on Instagram:\s*["“”]([\s\S]+?)["“”]\s*$',
     caseSensitive: false,
@@ -364,7 +272,6 @@ String cleanSocialCaption(String raw) {
     text = igMatch.group(1)!.trim();
   }
 
-  // Hashtag yığınlarını sadeleştir (#zikir -> zikir)
   text = text.replaceAllMapped(
     RegExp(r'#([a-zA-Z0-9_çğıöşüÇĞİÖŞÜ]+)'),
     (m) => m.group(1)!,

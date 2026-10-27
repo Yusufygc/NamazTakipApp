@@ -1,4 +1,4 @@
-/// Zikir Defteri, Instagram/Sosyal Medya Yakalayıcı ve Akıllı Zikirmatik metinleri.
+/// Zikir Defteri, Instagram/Sosyal Medya Yakalayıcı, Klasik Tesbihat ve Akıllı Zikirmatik metinleri.
 abstract final class DhikrStrings {
   static const screenTitle = 'Zikir ve Esma Defteri';
   static const topBarButton = 'Zikirler';
@@ -20,12 +20,33 @@ abstract final class DhikrStrings {
   static const pasteLinkButton = 'Bağlantı / Metin Kazı';
   static const manualAddButton = 'Yeni Zikir Ekle';
 
+  // Klasik Namaz Tesbihatı (33+33+33+1) ve Esmaül Hüsna Kataloğu
+  static const classicTesbihatButton = '33x3 Tesbihat';
+  static const classicTesbihatTitle = 'Klasik Namaz Tesbihatı';
+  static const classicTesbihatSubtitle =
+      '33 Sübhanallah • 33 Elhamdülillah • 33 Allahü Ekber • Hatim';
+  static const classicCompletedTitle = 'Allah Kabul Etsin!';
+  static const classicCompletedBody =
+      'Namaz tesbihatını (33 Sübhanallah, 33 Elhamdülillah, 33 Allahü Ekber ve tevhid duasını) tamamladınız.';
+  static const esmaCatalogButton = 'Esma Kataloğu';
+  static const esmaCatalogTitle = 'Esmaül Hüsna ve Faziletleri';
+  static const esmaAddedAction = 'Deftere Ekle';
+
+  static String classicStepIndicator(int step, int total) =>
+      'Aşama $step / $total';
+  static String esmaAddSuccess(String title) =>
+      '$title zikir defterinize eklendi';
+  static String esmaEbcedLabel(int count) => 'Zikir Adedi: $count';
+
   // Kazıma ve düzenleme alt sayfası
   static const scrapeSheetTitle = 'Sosyal Medyadan Zikir Kazı';
   static const editSheetTitle = 'Zikri Düzenle';
   static const addSheetTitle = 'Yeni Zikir veya Esma Ekle';
   static const sharedDetectedBanner =
       'Paylaşılan içerikten zikir, sayı ve vakit otomatik çıkarıldı. Kaydetmeden önce düzenleyebilirsiniz.';
+  static const captionMissingBanner =
+      'Bu bağlantının açıklaması okunamadı. Instagram gibi uygulamalar giriş yapmadan açıklama vermez. Videonun açıklamasını kopyalayıp aşağıdaki alana yapıştırın ve tekrar kazıyın; ya da zikri elle girin.';
+  static const openSourceToCopy = 'Bağlantıyı aç ve açıklamayı kopyala';
   static const rawInputLabel = 'Instagram Bağlantısı veya Video Açıklaması';
   static const rawInputHint =
       'https://www.instagram.com/reel/... veya açıklama metni yapıştırın';
@@ -44,9 +65,6 @@ abstract final class DhikrStrings {
   static const fieldCustomGroupHint = 'Veya yeni grup adı yazın...';
   static const fieldPrayerTime = 'Tavsiye Edilen Vakit';
   static const prayerTimeAny = 'Her Vakit';
-  static const captionMissingBanner =
-      'Bu bağlantının açıklaması okunamadı. Instagram gibi uygulamalar giriş yapmadan açıklama vermez. Videonun açıklamasını kopyalayıp aşağıdaki alana yapıştırın ve tekrar kazıyın; ya da zikri elle girin.';
-  static const openSourceToCopy = 'Bağlantıyı aç ve açıklamayı kopyala';
   static const fieldSourceUrl = 'Kaynak Video Bağlantısı';
   static const saveButton = 'Zikir Defterine Kaydet';
   static const updateButton = 'Değişiklikleri Kaydet';
@@ -69,6 +87,6 @@ abstract final class DhikrStrings {
 
   // Namaz sonrası tesbihat önerisi (Ana ekran)
   static String postPrayerPrompt(String prayerLabel, String dhikrTitle) =>
-      'Allah kabul etsin! $prayerLabel namazı tesbihatı: $dhikrTitle';
+      'Allah kabul etsin! $prayerLabel namazı tesbihatına başlayabilirsiniz ($dhikrTitle / 33x3)';
   static const postPrayerAction = 'Tesbihata Başla';
 }

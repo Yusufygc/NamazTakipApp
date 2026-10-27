@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:namaz_backend/namaz_backend.dart';
 import 'package:namaz_backend/src/platform/share_service.dart';
@@ -21,6 +22,7 @@ Future<HttpServer> _serve(Map<String, String> pages) async {
 }
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   late HttpServer server;
   late String base;
 
@@ -74,6 +76,75 @@ void main() {
     test('bağlantı yoksa eksik sayılmaz (düz metin paylaşımı)', () {
       expect(isCaptionMissing('Ya Rezzak 100 defa'), isFalse);
       expect(isCaptionMissing(''), isFalse);
+    });
+  });
+
+  group('güvenli bağlantı denetimi', () {
+    test('yalnızca http ve https, ana makine adıyla', () {
+      expect(isSafeWebUrl('https://www.instagram.com/p/abc/'), isTrue);
+      expect(isSafeWebUrl('  http://example.com/x  '), isTrue);
+      for (final bad in [
+        'file:///sdcard/x',
+        'tel:*2767*3855#',
+        'intent://scan/#Intent;scheme=zxing;end',
+        'javascript:alert(1)',
+        'content://x',
+        'https://',
+        'www.instagram.com/p/abc',
+        '',
+      ]) {
+        expect(isSafeWebUrl(bad), isFalse, reason: bad);
+      }
+    });
+
+    test('openExternalUrl güvenli olmayan şemayı kanala hiç göndermez',
+        () async {
+      final opened = <String>[];
+      const channel = MethodChannel('com.namaztakip.app/share');
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(channel, (call) async {
+        if (call.method == 'openUrl') {
+          opened.add((call.arguments as Map)['url'] as String);
+          return true;
+        }
+        return null;
+      });
+      addTearDown(() => TestDefaultBinaryMessengerBinding
+          .instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(channel, null));
+
+      expect(await ShareService.instance.openExternalUrl('tel:112'), isFalse);
+      expect(
+        await ShareService.instance.openExternalUrl('file:///etc/hosts'),
+        isFalse,
+      );
+      expect(opened, isEmpty);
+
+      expect(
+        await ShareService.instance
+            .openExternalUrl(' https://www.instagram.com/p/abc/ '),
+        isTrue,
+      );
+      expect(opened, ['https://www.instagram.com/p/abc/']);
+    });
+  });
+
+  group('sanitizeTargetCount (yapay zeka yanıtı)', () {
+    test('geçerli sayıyı tam sayı yapar', () {
+      expect(sanitizeTargetCount(33), 33);
+      expect(sanitizeTargetCount(100.0), 100);
+      expect(sanitizeTargetCount(100000), 100000);
+    });
+
+    test('sıfır, negatif, çok büyük ve sayı olmayan değerleri reddeder', () {
+      expect(sanitizeTargetCount(0), isNull);
+      expect(sanitizeTargetCount(-5), isNull);
+      expect(sanitizeTargetCount(100001), isNull);
+      expect(sanitizeTargetCount(1e15), isNull);
+      expect(sanitizeTargetCount(double.nan), isNull);
+      expect(sanitizeTargetCount(double.infinity), isNull);
+      expect(sanitizeTargetCount('100'), isNull);
+      expect(sanitizeTargetCount(null), isNull);
     });
   });
 

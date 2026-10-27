@@ -7,9 +7,11 @@ import '../../core/icons/app_icons.dart';
 import '../../core/strings/strings.dart';
 import '../../core/theme/app_theme.dart';
 import '../../providers/providers.dart';
+import '../widgets/classic_tesbihat_sheet.dart';
 import '../widgets/dhikr_card.dart';
 import '../widgets/dhikr_counter_sheet.dart';
 import '../widgets/dhikr_editor_sheet.dart';
+import '../widgets/esma_catalog_sheet.dart';
 import '../widgets/islamic_pattern.dart';
 
 class DhikrScreen extends ConsumerStatefulWidget {
@@ -135,6 +137,8 @@ class _DhikrScreenState extends ConsumerState<DhikrScreen> {
                   context,
                   startWithScraper: false,
                 ),
+                onClassicTesbihatTap: () => showClassicTesbihatSheet(context),
+                onEsmaCatalogTap: () => showEsmaCatalogSheet(context),
               ),
               const SizedBox(height: 12),
               // Arama çubuğu
@@ -218,11 +222,15 @@ class _SocialScraperBanner extends StatelessWidget {
     required this.palette,
     required this.onScrapeTap,
     required this.onManualAddTap,
+    required this.onClassicTesbihatTap,
+    required this.onEsmaCatalogTap,
   });
 
   final AppPalette palette;
   final VoidCallback onScrapeTap;
   final VoidCallback onManualAddTap;
+  final VoidCallback onClassicTesbihatTap;
+  final VoidCallback onEsmaCatalogTap;
 
   @override
   Widget build(BuildContext context) {
@@ -314,6 +322,62 @@ class _SocialScraperBanner extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.white.withValues(alpha: 0.10),
+                        side: BorderSide(
+                          color: palette.secondary.withValues(alpha: 0.55),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 9),
+                      ),
+                      onPressed: onClassicTesbihatTap,
+                      icon: Icon(
+                        AppIcons.dhikr,
+                        size: 16,
+                        color: palette.secondary,
+                      ),
+                      label: const Text(
+                        DhikrStrings.classicTesbihatButton,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.white.withValues(alpha: 0.10),
+                        side: BorderSide(
+                          color: palette.secondary.withValues(alpha: 0.55),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 9),
+                      ),
+                      onPressed: onEsmaCatalogTap,
+                      icon: Icon(
+                        AppIcons.sparkle,
+                        size: 16,
+                        color: palette.secondary,
+                      ),
+                      label: const Text(
+                        DhikrStrings.esmaCatalogButton,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
                   ),

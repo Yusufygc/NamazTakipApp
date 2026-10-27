@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -7,6 +10,13 @@ import '../domain/prayer_time_service.dart';
 
 class LocationService {
   const LocationService();
+
+  static const EventChannel _compassChannel =
+      EventChannel('com.namaztakip.app/compass');
+
+  /// Cihaz pusula sensöründen gelen kuzey açısı (`0.0` – `360.0`).
+  Stream<double> get compassHeading =>
+      _compassChannel.receiveBroadcastStream().map((e) => (e as num).toDouble());
 
   /// Konum iznini kontrol eder; gerekirse ister.
   Future<void> ensurePermission() async {

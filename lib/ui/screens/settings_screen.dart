@@ -7,6 +7,7 @@ import '../../core/icons/app_icons.dart';
 import '../../core/strings/strings.dart';
 import '../../core/theme/app_theme.dart';
 import '../../providers/providers.dart';
+import '../widgets/home_widget_preview_card.dart';
 import 'city_picker_screen.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -210,6 +211,8 @@ class SettingsScreen extends ConsumerWidget {
             ],
           ),
         ),
+        section(SettingsStrings.sectionHomeWidget),
+        const HomeWidgetPreviewCard(),
         section(SettingsStrings.sectionDhikrAi),
         Card(
           color: p.card,

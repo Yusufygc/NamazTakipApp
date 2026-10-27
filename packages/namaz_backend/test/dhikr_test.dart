@@ -42,14 +42,128 @@ void main() {
 
     test('Sözlükte olmayan Ya <Esma> kalıbını ve Arapça metni yakalar', () {
       const sharedText =
-          'İkindi namazından sonra x100 Ya Kerim يَا كَرِيمُ zikri.';
+          'İkindi namazından sonra x100 Ya Musavvir يَا مُصَوِّرُ zikri.';
 
       final draft = extractDhikrDraft(sharedText);
 
-      expect(draft.title, 'Ya Kerim');
-      expect(draft.arabic, 'يَا كَرِيمُ');
+      expect(draft.title, 'Ya Musavvir');
+      expect(draft.arabic, 'يَا مُصَوِّرُ');
       expect(draft.targetCount, 100);
       expect(draft.prayerTime, PrayerType.asr);
+    });
+  });
+
+  group('Hicri Takvim, Kerahat, Kıble Pusulası ve Kaza Planlayıcı', () {
+    test('HijriDate.fromGregorian ve detectSpecialDay doğru çalışır', () {
+      final friday = DateTime(2026, 10, 23); // Cuma
+      final hijri = HijriDate.fromGregorian(friday);
+      expect(hijri.year, greaterThanOrEqualTo(1448));
+      expect(hijri.month, inInclusiveRange(1, 12));
+      expect(hijri.day, inInclusiveRange(1, 30));
+      expect(detectSpecialDay(friday, hijri), SpecialDayId.friday);
+    });
+
+    test('detectKerahat güneş doğuşu, istiva ve akşam öncesi kerahati bulur', () {
+      final day = DateTime(2026, 10, 26);
+      final times = DayTimes(
+        date: day,
+        fajr: DateTime(2026, 10, 26, 5, 45),
+        sunrise: DateTime(2026, 10, 26, 7, 15),
+        dhuhr: DateTime(2026, 10, 26, 12, 55),
+        asr: DateTime(2026, 10, 26, 15, 50),
+        maghrib: DateTime(2026, 10, 26, 18, 15),
+        isha: DateTime(2026, 10, 26, 19, 35),
+      );
+
+      final israk = detectKerahat(times, DateTime(2026, 10, 26, 7, 30));
+      expect(israk?.type, KerahatType.sunrise);
+
+      final istiva = detectKerahat(times, DateTime(2026, 10, 26, 12, 30));
+      expect(istiva?.type, KerahatType.istiva);
+
+      final isfirar = detectKerahat(times, DateTime(2026, 10, 26, 17, 45));
+      expect(isfirar?.type, KerahatType.sunset);
+
+      final normal = detectKerahat(times, DateTime(2026, 10, 26, 14, 0));
+      expect(normal, isNull);
+    });
+
+    test('computeQibla İstanbul için Kâbe açısını ve mesafesini hesaplar', () {
+      const istanbul = AppLocation(
+        latitude: 41.0082,
+        longitude: 28.9784,
+        city: 'İstanbul',
+      );
+      final qibla = computeQibla(istanbul);
+      expect(qibla.bearingDegrees, closeTo(151.6, 1.5));
+      expect(qibla.distanceKm, closeTo(2400, 50));
+    });
+
+    test('QazaDebtPlan toplam borcu ve tahmini bitiş tarihini hesaplar', () {
+      const plan = QazaDebtPlan(
+        backlogByPrayer: {
+          PrayerType.fajr: 10,
+          PrayerType.dhuhr: 10,
+        },
+        dailyTarget: 5,
+      );
+      expect(plan.totalBacklog, 20);
+      expect(plan.grandTotal(5), 25);
+      expect(plan.estimatedDaysToFinish(5), 5);
+      expect(
+        plan.estimatedCompletionDate(5, DateTime(2026, 10, 26)),
+        DateTime(2026, 10, 31),
+      );
+    });
+
+    test('buildHomeWidgetSnapshot telefon ana ekran widget verisini doğru üretir', () {
+      const istanbul = AppLocation(
+        latitude: 41.0082,
+        longitude: 28.9784,
+        city: 'İstanbul',
+      );
+      final day = DateTime(2026, 10, 26);
+      final times = DayTimes(
+        date: day,
+        fajr: DateTime(2026, 10, 26, 5, 45),
+        sunrise: DateTime(2026, 10, 26, 7, 15),
+        dhuhr: DateTime(2026, 10, 26, 12, 55),
+        asr: DateTime(2026, 10, 26, 15, 50),
+        maghrib: DateTime(2026, 10, 26, 18, 15),
+        isha: DateTime(2026, 10, 26, 19, 35),
+      );
+      final records = <PrayerType, PrayerRecord>{
+        PrayerType.fajr: PrayerRecord(
+          date: day,
+          prayer: PrayerType.fajr,
+          status: PrayerStatus.performed,
+          isCongregation: false,
+        ),
+        PrayerType.dhuhr: PrayerRecord(
+          date: day,
+          prayer: PrayerType.dhuhr,
+          status: PrayerStatus.performed,
+          isCongregation: true,
+        ),
+      };
+
+      final snapshot = buildHomeWidgetSnapshot(
+        now: DateTime(2026, 10, 26, 14, 0),
+        location: istanbul,
+        todayTimes: times,
+        upcomingDays: [times],
+        todayRecords: records,
+      );
+
+      expect(snapshot, isNotNull);
+      expect(snapshot!.city, 'İstanbul');
+      expect(snapshot.nextPrayer, PrayerType.asr);
+      expect(snapshot.nextPrayerTime, '15:50');
+      expect(snapshot.completedCount, 2);
+      expect(snapshot.isPerformed(PrayerType.fajr), isTrue);
+      expect(snapshot.isPerformed(PrayerType.dhuhr), isTrue);
+      expect(snapshot.isPerformed(PrayerType.asr), isFalse);
+      expect(snapshot.toMap()['nextPrayerLabel'], 'İkindi');
     });
   });
 

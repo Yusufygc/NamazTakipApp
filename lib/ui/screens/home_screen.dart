@@ -10,9 +10,9 @@ import '../../core/icons/app_icons.dart';
 import '../../core/strings/strings.dart';
 import '../../core/theme/app_theme.dart';
 import '../../providers/providers.dart';
+import '../widgets/classic_tesbihat_sheet.dart';
 import '../widgets/corrupted_database_card.dart';
 import '../widgets/countdown_card.dart';
-import '../widgets/dhikr_counter_sheet.dart';
 import '../widgets/islamic_pattern.dart';
 import '../widgets/notification_health_card.dart';
 import '../widgets/prayer_card.dart';
@@ -117,7 +117,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         action: SnackBarAction(
           label: DhikrStrings.postPrayerAction,
           onPressed: () {
-            if (mounted) showDhikrCounterSheet(context, match);
+            if (mounted) showClassicTesbihatSheet(context);
           },
         ),
       ),

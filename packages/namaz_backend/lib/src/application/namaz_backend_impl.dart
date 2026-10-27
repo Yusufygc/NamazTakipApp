@@ -11,12 +11,14 @@ import '../data/turkish_cities.dart';
 import '../domain/achievements.dart';
 import '../domain/dates.dart';
 import '../domain/dhikr.dart';
+import '../domain/home_widget_snapshot.dart';
 import '../domain/models.dart';
 import '../domain/notification_plan.dart';
 import '../domain/prayer.dart';
 import '../domain/prayer_time_service.dart';
 import '../domain/streaks.dart';
 import '../namaz_backend.dart';
+import '../platform/home_widget_service.dart';
 import '../platform/location_service.dart';
 import '../platform/notification_service.dart';
 import '../platform/share_service.dart';
@@ -47,6 +49,7 @@ class NamazBackendImpl implements NamazBackend {
   final LocationService _location = const LocationService();
   final NotificationService _notifications = NotificationService.instance;
   final ShareService _shareService = ShareService.instance;
+  final HomeWidgetService _homeWidget = const HomeWidgetService();
 
   static Future<NamazBackendImpl> create(NamazBackendConfig config) async {
     final prefs = await SharedPreferences.getInstance();
@@ -70,12 +73,14 @@ class NamazBackendImpl implements NamazBackend {
       debugPrint('[Background] kaydedilemedi: $e');
     }
 
-    return NamazBackendImpl._(
+    final instance = NamazBackendImpl._(
       settings: settings,
       prayers: PrayerRepository(database),
       dhikrs: dhikrs,
       texts: config.notificationTexts,
     );
+    unawaited(instance.syncHomeWidget());
+    return instance;
   }
 
   DateTime get _today => trackingDay();
@@ -172,6 +177,9 @@ class NamazBackendImpl implements NamazBackend {
     return prayerDay(current, fajrToday: timesFor(dateOnly(current))?.fajr);
   }
 
+  @override
+  Stream<double> get compassHeading => _location.compassHeading;
+
   // ---- Takip ---------------------------------------------------------------------
 
   @override
@@ -191,7 +199,7 @@ class NamazBackendImpl implements NamazBackend {
     _rescheduleQuietly();
   }
 
-  // ---- Kaza ----------------------------------------------------------------------
+  // ---- Kaza & Geçmiş Kaza Borcu Planlayıcı ------------------------------------
 
   @override
   Future<List<QazaItem>> qazaItems() =>
@@ -200,6 +208,28 @@ class NamazBackendImpl implements NamazBackend {
   @override
   Future<void> compensate(QazaItem item) =>
       _prayers.markCompensated(item.date, item.prayer);
+
+  @override
+  QazaDebtPlan get qazaDebtPlan => QazaDebtPlan(
+        backlogByPrayer: _settings.qazaBacklog,
+        dailyTarget: _settings.qazaDailyTarget,
+      );
+
+  @override
+  Future<void> setQazaBacklog(Map<PrayerType, int> counts) =>
+      _settings.setQazaBacklog(counts);
+
+  @override
+  Future<void> decrementQazaBacklog(PrayerType prayer, {int step = 1}) async {
+    final current = Map<PrayerType, int>.from(_settings.qazaBacklog);
+    final nextVal = ((current[prayer] ?? 0) - step).clamp(0, 1000000);
+    current[prayer] = nextVal;
+    await _settings.setQazaBacklog(current);
+  }
+
+  @override
+  Future<void> setQazaDailyTarget(int dailyTarget) =>
+      _settings.setQazaDailyTarget(dailyTarget);
 
   // ---- İstatistik ----------------------------------------------------------------
 
@@ -233,7 +263,6 @@ class NamazBackendImpl implements NamazBackend {
     final today = _today;
     final performed =
         await _prayers.performedByPrayer(addDays(today, -(days - 1)), today);
-    // Yüzde: kılınan / gün sayısı. Takip başlangıcından önceki günler paydaya girmez.
     final span = daysDiff(today, trackingStart) + 1;
     final denom = span < days ? span : days;
     return {
@@ -329,8 +358,46 @@ class NamazBackendImpl implements NamazBackend {
   Future<void> dismissCorruptedDatabaseNotice() =>
       _settings.setCorruptedDbBackup(null);
 
+  // ---- Telefon Ana Ekran Widget'ı ------------------------------------------------
+
+  @override
+  Future<bool> syncHomeWidget() async {
+    final loc = _settings.effectiveLocation;
+    if (loc == null) return false;
+    final now = DateTime.now();
+    final today = trackingDay(now);
+    final todayTimes = timesFor(today);
+    final calToday = dateOnly(now);
+    final upcoming = [
+      for (final d in [addDays(calToday, -1), calToday, addDays(calToday, 1)])
+        ?timesFor(d),
+    ];
+    final records = await recordsForDate(today);
+    // Widget uygulama açılmadan da doğru kalsın: dünden başlayarak 7 günlük program.
+    final schedule = [
+      for (var i = -1; i <= 5; i++) ?timesFor(addDays(calToday, i)),
+    ];
+    final snapshot = buildHomeWidgetSnapshot(
+      now: now,
+      location: loc,
+      todayTimes: todayTimes,
+      upcomingDays: upcoming,
+      todayRecords: records,
+      scheduleDays: schedule,
+    );
+    if (snapshot == null) return false;
+    return _homeWidget.updateWidget(snapshot);
+  }
+
+  @override
+  Future<bool> requestPinHomeWidget() async {
+    await syncHomeWidget();
+    return _homeWidget.requestPinWidget();
+  }
+
   /// Planlama hatası kullanıcıya yansımasın ve işaretlemeyi bozmasın.
   void _rescheduleQuietly() {
+    unawaited(syncHomeWidget());
     unawaited(_scheduler.reschedule().catchError((Object e) {
       debugPrint('[Notifications] yeniden planlama başarısız: $e');
     }));

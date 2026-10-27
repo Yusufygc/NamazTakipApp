@@ -7,6 +7,7 @@ import '../../core/strings/strings.dart';
 import '../../core/theme/app_theme.dart';
 import '../../providers/providers.dart';
 import '../widgets/islamic_pattern.dart';
+import '../widgets/qaza_debt_sheet.dart';
 
 class QazaScreen extends ConsumerWidget {
   const QazaScreen({super.key});
@@ -15,12 +16,15 @@ class QazaScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final p = context.palette;
     final async = ref.watch(qazaProvider);
+    final debtPlan = ref.watch(qazaDebtProvider);
+    final today = ref.watch(trackingDayProvider);
 
     return async.when(
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => Center(child: Text(CommonStrings.error(e))),
       data: (items) {
-        if (items.isEmpty) {
+        final grandTotal = debtPlan.grandTotal(items.length);
+        if (grandTotal == 0) {
           return Center(
             child: Padding(
               padding: const EdgeInsets.all(32),
@@ -47,6 +51,12 @@ class QazaScreen extends ConsumerWidget {
                     QazaStrings.emptySubtitle,
                     style: TextStyle(fontSize: 15, color: p.textLight),
                   ),
+                  const SizedBox(height: 20),
+                  OutlinedButton.icon(
+                    onPressed: () => showQazaDebtSheet(context),
+                    icon: const Icon(AppIcons.navQazaSelected, size: 18),
+                    label: const Text(QazaStrings.debtPlannerButton),
+                  ),
                 ],
               ),
             ),
@@ -58,6 +68,10 @@ class QazaScreen extends ConsumerWidget {
           byDay.putIfAbsent(i.date, () => []).add(i);
         }
         final days = byDay.keys.toList()..sort((a, b) => b.compareTo(a));
+
+        final estDays = debtPlan.estimatedDaysToFinish(items.length);
+        final finishDate =
+            debtPlan.estimatedCompletionDate(items.length, today);
 
         final startColor = p.isDark ? const Color(0xFF16382B) : p.dark;
         final endColor = p.isDark ? const Color(0xFF0F261D) : p.primary;
@@ -83,7 +97,7 @@ class QazaScreen extends ConsumerWidget {
                 lineColor: Colors.white.withValues(alpha: 0.08),
                 accentColor: p.secondary.withValues(alpha: 0.16),
                 child: Padding(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(18),
                   child: Column(
                     children: [
                       Text(
@@ -95,32 +109,66 @@ class QazaScreen extends ConsumerWidget {
                           letterSpacing: 0.6,
                         ),
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 12),
                       Row(
                         children: [
                           Expanded(
                             child: _MetricPill(
-                              value: '${items.length}',
+                              value: '$grandTotal',
                               label: QazaStrings.totalPrayersLabel,
                               accent: p.secondary,
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: 10),
                           Expanded(
                             child: _MetricPill(
-                              value: '${days.length}',
-                              label: QazaStrings.totalDaysLabel,
+                              value: '${debtPlan.dailyTarget}',
+                              label: QazaStrings.dailyTargetLabel,
                               accent: p.secondary,
                             ),
                           ),
                         ],
                       ),
+                      if (finishDate != null && estDays != null) ...[
+                        const SizedBox(height: 10),
+                        Text(
+                          QazaStrings.estimatedFinish(
+                            DateStrings.long(finishDate),
+                            estDays,
+                          ),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.88),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
                       const SizedBox(height: 12),
-                      Text(
-                        QazaStrings.summary(items.length, days.length),
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.80),
-                          fontSize: 12,
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton.icon(
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            backgroundColor:
+                                Colors.white.withValues(alpha: 0.10),
+                            side: BorderSide(
+                              color: p.secondary.withValues(alpha: 0.55),
+                            ),
+                          ),
+                          onPressed: () => showQazaDebtSheet(context),
+                          icon: Icon(
+                            AppIcons.edit,
+                            size: 16,
+                            color: p.secondary,
+                          ),
+                          label: const Text(
+                            QazaStrings.debtPlannerButton,
+                            style: TextStyle(
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                         ),
                       ),
                     ],
@@ -128,16 +176,103 @@ class QazaScreen extends ConsumerWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 14),
-            for (var i = 0; i < days.length; i++)
-              _DayCard(
-                date: days[i],
-                items: byDay[days[i]]!,
-                initiallyExpanded: i == 0,
+            if (debtPlan.totalBacklog > 0) ...[
+              const SizedBox(height: 16),
+              Padding(
+                padding: const EdgeInsets.only(left: 4, bottom: 6),
+                child: Text(
+                  QazaStrings.backlogSectionTitle,
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.8,
+                    color: p.textLight,
+                  ),
+                ),
               ),
+              _BacklogCard(plan: debtPlan),
+            ],
+            if (days.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              Padding(
+                padding: const EdgeInsets.only(left: 4, bottom: 6),
+                child: Text(
+                  QazaStrings.trackedSectionTitle,
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.8,
+                    color: p.textLight,
+                  ),
+                ),
+              ),
+              for (var i = 0; i < days.length; i++)
+                _DayCard(
+                  date: days[i],
+                  items: byDay[days[i]]!,
+                  initiallyExpanded: i == 0,
+                ),
+            ],
           ],
         );
       },
+    );
+  }
+}
+
+class _BacklogCard extends ConsumerWidget {
+  const _BacklogCard({required this.plan});
+
+  final QazaDebtPlan plan;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final p = context.palette;
+    return Card(
+      color: p.card,
+      margin: EdgeInsets.zero,
+      child: Column(
+        children: [
+          for (final prayer in PrayerType.values)
+            if (plan.countFor(prayer) > 0)
+              ListTile(
+                leading: Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: p.primary.withValues(alpha: 0.10),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    AppIcons.prayerIcon(prayer),
+                    size: 18,
+                    color: p.primary,
+                  ),
+                ),
+                title: Text(
+                  prayer.label,
+                  style: const TextStyle(fontWeight: FontWeight.w700),
+                ),
+                subtitle: Text(
+                  QazaStrings.remainingPrayerCount(plan.countFor(prayer)),
+                  style: TextStyle(fontSize: 12.5, color: p.textLight),
+                ),
+                trailing: FilledButton.icon(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: p.primary,
+                    visualDensity: VisualDensity.compact,
+                  ),
+                  onPressed: () =>
+                      ref.read(qazaDebtProvider.notifier).decrementPrayer(prayer),
+                  icon: const Icon(AppIcons.confirmPerformed, size: 15),
+                  label: const Text(
+                    QazaStrings.decrementBacklogButton,
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                  ),
+                ),
+              ),
+        ],
+      ),
     );
   }
 }
@@ -168,7 +303,7 @@ class _MetricPill extends StatelessWidget {
             value,
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 28,
+              fontSize: 26,
               fontWeight: FontWeight.w800,
               fontFeatures: [FontFeature.tabularFigures()],
             ),

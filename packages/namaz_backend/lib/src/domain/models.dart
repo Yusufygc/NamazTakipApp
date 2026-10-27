@@ -1,4 +1,5 @@
 import 'achievements.dart';
+import 'dates.dart';
 import 'prayer.dart';
 import 'prayer_time_service.dart';
 import 'streaks.dart';
@@ -32,6 +33,36 @@ class QazaItem {
   final PrayerStatus status;
 
   bool get isAutoDetected => status == PrayerStatus.pending;
+}
+
+/// Geçmiş yıllardan kalan toplu kaza borcu ve günlük kaza eritme hedefi.
+class QazaDebtPlan {
+  const QazaDebtPlan({
+    required this.backlogByPrayer,
+    required this.dailyTarget,
+  });
+
+  final Map<PrayerType, int> backlogByPrayer;
+  final int dailyTarget;
+
+  int countFor(PrayerType prayer) => backlogByPrayer[prayer] ?? 0;
+
+  int get totalBacklog =>
+      backlogByPrayer.values.fold<int>(0, (sum, c) => sum + c);
+
+  int grandTotal(int autoTrackedCount) => totalBacklog + autoTrackedCount;
+
+  int? estimatedDaysToFinish(int autoTrackedCount) {
+    final total = grandTotal(autoTrackedCount);
+    if (total <= 0 || dailyTarget <= 0) return null;
+    return (total / dailyTarget).ceil();
+  }
+
+  DateTime? estimatedCompletionDate(int autoTrackedCount, DateTime today) {
+    final days = estimatedDaysToFinish(autoTrackedCount);
+    if (days == null) return null;
+    return addDays(today, days);
+  }
 }
 
 /// Bir günün, kılınan vakit sayısıyla özeti.

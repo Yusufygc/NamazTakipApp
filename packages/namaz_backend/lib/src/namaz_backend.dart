@@ -69,6 +69,9 @@ abstract interface class NamazBackend {
   /// Takip günü (varsayılan: şimdi). Gün sınırı `min(04:00, Sabah vakti)`'dir.
   DateTime trackingDay([DateTime? now]);
 
+  /// Cihaz pusula sensöründen gelen kuzey açısı (`0.0` – `360.0`).
+  Stream<double> get compassHeading;
+
   // ---- Takip ---------------------------------------------------------------------
 
   Future<Map<PrayerType, PrayerRecord>> recordsForDate(DateTime date);
@@ -80,10 +83,15 @@ abstract interface class NamazBackend {
   /// Kaydeder ve bildirimleri yeniden planlar.
   Future<void> markMissed(DateTime date, PrayerType prayer);
 
-  // ---- Kaza ----------------------------------------------------------------------
+  // ---- Kaza & Geçmiş Kaza Borcu Planlayıcı ------------------------------------
 
   Future<List<QazaItem>> qazaItems();
   Future<void> compensate(QazaItem item);
+
+  QazaDebtPlan get qazaDebtPlan;
+  Future<void> setQazaBacklog(Map<PrayerType, int> counts);
+  Future<void> decrementQazaBacklog(PrayerType prayer, {int step = 1});
+  Future<void> setQazaDailyTarget(int dailyTarget);
 
   // ---- İstatistik ----------------------------------------------------------------
 
@@ -144,4 +152,12 @@ abstract interface class NamazBackend {
 
   /// Bozuk veritabanı sıfırlama uyarısını onaylayıp kapatır.
   Future<void> dismissCorruptedDatabaseNotice();
+
+  // ---- Telefon Ana Ekran Widget'ı ---------------------------------------------
+
+  /// Güncel vakitleri ve kılınma durumunu telefon ana ekran widget'ına yazar.
+  Future<bool> syncHomeWidget();
+
+  /// Destekleyen başlatıcılarda (Android 8+) ana ekrana widget ekleme penceresini açar.
+  Future<bool> requestPinHomeWidget();
 }

@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../domain/dates.dart';
 import '../domain/models.dart';
+import '../domain/prayer.dart';
 import '../domain/prayer_time_service.dart';
 
 /// Kullanıcı ayarları ve küçük kalıcı durumlar (SharedPreferences).
@@ -22,6 +23,8 @@ class SettingsRepository {
   static const _kInstallDate = 'install_date';
   static const _kCorruptedDbBackup = 'corrupted_db_backup';
   static const _kGeminiApiKey = 'gemini_api_key';
+  static const _kQazaBacklog = 'qaza_backlog';
+  static const _kQazaDailyTarget = 'qaza_daily_target';
 
   String get themeKey => _prefs.getString(_kTheme) ?? 'default';
   Future<void> setThemeKey(String v) => _prefs.setString(_kTheme, v);
@@ -102,4 +105,34 @@ class SettingsRepository {
     }
     return _prefs.setString(_kGeminiApiKey, trimmed);
   }
+
+  /// Geçmiş yıllardan kalan vakit bazlı toplu kaza borcu.
+  Map<PrayerType, int> get qazaBacklog {
+    final raw = _prefs.getString(_kQazaBacklog);
+    if (raw == null || raw.isEmpty) {
+      return {for (final p in PrayerType.values) p: 0};
+    }
+    try {
+      final decoded = jsonDecode(raw) as Map<String, dynamic>;
+      return {
+        for (final p in PrayerType.values)
+          p: ((decoded[p.name] as num?)?.toInt() ?? 0).clamp(0, 1000000),
+      };
+    } catch (_) {
+      return {for (final p in PrayerType.values) p: 0};
+    }
+  }
+
+  Future<void> setQazaBacklog(Map<PrayerType, int> counts) {
+    final map = {
+      for (final p in PrayerType.values)
+        p.name: (counts[p] ?? 0).clamp(0, 1000000),
+    };
+    return _prefs.setString(_kQazaBacklog, jsonEncode(map));
+  }
+
+  int get qazaDailyTarget => (_prefs.getInt(_kQazaDailyTarget) ?? 2).clamp(1, 50);
+
+  Future<void> setQazaDailyTarget(int target) =>
+      _prefs.setInt(_kQazaDailyTarget, target.clamp(1, 50));
 }

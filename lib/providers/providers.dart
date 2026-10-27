@@ -55,6 +55,10 @@ class SettingsNotifier extends Notifier<AppSettings> {
     await _backend.setGeminiApiKey(apiKey);
     reload();
   }
+
+  Future<bool> syncHomeWidget() => _backend.syncHomeWidget();
+
+  Future<bool> requestPinHomeWidget() => _backend.requestPinHomeWidget();
 }
 
 final settingsProvider =
@@ -100,6 +104,18 @@ final locationRefreshProvider = FutureProvider<AppLocation?>((ref) async {
   ref.read(settingsProvider.notifier).reload();
   return location;
 });
+
+/// Mevcut konuma göre Kâbe açısı ve uzaklığı.
+final qiblaProvider = Provider<QiblaInfo?>((ref) {
+  final loc = ref.watch(settingsProvider.select((s) => s.location));
+  if (loc == null) return null;
+  return computeQibla(loc);
+});
+
+/// Cihaz pusula açısı akışı (derece 0..360, kuzey = 0).
+final compassHeadingProvider = StreamProvider.autoDispose<double>(
+  (ref) => ref.read(backendProvider).compassHeading,
+);
 
 // ---- Vakitler ------------------------------------------------------------------
 
@@ -199,6 +215,45 @@ class QazaNotifier extends AsyncNotifier<List<QazaItem>> {
 
 final qazaProvider = AsyncNotifierProvider.autoDispose<QazaNotifier, List<QazaItem>>(
     QazaNotifier.new);
+
+class QazaDebtNotifier extends Notifier<QazaDebtPlan> {
+  NamazBackend get _backend => ref.read(backendProvider);
+
+  @override
+  QazaDebtPlan build() => _backend.qazaDebtPlan;
+
+  Future<void> setBacklog(Map<PrayerType, int> counts) async {
+    await _backend.setQazaBacklog(counts);
+    state = _backend.qazaDebtPlan;
+  }
+
+  Future<void> addDuration({
+    required int years,
+    required int months,
+    required int days,
+  }) async {
+    final totalDays = (years * 365) + (months * 30) + days;
+    if (totalDays <= 0) return;
+    final current = state.backlogByPrayer;
+    final updated = <PrayerType, int>{
+      for (final p in PrayerType.values) p: (current[p] ?? 0) + totalDays,
+    };
+    await setBacklog(updated);
+  }
+
+  Future<void> decrementPrayer(PrayerType prayer) async {
+    await _backend.decrementQazaBacklog(prayer);
+    state = _backend.qazaDebtPlan;
+  }
+
+  Future<void> setDailyTarget(int target) async {
+    await _backend.setQazaDailyTarget(target);
+    state = _backend.qazaDebtPlan;
+  }
+}
+
+final qazaDebtProvider =
+    NotifierProvider<QazaDebtNotifier, QazaDebtPlan>(QazaDebtNotifier.new);
 
 // ---- Zikir & Sosyal Medya Yakalayıcı -------------------------------------------
 

@@ -1,14 +1,22 @@
 package com.namaztakip.namaz_takip
 
+import android.content.Context
 import android.content.Intent
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.net.Uri
 import android.os.Bundle
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
+import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : FlutterActivity() {
     private val shareChannelName = "com.namaztakip.app/share"
+    private val compassChannelName = "com.namaztakip.app/compass"
+    private val homeWidgetChannelName = "com.namaztakip.app/home_widget"
     private var shareChannel: MethodChannel? = null
     private var pendingSharedText: String? = null
 
@@ -32,11 +40,16 @@ class MainActivity : FlutterActivity() {
                 }
                 "openUrl" -> {
                     val url = call.argument<String>("url")
-                    if (url.isNullOrBlank()) {
+                    val parsed = url?.let { Uri.parse(it.trim()) }
+                    val scheme = parsed?.scheme?.lowercase()
+                    // Yalnızca http ve https; file:, tel:, intent: gibi şemalar açılmaz.
+                    if (parsed == null || (scheme != "http" && scheme != "https") ||
+                        parsed.host.isNullOrEmpty()
+                    ) {
                         result.success(false)
                     } else {
                         try {
-                            val viewIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+                            val viewIntent = Intent(Intent.ACTION_VIEW, parsed).apply {
                                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                             }
                             startActivity(viewIntent)
@@ -49,6 +62,61 @@ class MainActivity : FlutterActivity() {
                 else -> result.notImplemented()
             }
         }
+
+        // Kıble pusulası için cihaz yönelim (azimuth) sensör akışı
+        EventChannel(flutterEngine.dartExecutor.binaryMessenger, compassChannelName)
+            .setStreamHandler(object : EventChannel.StreamHandler {
+                private var sensorManager: SensorManager? = null
+                private var listener: SensorEventListener? = null
+
+                override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
+                    val sm = getSystemService(Context.SENSOR_SERVICE) as? SensorManager ?: return
+                    sensorManager = sm
+                    val rotationSensor = sm.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR) ?: return
+                    val rotationMatrix = FloatArray(9)
+                    val orientation = FloatArray(3)
+                    val sensorListener = object : SensorEventListener {
+                        override fun onSensorChanged(event: SensorEvent?) {
+                            if (event?.sensor?.type == Sensor.TYPE_ROTATION_VECTOR) {
+                                SensorManager.getRotationMatrixFromVector(rotationMatrix, event.values)
+                                SensorManager.getOrientation(rotationMatrix, orientation)
+                                val azimuthDeg = (Math.toDegrees(orientation[0].toDouble()) + 360.0) % 360.0
+                                events?.success(azimuthDeg)
+                            }
+                        }
+
+                        override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
+                    }
+                    listener = sensorListener
+                    sm.registerListener(sensorListener, rotationSensor, SensorManager.SENSOR_DELAY_UI)
+                }
+
+                override fun onCancel(arguments: Any?) {
+                    listener?.let { sensorManager?.unregisterListener(it) }
+                    listener = null
+                }
+            })
+
+        // Telefon ana ekran widget'ı güncelleme ve sabitleme kanalı
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, homeWidgetChannelName)
+            .setMethodCallHandler { call, result ->
+                when (call.method) {
+                    "updateWidget" -> {
+                        val args = call.arguments as? Map<*, *>
+                        if (args != null) {
+                            NamazHomeWidgetProvider.saveSnapshotAndRefresh(applicationContext, args)
+                            result.success(true)
+                        } else {
+                            result.success(false)
+                        }
+                    }
+                    "requestPinWidget" -> {
+                        val ok = NamazHomeWidgetProvider.requestPin(applicationContext)
+                        result.success(ok)
+                    }
+                    else -> result.notImplemented()
+                }
+            }
     }
 
     override fun onNewIntent(intent: Intent) {

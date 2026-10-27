@@ -21,6 +21,19 @@ abstract final class SettingsStrings {
   // Tema
   static const sectionTheme = 'Tema';
 
+  // Telefon Ana Ekran Widget'ı
+  static const sectionHomeWidget = 'Telefon Ana Ekran Widget\'ı';
+  static const homeWidgetSubtitle =
+      'Sıradaki namaz vaktini ve günün 6 vaktini telefonunuzun ana ekranında gösterir.';
+  static const homeWidgetPinButton = 'Ana Ekrana Widget Ekle';
+  static const homeWidgetRefreshButton = 'Güncelle';
+  static const homeWidgetPinSuccess =
+      'Widget verisi güncellendi. Ana ekrana ekleme penceresi açıldı.';
+  static const homeWidgetManualHint =
+      'Widget verisi güncellendi! Ana ekranınıza basılı tutup Widget\'lar menüsünden "Namaz Takip" widget\'ını ekleyebilirsiniz.';
+  static String homeWidgetHeader(String city) => 'Namaz Takip • $city';
+  static String homeWidgetDoneBadge(int done) => '$done / 5 Eda';
+
   // Zikir & Yapay Zeka Kazıma
   static const sectionDhikrAi = 'Sosyal Medya Zikir Kazıma (Gemini AI)';
   static const geminiKeyTitle = 'Gemini API Anahtarı (İsteğe Bağlı)';

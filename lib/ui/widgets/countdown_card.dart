@@ -79,6 +79,7 @@ class _CountdownCardState extends ConsumerState<CountdownCard> {
     final p = context.palette;
     final days = ref.watch(upcomingDaysProvider);
     final today = ref.watch(trackingDayProvider);
+    final todayTimes = ref.watch(todayTimesProvider);
     final records = ref.watch(todayRecordsProvider).value ?? const {};
     final doneCount = records.values
         .where(
@@ -89,6 +90,11 @@ class _CountdownCardState extends ConsumerState<CountdownCard> {
         .length;
     final next = days.isEmpty ? null : nextPrayer(_now, days);
     _notifyNext(next?.type);
+
+    final hijri = HijriDate.fromGregorian(today);
+    final specialDay = detectSpecialDay(today, hijri);
+    final kerahat =
+        todayTimes == null ? null : detectKerahat(todayTimes, _now);
 
     final startColor = p.isDark ? const Color(0xFF16382B) : p.dark;
     final endColor = p.isDark ? const Color(0xFF0F261D) : p.primary;
@@ -140,7 +146,7 @@ class _CountdownCardState extends ConsumerState<CountdownCard> {
           lineColor: Colors.white.withValues(alpha: 0.08),
           accentColor: p.secondary.withValues(alpha: 0.16),
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(18, 14, 18, 14),
+            padding: const EdgeInsets.fromLTRB(18, 12, 18, 12),
             child: Column(
               children: [
                 // Üst satır: Sıradaki vakit rozeti ve hedef saat kapsülü
@@ -200,7 +206,7 @@ class _CountdownCardState extends ConsumerState<CountdownCard> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 8),
                 // Merkez: Vakit adı ve büyük sayaç
                 Text(
                   HomeStrings.nextPrayer(next.type.label),
@@ -215,14 +221,14 @@ class _CountdownCardState extends ConsumerState<CountdownCard> {
                   remaining,
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 38,
-                    height: 1.08,
+                    fontSize: 36,
+                    height: 1.06,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 1.5,
                     fontFeatures: [FontFeature.tabularFigures()],
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 8),
                 // İlerleme çubuğu
                 ClipRRect(
                   borderRadius: BorderRadius.circular(6),
@@ -233,34 +239,40 @@ class _CountdownCardState extends ConsumerState<CountdownCard> {
                     backgroundColor: Colors.white.withValues(alpha: 0.16),
                   ),
                 ),
-                const SizedBox(height: 10),
-                // Alt bilgi satırı: Tarih ve tamamlanan vakit sayısı
+                const SizedBox(height: 8),
+                // Alt bilgi satırı: Miladi + Hicri Tarih ve tamamlanan vakit sayısı
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          AppIcons.calendar,
-                          size: 14,
-                          color: Colors.white.withValues(alpha: 0.80),
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          DateStrings.long(today),
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.85),
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
+                    Flexible(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            AppIcons.calendar,
+                            size: 13,
+                            color: Colors.white.withValues(alpha: 0.80),
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 5),
+                          Flexible(
+                            child: Text(
+                              DateStrings.hijriLong(hijri),
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.90),
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
+                    const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
+                        horizontal: 9,
+                        vertical: 3.5,
                       ),
                       decoration: BoxDecoration(
                         color: p.secondary.withValues(alpha: 0.22),
@@ -270,13 +282,60 @@ class _CountdownCardState extends ConsumerState<CountdownCard> {
                         HomeStrings.completedSummary(doneCount, 5),
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 12,
+                          fontSize: 11.5,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
                     ),
                   ],
                 ),
+                if (kerahat != null || specialDay != null) ...[
+                  const SizedBox(height: 6),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: kerahat != null
+                          ? p.danger.withValues(alpha: 0.28)
+                          : p.secondary.withValues(alpha: 0.20),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: (kerahat != null ? p.danger : p.secondary)
+                            .withValues(alpha: 0.55),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          kerahat != null ? AppIcons.warning : AppIcons.sparkle,
+                          size: 13,
+                          color: p.secondary,
+                        ),
+                        const SizedBox(width: 6),
+                        Flexible(
+                          child: Text(
+                            kerahat != null
+                                ? HomeStrings.kerahatBadge(
+                                    kerahat.type,
+                                    kerahat.remainingMinutes(_now),
+                                  )
+                                : DateStrings.specialDayLabel(specialDay!),
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ],
             ),
           ),

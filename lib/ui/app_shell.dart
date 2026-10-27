@@ -18,6 +18,7 @@ import 'screens/stats_screen.dart';
 import 'widgets/dhikr_counter_sheet.dart';
 import 'widgets/dhikr_editor_sheet.dart';
 import 'widgets/islamic_pattern.dart';
+import 'widgets/qibla_compass_sheet.dart';
 
 final selectedDestinationProvider =
     NotifierProvider<_SelectedDestination, int>(_SelectedDestination.new);
@@ -133,23 +134,28 @@ class _AppShellState extends ConsumerState<AppShell> {
     final qazaCount = ref.watch(
       qazaProvider.select((async) => async.value?.length ?? 0),
     );
+    final qazaBacklog = ref.watch(
+      qazaDebtProvider.select((plan) => plan.totalBacklog),
+    );
+    final totalQazaBadge = qazaCount + qazaBacklog;
 
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: 16,
+        titleSpacing: 12,
         title: Row(
           children: [
             SeljukMedallion(
-              size: 36,
+              size: 32,
               fillColor: p.primary.withValues(alpha: p.isDark ? 0.22 : 0.12),
               borderColor: p.secondary.withValues(alpha: 0.65),
-              child: Icon(AppIcons.app, size: 18, color: p.primary),
+              child: Icon(AppIcons.app, size: 16, color: p.primary),
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: 8),
             Expanded(
               child: Text(
                 current.title,
                 overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontSize: 17),
               ),
             ),
           ],
@@ -157,16 +163,17 @@ class _AppShellState extends ConsumerState<AppShell> {
         actions: [
           if (index == 0 && location != null)
             Padding(
-              padding: const EdgeInsets.only(right: 4),
+              padding: const EdgeInsets.only(right: 2),
               child: ActionChip(
-                visualDensity: VisualDensity.compact,
-                padding: const EdgeInsets.symmetric(horizontal: 4),
+                visualDensity:
+                    const VisualDensity(horizontal: -3, vertical: -3),
+                padding: const EdgeInsets.symmetric(horizontal: 2),
                 labelPadding: const EdgeInsets.only(right: 4),
-                avatar: Icon(AppIcons.location, size: 14, color: p.primary),
+                avatar: Icon(AppIcons.location, size: 13, color: p.primary),
                 label: Text(
                   location.city,
                   style: TextStyle(
-                    fontSize: 11.5,
+                    fontSize: 11,
                     fontWeight: FontWeight.w600,
                     color: p.text,
                   ),
@@ -183,17 +190,26 @@ class _AppShellState extends ConsumerState<AppShell> {
                 ),
               ),
             ),
+          if (index == 0)
+            IconButton(
+              visualDensity: const VisualDensity(horizontal: -3, vertical: -3),
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+              tooltip: HomeStrings.qiblaButton,
+              icon: Icon(AppIcons.compass, size: 20, color: p.primary),
+              onPressed: () => showQiblaCompassSheet(context),
+            ),
           Padding(
             padding: const EdgeInsets.only(right: 2),
             child: ActionChip(
-              visualDensity: VisualDensity.compact,
-              padding: const EdgeInsets.symmetric(horizontal: 4),
+              visualDensity: const VisualDensity(horizontal: -3, vertical: -3),
+              padding: const EdgeInsets.symmetric(horizontal: 2),
               labelPadding: const EdgeInsets.only(right: 4),
-              avatar: Icon(AppIcons.navDhikr, size: 15, color: p.secondary),
+              avatar: Icon(AppIcons.navDhikr, size: 14, color: p.secondary),
               label: Text(
                 DhikrStrings.topBarButton,
                 style: TextStyle(
-                  fontSize: 11.5,
+                  fontSize: 11,
                   fontWeight: FontWeight.w700,
                   color: p.text,
                 ),
@@ -211,9 +227,11 @@ class _AppShellState extends ConsumerState<AppShell> {
             ),
           ),
           IconButton(
-            visualDensity: VisualDensity.compact,
+            visualDensity: const VisualDensity(horizontal: -3, vertical: -3),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
             tooltip: NavStrings.about,
-            icon: Icon(AppIcons.navAbout, color: p.textLight),
+            icon: Icon(AppIcons.navAbout, size: 20, color: p.textLight),
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute<void>(
                 builder: (_) => Scaffold(
@@ -242,10 +260,12 @@ class _AppShellState extends ConsumerState<AppShell> {
           destinations: [
             for (var i = 0; i < _destinations.length; i++)
               NavigationDestination(
-                icon:
-                    _buildNavIcon(_destinations[i].icon, i == 1 ? qazaCount : 0, p),
+                icon: _buildNavIcon(
+                    _destinations[i].icon, i == 1 ? totalQazaBadge : 0, p),
                 selectedIcon: _buildNavIcon(
-                    _destinations[i].selectedIcon, i == 1 ? qazaCount : 0, p),
+                    _destinations[i].selectedIcon,
+                    i == 1 ? totalQazaBadge : 0,
+                    p),
                 label: _destinations[i].tabLabel,
               ),
           ],

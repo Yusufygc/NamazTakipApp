@@ -54,7 +54,11 @@ class ShareService {
   }
 
   /// Kaynak video bağlantısını dış tarayıcıda veya Instagram uygulamasında açar.
+  ///
+  /// Yalnızca `http` ve `https` açılır: bağlantı paylaşılan metinden veya elle
+  /// yazılan alandan gelir; `file:`, `tel:`, `intent:` gibi şemalar açılmaz.
   Future<bool> openExternalUrl(String url) async {
+    if (!isSafeWebUrl(url)) return false;
     try {
       final ok =
           await _channel.invokeMethod<bool>('openUrl', {'url': url.trim()});
@@ -107,6 +111,7 @@ class ShareService {
     HttpClient? client;
     try {
       final uri = Uri.parse(url);
+      if (!isSafeWebUrl(url)) return null;
       client = HttpClient()
         ..connectionTimeout = const Duration(seconds: 5)
         ..userAgent =
@@ -120,10 +125,15 @@ class ShareService {
         return null;
       }
       // İlk 120 KB meta etiketleri için yeterlidir.
+      // Yavaş sunucu (parça parça gönderen) kazımayı sonsuza uzatmasın: parçalar
+      // arası ve toplam süre sınırlıdır.
       final bytes = <int>[];
-      await for (final chunk in response) {
+      final deadline = DateTime.now().add(const Duration(seconds: 10));
+      await for (final chunk
+          in response.timeout(const Duration(seconds: 6))) {
         bytes.addAll(chunk);
         if (bytes.length >= 120 * 1024) break;
+        if (DateTime.now().isAfter(deadline)) break;
       }
       final html = utf8.decode(bytes, allowMalformed: true);
       final parts = <String>[];
@@ -271,8 +281,8 @@ $combinedText
         meaning: (item['meaning'] as String?)?.trim().isNotEmpty == true
             ? (item['meaning'] as String).trim()
             : fallback.meaning,
-        targetCount: (item['targetCount'] as num?)?.toInt() ??
-            fallback.targetCount,
+        targetCount:
+            sanitizeTargetCount(item['targetCount']) ?? fallback.targetCount,
         groupName: (item['groupName'] as String?)?.trim().isNotEmpty == true
             ? (item['groupName'] as String).trim()
             : fallback.groupName,
