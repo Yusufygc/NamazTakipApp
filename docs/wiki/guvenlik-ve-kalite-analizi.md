@@ -33,9 +33,9 @@
 
 | # | Önem | Bulgu |
 |---|---|---|
-| 18 | Orta | **Mimari ilke ihlali:** backend'de Türkçe metin (`home_widget_snapshot.dart` vakit adları, esma kataloğu, `Paylaşılan Zikir` varsayılanı) ve Kotlin'de sabit metin. Koruma testi yalnızca `lib/ui`'ı tarıyor. Düzeltme: metinler ön yüzden verilir veya koruma testi backend'e genişler. |
+| 18 | Orta | **Mimari ilke ihlali:** backend'de Türkçe metin (widget vakit adları, esma kataloğu, `Paylaşılan Zikir` varsayılanı) ve Kotlin'de sabit metin; koruma testi yalnızca `lib/ui`'ı tarıyordu. | **Düzeltildi:** metinler `HomeWidgetTexts` ve `DhikrContent` portlarıyla ön yüzden gelir, Kotlin metin üretmez, backend koruma testi eklendi. Kalan izinli istisnalar: [[metin-sistemi]] |
 | 19 | Düşük | Üst çubuk düğmeleri 32 dp (önerilen 48 dp), yazılar 11-17 punto: erişilebilirlik. |
-| 20 | Düşük | Dosya boyutu: `dhikr_editor_sheet.dart` 523 satır (eşik 500), `qibla_compass_sheet.dart` 494, `esma_catalog.dart` 465 (veri). Uzun `build` metotları. |
+| 20 | Düşük | Dosya boyutu: `dhikr_editor_sheet.dart` 523 satır (eşik 500), `qibla_compass_sheet.dart` 494, `dhikr_catalog.dart` (veri). Uzun `build` metotları. |
 | 21 | Düşük | `HapticFeedback` `build` içinde tetikleniyor (yan etki); `initState`/dinleyici daha doğru. |
 | 22 | Düşük | `home_widget_service.dart` tüm hataları sessizce yutuyor (`catch (_)`); sorun gizleniyor. |
 | 23 | Bilgi | Antigravity'nin yazdığı testler çoğunlukla uygulamanın kendi çıktısını doğrular (Hicri testi Diyanet farkını yakalamıyordu). Bu turda dış doğruluk kaynaklı testler eklendi. |

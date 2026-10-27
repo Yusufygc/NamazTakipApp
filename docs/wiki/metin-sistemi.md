@@ -31,6 +31,7 @@ Kullanıcıya görünen tüm metinler `lib/core/strings/` altında, modül baş�
 | `startup_strings.dart` | `StartupStrings` | Başlatma hata ekranı ve bozuk veritabanı kurtarma uyarısı |
 | `notification_health_strings.dart` | `NotificationHealthStrings` | Tam zamanlı alarm izni uyarısı |
 | `notification_texts_adapter.dart` | `AppNotificationTexts` | Backend'in `NotificationTexts` portunu bu metinlerle doldurur: [[bildirimler]] |
+| `home_widget_texts_adapter.dart` | `AppHomeWidgetTexts` | Backend'in `HomeWidgetTexts` portunu doldurur (vakit adları, başlık, rozetler): [[ana-ekran-widget]] |
 
 Metin sistemi **ön yüze** aittir; backend metin içermez, bildirim metinlerini port üzerinden alır ([[backend-paketi]]). Enum'lar backend'dedir (`PrayerType`, `CalcMethod`, `AchievementId`); etiket uzantıları ön yüzdedir. Enum'ların görünen adı enum içinde değil, strings modülündedir: `PrayerType.label` (`prayer_strings.dart`), `CalcMethod.label` (`settings_strings.dart`). Böylece çekirdek model dile bağımlı olmaz.
 
@@ -54,6 +55,20 @@ Metin sistemi **ön yüze** aittir; backend metin içermez, bildirim metinlerini
 ## Bilinen sınır
 
 Sürüm numarası (`CommonStrings.version`) `pubspec.yaml`'dan okunmaz, elle yazılıdır; sürüm artırılırken ikisi birlikte güncellenmelidir: [[bilinen-sorunlar]].
+
+## Zikir içeriği (`lib/core/content/`)
+
+Esmaül Hüsna kataloğu, yaygın zikirler, klasik tesbihat adımları, ilk kurulum başlıkları, varsayılan taslak metinleri ve yapay zeka istemi `lib/core/content/dhikr_catalog.dart` içindedir (`kAppDhikrContent`). `main.dart` bunu `NamazBackendConfig.dhikrContent` ile backend'e verir; backend katalogu bilmez, yalnızca `DhikrCatalogEntry` türünü ve `DhikrContent` sözleşmesini tanır. Neden ön yüzde: içerik yerelleştirilebilir metindir (başka dile geçişte yalnızca ön yüz değişir). Dinî onay durumu: [[dini-icerik-onayi]].
+
+### Backend'de kalan Türkçe sabitler (izin listesi)
+
+Backend koruma testi bunlar dışında Türkçe metin sabitini reddeder; her biri gerekçelidir ve dosya artık Türkçe içermezse test listeden çıkarmayı ister:
+
+| Dosya | Neden |
+|---|---|
+| `data/turkish_cities.dart` | İl adları veridir (özel isim) |
+| `domain/dhikr_extractor.dart` | Türkçe girdiyi ayrıştıran anahtar sözcükler ("defa", "sabah namazı"); çıktıya metin koymaz |
+| `domain/dhikr.dart` | `DhikrGroups`: veritabanında saklanan kalıcı grup değerleri; taşımak mevcut kullanıcı kayıtları için veri göçü gerektirir |
 
 ## İlgili sayfalar
 

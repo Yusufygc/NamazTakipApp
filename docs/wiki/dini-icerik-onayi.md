@@ -4,9 +4,9 @@ Uygulamada dinî bilgi taşıyan veriler (esma, zikir metinleri, kerahat sürele
 
 ## Esmaül Hüsna kataloğu (99 isim)
 
-Kaynak: `packages/namaz_backend/lib/src/domain/esma_catalog.dart` (`kEsmaAndDhikrCatalog`). Yapı: Lafz-ı Celâl ("Yâ Allah", 99'a sayılmaz), ardından Diyanet/ilmihal sırasıyla 99 isim (Rahmân ile başlar, Sabûr ile biter), en sonda 99'a girmeyen "Yâ Şâfî". Her kayıtta Arapça yazı, okunuş, kısa anlam, varsayılan adet, grup, anahtar kelimeler bulunur.
+Kaynak: `lib/core/content/dhikr_catalog.dart` (`kEsmaAndDhikrCatalog`; ön yüzde, backend'e `kAppDhikrContent` ile verilir). Yapı: Lafz-ı Celâl ("Yâ Allah", 99'a sayılmaz), ardından Diyanet/ilmihal sırasıyla 99 isim (Rahmân ile başlar, Sabûr ile biter), en sonda 99'a girmeyen "Yâ Şâfî". Her kayıtta Arapça yazı, okunuş, kısa anlam, varsayılan adet, grup, anahtar kelimeler bulunur.
 
-### Makineyle doğrulananlar (`esmaul_husna_test.dart`, 7 test)
+### Makineyle doğrulananlar (`test/esmaul_husna_test.dart`, 7 test)
 
 - Tam 99 isim, sıra, benzersiz başlıklar; 99 dışında yalnızca Allah ve Şâfî.
 - Varsayılan adet, Türkçe kaynaklarda yaygın **geleneksel ebced** tablosuyla birebir aynı.
@@ -25,7 +25,7 @@ Kaynak: `packages/namaz_backend/lib/src/domain/esma_catalog.dart` (`kEsmaAndDhik
 
 ## Zikir ve tesbihat metinleri
 
-`kDhikrCatalog` (`domain/dhikr_extractor.dart`) ve `kClassicTesbihatSteps` (`domain/esma_catalog.dart`): Arapça metinler, okunuşlar, anlamlar ve adetler (33'er, 100, "Hasbünallah 450", "Yunus duası 41" gibi) onay bekler. Kataloğa kaynaklı olmayan adet eklenmemesi önerilir.
+`kDhikrCatalog` ve `kClassicTesbihatSteps` (`lib/core/content/dhikr_catalog.dart`): Arapça metinler, okunuşlar, anlamlar ve adetler (33'er, 100, "Hasbünallah 450", "Yunus duası 41" gibi) onay bekler. Kataloğa kaynaklı olmayan adet eklenmemesi önerilir.
 
 ## Kerahat süreleri
 
@@ -46,7 +46,7 @@ Hicri ay başları Diyanet'e dayanan yayınlarla örtüşecek şekilde tabloya y
 ## Onay süreci
 
 1. Bu sayfadaki "Onay bekleyenler" maddelerini dinî kaynağa (Diyanet İlmihali, ilgili müftülük veya güvendiğiniz bir hoca) gösterin.
-2. Düzeltmeleri `esma_catalog.dart` ve `islamic_calendar.dart` içinde yapın; `esmaul_husna_test.dart` sayı, sıra ve ebced tutarlılığını yeniden denetler.
+2. Düzeltmeleri `lib/core/content/dhikr_catalog.dart` ve `islamic_calendar.dart` içinde yapın; `esmaul_husna_test.dart` sayı, sıra ve ebced tutarlılığını yeniden denetler.
 3. Onaylanan maddeyi "tarih, onaylayan, kaynak" ile buraya ekleyin ve [[bilinen-sorunlar]] satırını güncelleyin.
 
 ## İlgili sayfalar

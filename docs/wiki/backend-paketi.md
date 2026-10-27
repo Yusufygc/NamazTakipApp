@@ -11,7 +11,7 @@ Paket, kök `pubspec.yaml`'daki `workspace:` bölümüyle uygulamaya bağlanır;
 | Grup | Öğeler |
 |---|---|
 | Arayüz | `NamazBackend`, `NamazBackendConfig` |
-| Port | `NotificationTexts` (bildirim metinleri) |
+| Portlar | `NotificationTexts` (bildirim metinleri), `HomeWidgetTexts` (widget metinleri), `DhikrContent` + `DhikrCatalogEntry` (zikir kataloğu ve varsayılan metinler), `kWidgetCityToken` |
 | Modeller | `PrayerType`, `PrayerStatus`, `DayTimes`, `NextPrayer`, `PrayerRecord`, `QazaItem`, `DayCount`, `WeekComparison`, `GamificationData`, `AppSettings`, `AppLocation`, `CalcMethod`, `LocationMode`, `LocationFailure`, `LocationException`, `PrayerPrompt`, `StreakStats`, `Achievement`, `AchievementId` |
 | Saf yardımcılar | `prayerDay(now, {fajrToday})`, `nextPrayer`, `dateOnly`, `dateKey`, `parseDateKey`, `addDays`, `daysBetween`, `daysDiff`, `computeStreaks`, `buildAchievements` |
 
@@ -37,6 +37,8 @@ Arayüz yöntemleri düz Dart modelleri döner; SQL, eklenti sınıfı veya `Str
 | Alan | Ne |
 |---|---|
 | `notificationTexts` | `NotificationTexts` uygulaması; ön yüzde `AppNotificationTexts` ([[metin-sistemi]]) |
+| `homeWidgetTexts` | `HomeWidgetTexts` uygulaması; ön yüzde `AppHomeWidgetTexts`: vakit adları, başlık ve rozet metinleri ([[ana-ekran-widget]]) |
+| `dhikrContent` | `DhikrContent`: katalog, ilk kurulum başlıkları, varsayılan taslak başlığı ve anlamı, yapay zeka istemi; ön yüzde `kAppDhikrContent` ([[zikir-paylasim]], [[dini-icerik-onayi]]) |
 | `backgroundEntryPoint` | `@pragma('vm:entry-point')` ile işaretli üst düzey fonksiyon; ön yüzde `namazBackgroundEntryPoint` ([[arka-plan-gorevleri]]) |
 
 ## Katman kuralları

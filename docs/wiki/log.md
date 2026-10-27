@@ -2,6 +2,9 @@
 
 Kronolojik kayıt; en yeni kayıt en üsttedir. Biçim: `## [YYYY-AA-GG] [İŞLEM_TİPİ] | Kısa Açıklama`. İşlem tipleri: INGEST, QUERY, UPDATE, DECISION, LINT, SETUP. Kurallar: [[wiki-kullanim]]. Harita: [[index]].
 
+## [2026-10-27] UPDATE | Sabit Türkçe metinler ön yüze taşındı; backend koruma testi
+Backend ve Kotlin'deki kullanıcıya görünen metinler ön yüzden gelir: `HomeWidgetTexts` (widget vakit adları, başlık, rozetler) ve `DhikrContent` (esma kataloğu, tesbihat, ilk kurulum başlıkları, varsayılan taslak metni, yapay zeka istemi) portları `NamazBackendConfig`'e eklendi. Katalog `lib/core/content/dhikr_catalog.dart`'a, esma testi `test/`'e taşındı; backend `esma_catalog.dart` silindi. Android widget metin üretmiyor, Dart'ın gönderdiğini saklayıp seçiyor. Backend `architecture_test.dart` izin listesi dışında Türkçe metin sabitini reddediyor (sabit eklenince düştüğü doğrulandı). İzinli istisnalar: `DhikrGroups`, ayrıştırıcı anahtar sözcükleri, il adları. 164 test geçiyor (ön yüz 42, backend 107, Kotlin 15). Sayfalar: [[metin-sistemi]], [[mimari-genel]], [[backend-paketi]], [[ana-ekran-widget]], [[test-stratejisi]].
+
 ## [2026-10-27] UPDATE | Esmaül Hüsna 99 isme tamamlandı; dinî içerik onay sayfası
 Esma kataloğu 44 girişten Lafz-ı Celâl + 99 isim + Yâ Şâfî'ye çıkarıldı (Diyanet sırası, geleneksel ebced adedi); birleşik girdiler (Hayy/Kayyûm, Mukaddim/Muahhir, Ganiyy/Mugnî) bireysele ayrıldı. 7 yeni test: sayı, sıra, ebced (Arapça yazıdan da hesaplandı, 3 hemze istisnası), anahtar kelime gölgelenmesi. Kaynaksız fazilet ifadeleri arayüzden ve Gemini isteminden kaldırıldı. Dinî onay bekleyenler ve kerahat sürelerinin tutarsız kaynakları yeni sayfada: [[dini-icerik-onayi]]. 160 test geçiyor. Sayfalar: [[test-stratejisi]], [[bilinen-sorunlar]], [[zikir-paylasim]].
 

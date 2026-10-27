@@ -9,6 +9,10 @@ Telefon ana ekranında sıradaki vakti, günün altı saatini ve "n / 5 Eda" say
 3. Android bunu `SharedPreferences`'a (`namaz_home_widget`) yazar.
 4. Widget her çizimde **kendisi hesaplar** (`WidgetSchedule.compute`): sıradaki vakit, bugünün saatleri, takip günü, kılınma sayısı geçerli mi.
 
+## Metinler ön yüzden gelir
+
+Widget kendi metnini üretmez (metin ve dil kararı ön yüzdedir). Dart, anlık görüntüyle birlikte `HomeWidgetTexts` portundan şunları gönderir: `prayerLabels` (5 vakit adı, Sabah..Yatsı), `sunriseLabel`, `nextTag` ("SIRADAKİ VAKİT"), `headerTemplate` (şehir yerine `{city}` işareti, `kWidgetCityToken`) ve `doneBadges` (0..5 için hazır rozet metni). Kotlin bunları `SharedPreferences`'ta saklar ve çizerken yalnızca seçer/yerine koyar. Düzen dosyasındaki (`namaz_home_widget.xml`) eski sabit metinler `tools:text` (yalnızca tasarım zamanı) oldu; vakit etiketleri ve etiketler kimlik aldı (`widget_label_*`, `widget_next_tag`). Uygulama bir kez açılıp metinleri göndermeden widget boş metin gösterir (widget zaten uygulama açıkken eklenir). Emülatörde doğrulandı: `shared_prefs` içinde yeni anahtarlar var, widget metinleri doğru. `home_widget_schedule_test.dart` backend'in metni kendi üretmediğini İngilizce sahte metinle denetler.
+
 ## Bayatlama sorunu ve çözümü (2026-10-27)
 
 Eski sürüm yalnızca uygulama bir şey yazınca doğruydu. 30 dakikalık otomatik yenileme (`updatePeriodMillis`) aynı eski veriyi yeniden çiziyordu; bir vakit geçince "sıradaki vakit" uygulama açılana kadar yanlış kalır, gün değişince dünün saatleri görünürdü.
@@ -31,7 +35,6 @@ Eski sürüm yalnızca uygulama bir şey yazınca doğruydu. 30 dakikalık otoma
 
 ## Bilinen sınırlar
 
-- Kotlin'de "Namaz Takip • şehir", "n / 5 Eda" ve vakit adları sabit Türkçe yazılıdır (metin sistemi dışında): [[bilinen-sorunlar]].
 - `performedMask` ve Hicri tarih gönderilir ama Android widget kullanmaz.
 - Widget'a dokununca uygulama açılır; vakit işaretlenmez.
 

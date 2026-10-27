@@ -47,7 +47,7 @@ Arayüz bilmez: `material`, `widgets`, Riverpod, `fl_chart` içe aktarılmaz. Ay
 1. **Paket sınırı:** Ön yüz backend'in iç dosyalarını (`src/`) içe aktaramaz; içe aktarırsa `flutter analyze` ve test düşer.
 2. **Bağımlılık sınırı:** Konum, bildirim, depolama paketleri yalnızca backend'in `pubspec.yaml`'ındadır.
 3. **Otomatik testler:** `test/architecture_test.dart` (ön yüz) ve `packages/namaz_backend/test/architecture_test.dart` (backend) sınırları denetler; ihlal eklenince düştükleri elle doğrulandı: [[test-stratejisi]].
-4. **Metin ve dil kararı ön yüzdedir.** Backend bildirim metnini üretmez; `NotificationTexts` portu ile ön yüzden alır.
+4. **Metin ve dil kararı ön yüzdedir.** Backend kullanıcıya görünen metin üretmez; bildirim, widget ve zikir metinlerini `NotificationTexts`, `HomeWidgetTexts` ve `DhikrContent` portlarıyla ön yüzden alır. `packages/namaz_backend/test/architecture_test.dart` backend'de Türkçe metin sabiti bulunmasını yasaklar; üç dosya gerekçeli izin listesindedir: [[metin-sistemi]].
 
 ## Başlangıç sırası
 
