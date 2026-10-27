@@ -231,6 +231,6 @@ Hata bildirimi ve öneriler için bir *issue* açabilirsiniz. Kod katkısından 
 
 <div align="center">
 
-MYY tarafından geliştirildi · [GitHub: Yusufygc](https://github.com/Yusufygc/NamazTakipApp) · Namazlarınız kabul olsun.
+MYY tarafından geliştirildi · [GitHub: Yusufygc](https://github.com/Yusufygc/NamazTakipApp)
 
 </div>
