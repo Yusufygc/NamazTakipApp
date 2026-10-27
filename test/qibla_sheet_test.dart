@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:namaz_backend/namaz_backend.dart';
@@ -9,9 +10,11 @@ import 'package:namaz_takip/ui/widgets/qibla_compass_sheet.dart';
 
 /// Yalnızca pusula sayfasının kullandığı üyeleri uygulayan sahte backend.
 class _FakeBackend implements NamazBackend {
-  _FakeBackend({this.location});
+  _FakeBackend({this.location, Stream<double>? compass})
+      : _compass = compass ?? const Stream<double>.empty();
 
   final AppLocation? location;
+  final Stream<double> _compass;
 
   @override
   AppSettings get settings => AppSettings(
@@ -24,9 +27,8 @@ class _FakeBackend implements NamazBackend {
         location: location,
       );
 
-  // Sensör yok: sayfa elle çevirme ile çalışmalı.
   @override
-  Stream<double> get compassHeading => const Stream<double>.empty();
+  Stream<double> get compassHeading => _compass;
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
@@ -95,5 +97,50 @@ void main() {
     expect(find.text(HomeStrings.qiblaDegree(160)), findsWidgets);
     expect(find.text(HomeStrings.qiblaDistanceKm(2162)), findsOneWidget);
     expect(find.text(HomeStrings.qiblaDegree(152)), findsNothing);
+  });
+
+  const istanbul = AppLocation(
+    latitude: 41.0082,
+    longitude: 28.9784,
+    city: 'İstanbul',
+  );
+
+  testWidgets('sensör yoksa (NO_SENSOR) açık uyarı gösterilir', (tester) async {
+    final backend = _FakeBackend(
+      location: istanbul,
+      compass: Stream<double>.error(
+        PlatformException(code: 'NO_SENSOR', message: 'sensör yok'),
+      ),
+    );
+    await _openSheet(tester, backend);
+
+    expect(find.text(HomeStrings.qiblaNoSensor), findsOneWidget);
+    // Kadran ve metrikler yine de çalışır: elle çevrilebilir.
+    expect(find.text(HomeStrings.qiblaAngleLabel), findsOneWidget);
+  });
+
+  testWidgets('sensör varken uyarı çıkmaz ve sensör açısı kullanılır',
+      (tester) async {
+    // Gerçek kuzeye göre 152 derece: Kıble 151,6 derece, 5 derece içinde hizalı.
+    final backend = _FakeBackend(
+      location: istanbul,
+      compass: Stream<double>.value(152),
+    );
+    await _openSheet(tester, backend);
+
+    expect(find.text(HomeStrings.qiblaNoSensor), findsNothing);
+    expect(find.text(HomeStrings.qiblaAligned), findsOneWidget);
+  });
+
+  testWidgets('sensör Kıble yönünden uzaksa hizalı denmez', (tester) async {
+    final backend = _FakeBackend(
+      location: istanbul,
+      compass: Stream<double>.value(10),
+    );
+    await _openSheet(tester, backend);
+
+    expect(find.text(HomeStrings.qiblaNoSensor), findsNothing);
+    expect(find.text(HomeStrings.qiblaAligned), findsNothing);
+    expect(find.text(HomeStrings.qiblaRotateHint), findsOneWidget);
   });
 }

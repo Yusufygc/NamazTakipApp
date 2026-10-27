@@ -2,12 +2,14 @@ package com.namaztakip.namaz_takip
 
 import android.content.Context
 import android.content.Intent
+import android.hardware.GeomagneticField
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.EventChannel
@@ -70,9 +72,31 @@ class MainActivity : FlutterActivity() {
                 private var listener: SensorEventListener? = null
 
                 override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
-                    val sm = getSystemService(Context.SENSOR_SERVICE) as? SensorManager ?: return
+                    val sm = getSystemService(Context.SENSOR_SERVICE) as? SensorManager
+                    val rotationSensor = sm?.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)
+                    if (sm == null || rotationSensor == null) {
+                        // Sessiz kalmak yerine Dart'a açık hata: sayfa elle çevirmeye geçer.
+                        events?.error("NO_SENSOR", "Cihazda yön (pusula) sensörü yok", null)
+                        return
+                    }
                     sensorManager = sm
-                    val rotationSensor = sm.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR) ?: return
+
+                    // Sensör manyetik kuzeyi verir; konum biliniyorsa manyetik sapma
+                    // eklenerek gerçek kuzeye çevrilir (Kıble açısı gerçek kuzeye göredir).
+                    val args = arguments as? Map<*, *>
+                    val latitude = (args?.get("latitude") as? Number)?.toDouble()
+                    val longitude = (args?.get("longitude") as? Number)?.toDouble()
+                    val declination = if (latitude != null && longitude != null) {
+                        GeomagneticField(
+                            latitude.toFloat(),
+                            longitude.toFloat(),
+                            0f,
+                            System.currentTimeMillis()
+                        ).declination.toDouble()
+                    } else {
+                        0.0
+                    }
+                    Log.d("Pusula", "manyetik sapma: $declination derece")
                     val rotationMatrix = FloatArray(9)
                     val orientation = FloatArray(3)
                     val sensorListener = object : SensorEventListener {
@@ -80,8 +104,8 @@ class MainActivity : FlutterActivity() {
                             if (event?.sensor?.type == Sensor.TYPE_ROTATION_VECTOR) {
                                 SensorManager.getRotationMatrixFromVector(rotationMatrix, event.values)
                                 SensorManager.getOrientation(rotationMatrix, orientation)
-                                val azimuthDeg = (Math.toDegrees(orientation[0].toDouble()) + 360.0) % 360.0
-                                events?.success(azimuthDeg)
+                                val magneticDeg = Math.toDegrees(orientation[0].toDouble())
+                                events?.success(CompassMath.trueHeading(magneticDeg, declination))
                             }
                         }
 

@@ -34,12 +34,14 @@ abstract final class HomeStrings {
 
   // Kıble Pusulası
   static const qiblaButton = 'Kıble';
-  static const qiblaSheetTitle = 'Selçuklu Kıble Pusulası';
+  static const qiblaSheetTitle = 'Kıble Pusulası';
   static const qiblaAligned = 'Kıble Yönüne Hizalandınız';
   static const qiblaRotateHint =
       'Cihazı düz tutarak döndürün veya kadranı parmağınızla çevirin';
   static const qiblaNoLocation =
       'Konum belirlenmediği için Kıble yönü hesaplanamıyor. Ayarlar ekranından şehir seçin veya konumu otomatik bulun.';
+  static const qiblaNoSensor =
+      'Bu cihazda pusula sensörü yok. Kıble yönünü kadranı parmağınızla çevirerek bulun.';
   static const qiblaAngleLabel = 'Kıble Açısı';
   static const qiblaDistanceLabel = 'Kâbe Mesafesi';
   static const qiblaNorth = 'K';

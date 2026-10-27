@@ -15,8 +15,18 @@ class LocationService {
       EventChannel('com.namaztakip.app/compass');
 
   /// Cihaz pusula sensöründen gelen kuzey açısı (`0.0` – `360.0`).
-  Stream<double> get compassHeading =>
-      _compassChannel.receiveBroadcastStream().map((e) => (e as num).toDouble());
+  ///
+  /// Konum verilirse platform manyetik sapmayı ekleyip **gerçek kuzeye** göre açı
+  /// döndürür (Kıble açısı gerçek kuzeye göredir); verilmezse manyetik kuzeye göredir.
+  /// Cihazda sensör yoksa akış `PlatformException(code: 'NO_SENSOR')` ile hata verir.
+  Stream<double> compassHeading({double? latitude, double? longitude}) {
+    final args = (latitude != null && longitude != null)
+        ? <String, double>{'latitude': latitude, 'longitude': longitude}
+        : null;
+    return _compassChannel
+        .receiveBroadcastStream(args)
+        .map((e) => (e as num).toDouble());
+  }
 
   /// Konum iznini kontrol eder; gerekirse ister.
   Future<void> ensurePermission() async {

@@ -43,7 +43,10 @@ class _QiblaCompassSheetState extends ConsumerState<_QiblaCompassSheet> {
   Widget build(BuildContext context) {
     final p = context.palette;
     final qibla = ref.watch(qiblaProvider);
-    final sensorHeading = ref.watch(compassHeadingProvider).value;
+    final compass = ref.watch(compassHeadingProvider);
+    final sensorHeading = compass.value;
+    // Sensör yoksa (NO_SENSOR) sessiz kalmak yerine kullanıcıya söylenir.
+    final noSensor = compass.hasError;
     final location = ref.watch(settingsProvider.select((s) => s.location));
 
     // Konum yokken sahte bir yön gösterilmez; kadran yerine açıklama çıkar.
@@ -182,6 +185,17 @@ class _QiblaCompassSheetState extends ConsumerState<_QiblaCompassSheet> {
                       ],
                     ),
                   ),
+                  if (noSensor) ...[
+                    const SizedBox(height: 10),
+                    Text(
+                      HomeStrings.qiblaNoSensor,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.85),
+                        fontSize: 12.5,
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 20),
                   // Selçuklu Pusula Kadranı
                   GestureDetector(

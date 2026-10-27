@@ -178,7 +178,14 @@ class NamazBackendImpl implements NamazBackend {
   }
 
   @override
-  Stream<double> get compassHeading => _location.compassHeading;
+  Stream<double> get compassHeading {
+    // Manyetik sapma konuma bağlıdır; dinleme başlarken geçerli konum verilir.
+    final loc = _settings.effectiveLocation;
+    return _location.compassHeading(
+      latitude: loc?.latitude,
+      longitude: loc?.longitude,
+    );
+  }
 
   // ---- Takip ---------------------------------------------------------------------
 

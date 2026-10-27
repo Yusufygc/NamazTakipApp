@@ -12,14 +12,20 @@ final class CompassStreamHandler: NSObject, FlutterStreamHandler, CLLocationMana
   private var eventSink: FlutterEventSink?
 
   func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
-    self.eventSink = events
-    if CLLocationManager.headingAvailable() {
-      let manager = CLLocationManager()
-      manager.headingFilter = 1.0
-      manager.delegate = self
-      manager.startUpdatingHeading()
-      self.locationManager = manager
+    // Sensör yoksa sessiz kalma: Dart tarafı açık uyarı gösterir.
+    guard CLLocationManager.headingAvailable() else {
+      return FlutterError(
+        code: "NO_SENSOR",
+        message: "Cihazda yön (pusula) sensörü yok",
+        details: nil
+      )
     }
+    self.eventSink = events
+    let manager = CLLocationManager()
+    manager.headingFilter = 1.0
+    manager.delegate = self
+    manager.startUpdatingHeading()
+    self.locationManager = manager
     return nil
   }
 

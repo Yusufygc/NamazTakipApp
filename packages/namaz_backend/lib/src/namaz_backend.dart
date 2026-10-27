@@ -69,7 +69,9 @@ abstract interface class NamazBackend {
   /// Takip günü (varsayılan: şimdi). Gün sınırı `min(04:00, Sabah vakti)`'dir.
   DateTime trackingDay([DateTime? now]);
 
-  /// Cihaz pusula sensöründen gelen kuzey açısı (`0.0` – `360.0`).
+  /// Cihaz pusula sensöründen gelen **gerçek kuzeye** göre açı (`0.0` – `360.0`);
+  /// konum biliniyorsa manyetik sapma düzeltilmiştir. Cihazda sensör yoksa akış
+  /// hata verir (`PlatformException`, kod `NO_SENSOR`).
   Stream<double> get compassHeading;
 
   // ---- Takip ---------------------------------------------------------------------
