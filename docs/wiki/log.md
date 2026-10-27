@@ -2,6 +2,9 @@
 
 Kronolojik kayıt; en yeni kayıt en üsttedir. Biçim: `## [YYYY-AA-GG] [İŞLEM_TİPİ] | Kısa Açıklama`. İşlem tipleri: INGEST, QUERY, UPDATE, DECISION, LINT, SETUP. Kurallar: [[wiki-kullanim]]. Harita: [[index]].
 
+## [2026-10-27] UPDATE | Esmaül Hüsna 99 isme tamamlandı; dinî içerik onay sayfası
+Esma kataloğu 44 girişten Lafz-ı Celâl + 99 isim + Yâ Şâfî'ye çıkarıldı (Diyanet sırası, geleneksel ebced adedi); birleşik girdiler (Hayy/Kayyûm, Mukaddim/Muahhir, Ganiyy/Mugnî) bireysele ayrıldı. 7 yeni test: sayı, sıra, ebced (Arapça yazıdan da hesaplandı, 3 hemze istisnası), anahtar kelime gölgelenmesi. Kaynaksız fazilet ifadeleri arayüzden ve Gemini isteminden kaldırıldı. Dinî onay bekleyenler ve kerahat sürelerinin tutarsız kaynakları yeni sayfada: [[dini-icerik-onayi]]. 160 test geçiyor. Sayfalar: [[test-stratejisi]], [[bilinen-sorunlar]], [[zikir-paylasim]].
+
 ## [2026-10-27] UPDATE | Pusula manyetik sapma düzeltmesi ve sensör yok hatası; Kıble başlığı sadeleşti
 Android pusula manyetik kuzeye göre yön veriyordu; konuma göre `GeomagneticField` sapması eklenip gerçek kuzeye çevrildi (Sakarya 6,4°). Sensör yoksa akış sessiz kalıyordu; artık Android ve iOS `NO_SENSOR` hatası döndürüyor, sayfa uyarı gösteriyor. Sayfa başlığı "Selçuklu Kıble Pusulası" yerine "Kıble Pusulası" oldu. 8 yeni test (toplam 153). Sayfalar: [[kible-pusulasi]], [[test-stratejisi]], [[bilinen-sorunlar]], [[guvenlik-ve-kalite-analizi]].
 

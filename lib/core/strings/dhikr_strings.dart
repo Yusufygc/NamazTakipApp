@@ -8,7 +8,7 @@ abstract final class DhikrStrings {
   // Filtreler ve arama
   static const allGroups = 'Tümü';
   static const favoritesGroup = 'Favoriler';
-  static const searchHint = 'Zikir, esma veya fazilet ara...';
+  static const searchHint = 'Zikir veya esma ara...';
   static const emptyListTitle = 'Bu grupta henüz zikir yok';
   static const emptyListBody =
       'Instagram\'da gördüğünüz dini videoları "Paylaş -> Namaz Takip" ile buraya gönderebilir veya aşağıdaki butonla ekleyebilirsiniz.';
@@ -29,7 +29,7 @@ abstract final class DhikrStrings {
   static const classicCompletedBody =
       'Namaz tesbihatını (33 Sübhanallah, 33 Elhamdülillah, 33 Allahü Ekber ve tevhid duasını) tamamladınız.';
   static const esmaCatalogButton = 'Esma Kataloğu';
-  static const esmaCatalogTitle = 'Esmaül Hüsna ve Faziletleri';
+  static const esmaCatalogTitle = 'Esmaül Hüsna (99 İsim)';
   static const esmaAddedAction = 'Deftere Ekle';
 
   static String classicStepIndicator(int step, int total) =>
@@ -59,7 +59,7 @@ abstract final class DhikrStrings {
   static const fieldTitleHint = 'Örn: Yâ Rezzâk, Sübhanallahi ve Bihamdihi';
   static const fieldArabic = 'Arapça Yazılışı (İsteğe Bağlı)';
   static const fieldTransliteration = 'Türkçe Okunuşu';
-  static const fieldMeaning = 'Anlamı ve Fazileti';
+  static const fieldMeaning = 'Anlamı ve Notlar';
   static const fieldTargetCount = 'Hedef Sayı (Adet)';
   static const fieldGroup = 'Grup';
   static const fieldCustomGroupHint = 'Veya yeni grup adı yazın...';

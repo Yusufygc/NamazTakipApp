@@ -35,6 +35,7 @@ Paylaşım kapısı dışa açıktır (`ACTION_SEND` süzgeci), bu yüzden gelen
 - **Bağlantı açma:** yalnızca `http`/`https` ve ana makine adı olan bağlantılar dış uygulamada açılır (`isSafeWebUrl`, hem Dart'ta hem `MainActivity.kt`'de). `file:`, `tel:`, `intent:`, `javascript:` açılmaz.
 - **Kazıma:** yalnızca `http`/`https`; parçalar arası 6 sn, toplam 10 sn zaman aşımı, en çok 120 KB.
 - **Yapay zeka yanıtı:** hedef sayı `sanitizeTargetCount` ile 1-100000 arasına zorlanır; yanıt zaten kullanıcıya düzenlenebilir taslak olarak gösterilir, doğrudan kaydedilmez.
+- **Fazilet iddiası:** Gemini istemi "fazilet veya sevap iddiası ekleme" der; yapay zeka kaynaksız dinî iddia üretmesin diye anlam alanı yalnızca anlamdır: [[dini-icerik-onayi]].
 - **Kabul edilen risk:** kazıma yerel ağ adreslerine GET atabilir; yanıt saldırgana dönmez.
 
 ## Gemini (isteğe bağlı)

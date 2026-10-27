@@ -39,6 +39,7 @@ Namaz Takip projesinin bilgi tabanı. Her işe buradan başlayın; kurallar içi
 - [[hicri-takvim]] — Hicri tarih (Diyanet ay başı tablosu), kandil ve bayram günleri, kerahat.
 - [[kible-pusulasi]] — Kıble açısı hesabı, konum yokken davranış, pusula sınırları.
 - [[ana-ekran-widget]] — Android ana ekran widget'ı: program, alarm, bayatlama düzeltmesi.
+- [[dini-icerik-onayi]] — Esmaül Hüsna (99), zikir, kerahat ve kandil verilerinin onay durumu.
 - [[guvenlik-ve-kalite-analizi]] — Antigravity kodunun güvenlik ve kalite analizi (2026-10-27).
 - [[tema-sistemi]] — Beş tema, `AppPalette` ve doğrulama durumu.
 - [[ikon-sistemi]] — `AppIcons` kuralları ve gruplar.

@@ -42,12 +42,13 @@ void main() {
 
     test('Sözlükte olmayan Ya <Esma> kalıbını ve Arapça metni yakalar', () {
       const sharedText =
-          'İkindi namazından sonra x100 Ya Musavvir يَا مُصَوِّرُ zikri.';
+          'İkindi namazından sonra x100 Ya Mubarek يَا مُبَارَكُ zikri.';
 
       final draft = extractDhikrDraft(sharedText);
 
-      expect(draft.title, 'Ya Musavvir');
-      expect(draft.arabic, 'يَا مُصَوِّرُ');
+      // Mübarek, 99 Esmaül Hüsna'da değildir; genel "Ya <Esma>" kalıbı çalışır.
+      expect(draft.title, 'Ya Mubarek');
+      expect(draft.arabic, 'يَا مُبَارَكُ');
       expect(draft.targetCount, 100);
       expect(draft.prayerTime, PrayerType.asr);
     });

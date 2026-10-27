@@ -219,7 +219,7 @@ Aşağıdaki sosyal medya (Instagram vb.) dini video açıklamasından zikir, es
   "title": "Zikrin veya Esmanın kısa Türkçe başlığı (örn. Yâ Rezzâk, Sübhanallahi ve Bihamdihi)",
   "arabic": "Arapça yazılışı",
   "transliteration": "Türkçe okunuşu",
-  "meaning": "Türkçe anlamı ve fazileti (1-2 cümle)",
+  "meaning": "Türkçe anlamı (1-2 cümle; fazilet veya sevap iddiası ekleme)",
   "targetCount": 100,
   "groupName": "Esmaül Hüsna | Sabah & Akşam | Rızık & Bereket | Şifa & Huzur | Namaz Tesbihatı | Genel Zikirler",
   "prayerTime": "fajr | dhuhr | asr | maghrib | isha | null"

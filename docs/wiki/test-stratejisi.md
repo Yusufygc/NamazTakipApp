@@ -12,7 +12,7 @@ flutter test                                     # ön yüz testleri (kökte)
 (cd packages/namaz_backend && flutter test)      # backend testleri
 ```
 
-Durum (2026-10-27): `flutter analyze` temiz; ön yüz **35**, backend **103**, Android (Kotlin) **15**, toplam **153 test geçiyor**. Kotlin testi: `cd android && ./gradlew :app:testDebugUnitTest`.
+Durum (2026-10-27): `flutter analyze` temiz; ön yüz **35**, backend **110**, Android (Kotlin) **15**, toplam **160 test geçiyor**. Kotlin testi: `cd android && ./gradlew :app:testDebugUnitTest`.
 
 ## Test dosyaları
 
@@ -25,6 +25,7 @@ Durum (2026-10-27): `flutter analyze` temiz; ön yüz **35**, backend **103**, A
 | `packages/namaz_backend/test/time_zone_instant_test.dart` | 2 | `TZDateTime.from` mutlak anı korur (zamanlama `tz.local`'e bağlı değil) |
 | `packages/namaz_backend/test/dhikr_test.dart` | 10 | Zikir ayıklama (Esma, sayı, vakit, bağlantı) ve zikir kaydı |
 | `packages/namaz_backend/test/share_service_test.dart` | 13 | Yerel `HttpServer` ile paylaşım kazıma (açıklamasız sayfa, kesme işaretli meta, 404, düz metin), `isCaptionMissing`, `isSafeWebUrl`, `openExternalUrl` şema denetimi, `sanitizeTargetCount` |
+| `packages/namaz_backend/test/esmaul_husna_test.dart` | 7 | 99 Esmaül Hüsna: sayı, sıra, benzersizlik, geleneksel ebced, Arapça yazıdan ebced hesabı (3 hemze istisnası), anahtar kelime gölgelenmesi |
 | `packages/namaz_backend/test/hijri_test.dart` | 18 | Hicri tarih ve özel günler: Diyanet bayram, Ramazan, üç aylar, kandil tarihleri; tablo sürekliliği; Regaip kuralı |
 | `packages/namaz_backend/test/home_widget_schedule_test.dart` | 5 | Widget gün programı biçimi (Kotlin `WidgetSchedule` ile sözleşme), takip günü |
 | `packages/namaz_backend/test/architecture_test.dart` | 4 | Backend arayüz paketi kullanmaz, `domain/` saf, katman yönleri, tek barrel |

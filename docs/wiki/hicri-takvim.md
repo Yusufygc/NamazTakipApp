@@ -29,7 +29,7 @@ Kandil geceleri bir sonraki Hicri günün arifesi olduğu için kuralda bir gün
 
 ## Kerahat vakitleri
 
-`detectKerahat(times, now)`: güneş doğuşundan 45 dk, öğle ezanından önceki 30 dk, akşam ezanından önceki 40 dk. Süreler **koda yazıldığı gibidir; dinî kaynakla doğrulanmadı**, karar kullanıcıya ait: [[bilinen-sorunlar]].
+`detectKerahat(times, now)`: güneş doğuşundan 45 dk, öğle ezanından önceki 30 dk, akşam ezanından önceki 40 dk. Süreler **koda yazıldığı gibidir; dinî kaynakla doğrulanmadı**, kaynaklar birbirini tutmuyor, karar kullanıcıya ait: [[dini-icerik-onayi]], [[bilinen-sorunlar]].
 
 ## Hicri günün başlangıcı
 
