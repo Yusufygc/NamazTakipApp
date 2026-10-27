@@ -25,7 +25,7 @@
 | 12 | Yüksek | Hicri takvim bayramları 1 gün erken veriyordu | **Düzeltildi:** [[hicri-takvim]] |
 | 13 | Orta | Kıble konum yokken sabit 151° / 2.400 km gösteriyordu | **Düzeltildi:** [[kible-pusulasi]] |
 | 14 | Orta | Regaip kuralı Recep'in 1'i Cuma ise kaçırıyor, 7. günü yanlış işaretliyordu | **Düzeltildi** |
-| 15 | Orta | Pusula manyetik kuzeyi kullanıyor, sapma düzeltmesi yok; sensör yoksa akış sessiz | Açık |
+| 15 | Orta | Pusula manyetik kuzeyi kullanıyor, sapma düzeltmesi yok; sensör yoksa akış sessiz | **Düzeltildi (Android):** `GeomagneticField` sapması eklenir, sensör yoksa `NO_SENSOR` hatası ve arayüz uyarısı. iOS derlenmedi: [[kible-pusulasi]] |
 | 16 | Orta | Dinî içerik (esma 44 giriş, fazilet metinleri, ebced sayıları, kerahat süreleri) kullanıcı onayı bekliyor | Açık |
 | 17 | Düşük | Esma anahtar kelimeleri kelime sınırı olmadan alt dizge eşleşir (`ya nur`, `ya semi` başka kelimelerin içinde eşleşebilir) | Açık |
 

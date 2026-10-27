@@ -2,6 +2,9 @@
 
 Kronolojik kayıt; en yeni kayıt en üsttedir. Biçim: `## [YYYY-AA-GG] [İŞLEM_TİPİ] | Kısa Açıklama`. İşlem tipleri: INGEST, QUERY, UPDATE, DECISION, LINT, SETUP. Kurallar: [[wiki-kullanim]]. Harita: [[index]].
 
+## [2026-10-27] UPDATE | Pusula manyetik sapma düzeltmesi ve sensör yok hatası; Kıble başlığı sadeleşti
+Android pusula manyetik kuzeye göre yön veriyordu; konuma göre `GeomagneticField` sapması eklenip gerçek kuzeye çevrildi (Sakarya 6,4°). Sensör yoksa akış sessiz kalıyordu; artık Android ve iOS `NO_SENSOR` hatası döndürüyor, sayfa uyarı gösteriyor. Sayfa başlığı "Selçuklu Kıble Pusulası" yerine "Kıble Pusulası" oldu. 8 yeni test (toplam 153). Sayfalar: [[kible-pusulasi]], [[test-stratejisi]], [[bilinen-sorunlar]], [[guvenlik-ve-kalite-analizi]].
+
 ## [2026-10-27] REVIEW | Antigravity kodunun güvenlik ve kalite analizi; widget, Hicri, kıble düzeltmeleri; iOS durumu
 Commit edilmemiş çalışma (widget, kıble, Hicri/kerahat, kaza borcu, esma, tesbihat) incelendi: [[guvenlik-ve-kalite-analizi]]. Düzeltilenler: Android widget bayatlıyordu, artık 7 günlük programdan kendisi hesaplıyor ve AlarmManager ile yenileniyor ([[ana-ekran-widget]]); Hicri tarih bayramları 1 gün erken veriyordu, Diyanet ay başı tablosuna geçildi, Regaip kuralı düzeltildi ([[hicri-takvim]]); Kıble konum yokken sahte 151° gösteriyordu ([[kible-pusulasi]]); `openUrl` her şemayı açıyordu, kazıma süre sınırsızdı, Gemini sayısı doğrulanmıyordu ([[zikir-paylasim]]). iOS uzantı hedefleri Xcode projesinde yok; önceki "iOS entegrasyonu kuruldu" kaydı yanlıştı, düzeltildi: [[ios-yapilandirma]]. 145 test geçiyor (ön yüz 32, backend 103, Kotlin 10). Açık: dinî içerik onayı, pusula sapması, Hicri tablosu 1448'de bitiyor: [[bilinen-sorunlar]].
 

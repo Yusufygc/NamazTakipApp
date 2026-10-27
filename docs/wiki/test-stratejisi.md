@@ -12,7 +12,7 @@ flutter test                                     # ön yüz testleri (kökte)
 (cd packages/namaz_backend && flutter test)      # backend testleri
 ```
 
-Durum (2026-10-27): `flutter analyze` temiz; ön yüz **32**, backend **103**, Android (Kotlin) **10**, toplam **145 test geçiyor**. Kotlin testi: `cd android && ./gradlew :app:testDebugUnitTest`.
+Durum (2026-10-27): `flutter analyze` temiz; ön yüz **35**, backend **103**, Android (Kotlin) **15**, toplam **153 test geçiyor**. Kotlin testi: `cd android && ./gradlew :app:testDebugUnitTest`.
 
 ## Test dosyaları
 
@@ -31,8 +31,9 @@ Durum (2026-10-27): `flutter analyze` temiz; ön yüz **32**, backend **103**, A
 | `test/central_system_test.dart` | 12 | Metin ve ikon sistemi, `turkishUpper`, `foldTurkish`, merkezileştirme koruma kuralları |
 | `test/startup_error_app_test.dart` | 4 | Başlatma hata ekranı (mesaj, ayrıntı, "Tekrar dene"; veri silen eylem yok) ve bozuk veritabanı kurtarma uyarısı (`CorruptedDatabaseCard`) |
 | `test/notification_health_card_test.dart` | 6 | Uyarı kartı: izin yokken görünür, izin varken/bildirim kapalıyken görünmez, düğme ayarı açar, "yok → var" geçişinde bir kez yeniden planlar (sahte `NamazBackend`) |
-| `test/qibla_sheet_test.dart` | 3 | Kıble sayfası: konum yokken sahte değer yok, konumlu açı ve mesafe, şehre göre değişim |
+| `test/qibla_sheet_test.dart` | 6 | Kıble sayfası: konum yokken sahte değer yok, konumlu açı ve mesafe, şehre göre değişim, sensör hatasında uyarı, sensör açısıyla hizalanma |
 | `android/app/src/test/kotlin/.../WidgetScheduleTest.kt` | 10 | Widget sıradaki vakit, gün değişimi, takip günü sınırı, yenileme anı, ayrıştırma |
+| `android/app/src/test/kotlin/.../CompassMathTest.kt` | 5 | Pusula manyetik sapma ekleme ve 0-360 sarma |
 | `test/architecture_test.dart` | 7 | Ön yüz `src/` ve backend-only paketleri içe aktarmaz, `pubspec.yaml` temiz, `backendProvider` kullanımı sınırlı, `AppNotificationTexts` adaptörü |
 
 Sayılar 2026-10-27 itibarıyladır; test eklenince bu tablo güncellenir.

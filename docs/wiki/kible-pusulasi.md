@@ -16,8 +16,16 @@ Eskiden konum bilinmiyorsa sayfa sessizce **151° ve 2.400 km** (İstanbul değe
 ## Cihaz yönü
 
 - Android: `TYPE_ROTATION_VECTOR` sensörü, `EventChannel com.namaztakip.app/compass` (`MainActivity.kt`). iOS: `CLHeading` (`AppDelegate.swift`, derlenmedi).
-- Sensör yoksa akış sessiz kalır; sayfa kadranı parmakla çevirmeye izin verir.
-- **Sınırlar** ([[bilinen-sorunlar]]): sensör **manyetik** kuzeyi verir ve manyetik sapma düzeltilmez (Türkiye'de yaklaşık 5°); hizalanma toleransı ±5°. Cihaz düz tutulmalıdır. Pusula gerçek cihazda denenmedi, yalnızca açı hesabı ve sayfa emülatörde görüldü.
+- **Manyetik sapma düzeltmesi (Android, 2026-10-27):** Sensör **manyetik** kuzeye göre yön verir; Kıble açısı **gerçek** kuzeye göredir. Fark manyetik sapmadır (Türkiye'de yaklaşık 5-7° doğuya). Dart dinlemeyi başlatırken geçerli konumu kanala verir (`NamazBackend.compassHeading`, konum yoksa sapma 0); Kotlin `GeomagneticField(lat, lon, 0, şimdi).declination` ile sapmayı bulup `CompassMath.trueHeading` ile ekler. Emülatörde Sakarya için sapma 6,4° bulundu (logcat etiketi `Pusula`). Eskiden sapma hiç eklenmiyordu ve ±5° hizalama toleransının tamamı bu hataya gidiyordu.
+- **Sensör yoksa açık hata:** Eskiden akış sessiz kalıyordu. Artık Android ve iOS `NO_SENSOR` hatası döndürür; `compassHeadingProvider` hata durumuna geçer ve sayfa "Bu cihazda pusula sensörü yok..." uyarısı gösterip kadranı parmakla çevirmeye bırakır.
+- Hizalanma toleransı ±5°; cihaz düz tutulmalıdır.
+- **Sınırlar** ([[bilinen-sorunlar]]): iOS tarafında `trueHeading` kullanılır ama konum güncellemesi açık değilse sistem negatif döndürür ve kod manyetik açıya düşer; derlenmediği için doğrulanmadı. Pusula gerçek cihazda denenmedi: emülatör sanal sensörü sabit yön verir, yalnızca sapma değeri ve hata yolunun akışı denendi.
+
+## Testler
+
+- `test/qibla_sheet_test.dart` (6): konum yokken sahte değer yok, açı ve mesafe, şehre göre değişim, **sensör hatasında uyarı**, sensör açısıyla hizalanma, uzak açıda hizalı denmemesi.
+- `CompassMathTest` (Kotlin, 5): sapma ekleme, çıkarma, 0-360 sarma, negatif açı.
+- Sapmanın kendisini veren `GeomagneticField` Android sınıfıdır, birim testte çağrılmaz; emülatörde değeri görüldü.
 
 ## İlgili sayfalar
 
