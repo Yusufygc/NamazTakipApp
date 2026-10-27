@@ -35,6 +35,7 @@ Namaz Takip projesinin bilgi tabanı. Her işe buradan başlayın; kurallar içi
 ## Arayüz
 
 - [[ui-ekranlar]] — Kabuk, altı ekran ve şehir seçici.
+- [[zikir-paylasim]] — Sosyal medyadan zikir yakalama, açıklaması okunamayan bağlantılar, Gemini.
 - [[tema-sistemi]] — Beş tema, `AppPalette` ve doğrulama durumu.
 - [[ikon-sistemi]] — `AppIcons` kuralları ve gruplar.
 - [[metin-sistemi]] — Modüler `strings` sistemi, Türkçe yardımcılar.

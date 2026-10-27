@@ -18,6 +18,18 @@ Elle yapılan testlerin kaydı ve bulunan hatalar. Yeni bir test turu eklendiği
 | Bozuk veritabanı yedekleme | `/dev/urandom` ile 256 rastgele bayt yazılan `namaz_takip.db` (`sha256: b5a5eed6...`) açılışta silinmeden önce `namaz_takip.db.bozuk-20261026-214907` olarak bire bir aynı hash ile yedeklendi; yeni `namaz_takip.db` (32 KB) temiz şemayla oluşturuldu |
 | Ön yüz uyarısı (`CorruptedDatabaseCard`) | Ana ekranda `Kayıt dosyası bozulduğu için sıfırlandı` başlığı, yedek dosya yolu ve `Anladım` düğmesi `uiautomator dump` ile doğrulandı; `Anladım`'a dokunulunca kart kapandı |
 
+## Tur 4 — 2026-10-27, zikir paylaşımı (aynı emülatör, Android 36)
+
+Instagram kurulmadan, gerçek paylaşım niyetiyle (`adb shell am start -a android.intent.action.SEND ...`) denendi: [[zikir-paylasim]].
+
+- Yalnızca Instagram bağlantısı: düzenleme sayfası açıldı, "açıklaması okunamadı" uyarısı ve "Bağlantıyı aç" düğmesi göründü, taslak boş ("Paylaşılan Zikir", 33).
+- Açıklama metni + bağlantı: Yâ Rezzâk, Arapça yazılış, 100, grup "Rızık & Bereket" doğru ayıklandı.
+- Uyarı varken alana açıklama yazıp "Videodan / Metinden Kazı"ya basınca uyarı kalktı, yeşil bilgi çubuğu ve dolu taslak geldi.
+- Instagram sayfası uygulamanın tarayıcı kimliğiyle çekildi: 200, 499 KB, hiç `og:` etiketi yok.
+- Denenmeyenler: gerçek Instagram uygulamasından paylaşım, iOS paylaşım uzantısı, Gemini'li akış (anahtar yok).
+
+Emülatör saat dilimi her soğuk açılışta GMT'ye döner; çözüm: [[gelistirme-ortami]].
+
 ## Tur 3 — 2026-10-26, denetim bulguları #1–#7 düzeltmeleri (aynı emülatör)
 
 | Alan | Sonuç |

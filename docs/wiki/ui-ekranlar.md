@@ -27,6 +27,8 @@ Widget'lar: `PrayerCard` (zaman çizelgeli vakit kartı), `CountdownCard` (mihra
 
 ## Zikir ve Esma Defteri (`dhikr_screen.dart`)
 
+Sosyal medyadan yakalama akışının ayrıntısı ve sınırları: [[zikir-paylasim]].
+
 Üst bardaki **Zikirler** düğmesiyle veya sosyal medyadan (`Paylaş -> Namaz Takip / Zikir Yakala`) içerik gönderildiğinde açılır. Üstte Instagram/sosyal medya kazıma kartı, Türkçe duyarlı (`foldTurkish`) arama çubuğu, grup filtre çipleri (`Tümü`, `Favoriler`, `Esmaül Hüsna`, `Sabah & Akşam`, `Rızık & Bereket`, `Şifa & Huzur`, `Namaz Tesbihatı`, `Genel Zikirler` ve özel gruplar) ve `DhikrCard` listesi bulunur. Her karttan dokunmatik Selçuklu **Zikirmatik** (`DhikrCounterSheet`) açılabilir, kaynak video bağlantısı ziyaret edilebilir, zikir düzenlenebilir (`DhikrEditorSheet`) veya silinebilir.
 
 ## Rozetler & Seri

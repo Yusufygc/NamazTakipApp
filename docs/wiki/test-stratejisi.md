@@ -12,7 +12,7 @@ flutter test                                     # ön yüz testleri (kökte)
 (cd packages/namaz_backend && flutter test)      # backend testleri
 ```
 
-Durum (2026-10-26): `flutter analyze` temiz; ön yüz **29**, backend **57**, toplam **86 test geçiyor**.
+Durum (2026-10-27): `flutter analyze` temiz; ön yüz **29**, backend **76**, toplam **105 test geçiyor**.
 
 ## Test dosyaları
 
@@ -23,13 +23,15 @@ Durum (2026-10-26): `flutter analyze` temiz; ön yüz **29**, backend **57**, to
 | `packages/namaz_backend/test/notification_plan_test.dart` | 9 | Bildirim kimlikleri, çift bildirim yok, geçmiş vakit, önceki vakti sorma, hatırlatma süresi, payload, 81 il |
 | `packages/namaz_backend/test/notification_scheduler_test.dart` | 9 | Planlayıcı kuyruğu: konum yok, bildirim kapalı, tek çağrı, eşzamanlı çağrı örtüşmez, hızlı çağrılar birleşir, hata sonrası kilitlenmez, geçmişe düşen ve geçmiş zaman hatası fırlatan öğeler kalan planı durdurmaz (sahte `NotificationGateway`, bellek içi SQLite, sahte `SharedPreferences`) |
 | `packages/namaz_backend/test/time_zone_instant_test.dart` | 2 | `TZDateTime.from` mutlak anı korur (zamanlama `tz.local`'e bağlı değil) |
+| `packages/namaz_backend/test/dhikr_test.dart` | 10 | Zikir ayıklama (Esma, sayı, vakit, bağlantı) ve zikir kaydı |
+| `packages/namaz_backend/test/share_service_test.dart` | 9 | Yerel `HttpServer` ile paylaşım kazıma: açıklamasız sayfa (`captionUnavailable`), kesme işaretli ve tek tırnaklı meta, 404, düz metin, `isCaptionMissing` |
 | `packages/namaz_backend/test/architecture_test.dart` | 4 | Backend arayüz paketi kullanmaz, `domain/` saf, katman yönleri, tek barrel |
 | `test/central_system_test.dart` | 12 | Metin ve ikon sistemi, `turkishUpper`, `foldTurkish`, merkezileştirme koruma kuralları |
 | `test/startup_error_app_test.dart` | 4 | Başlatma hata ekranı (mesaj, ayrıntı, "Tekrar dene"; veri silen eylem yok) ve bozuk veritabanı kurtarma uyarısı (`CorruptedDatabaseCard`) |
 | `test/notification_health_card_test.dart` | 6 | Uyarı kartı: izin yokken görünür, izin varken/bildirim kapalıyken görünmez, düğme ayarı açar, "yok → var" geçişinde bir kez yeniden planlar (sahte `NamazBackend`) |
 | `test/architecture_test.dart` | 7 | Ön yüz `src/` ve backend-only paketleri içe aktarmaz, `pubspec.yaml` temiz, `backendProvider` kullanımı sınırlı, `AppNotificationTexts` adaptörü |
 
-Sayılar 2026-10-26 itibarıyladır; test eklenince bu tablo güncellenir.
+Sayılar 2026-10-27 itibarıyladır; test eklenince bu tablo güncellenir.
 
 ## Koruma testleri
 

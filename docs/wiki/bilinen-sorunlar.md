@@ -10,6 +10,8 @@ Henüz çözülmemiş sorunlar, doğrulanmamış alanlar ve bilinçli sınırlar
 | Orta | Tam zamanlı alarm izni kullanıcıya bağlı | Ana ekranda uyarı kartı ve "Ayarları aç" düğmesi var; izin verilince alarmlar otomatik tam zamanlıya çevrilir (emülatörde doğrulandı). Kullanıcı izni vermezse bildirimler yine **bir saate kadar geç** gelir: [[izinler]], [[bildirimler]] |
 | Düşük | Ön plan ile arka plan izolatı aynı anda planlarsa serileştirme geçerli değil | `NotificationScheduler` kuyruğu tek izolat içindir; sabit kimlikler zararı sınırlar: [[bildirimler]] |
 | Düşük | Gizlilik politikası ve veri silme/dışa aktarma yok | Yedekleme kapatıldı; mağaza yayını için yasal metin ve kullanıcı eylemleri gerekir: [[android-yapilandirma]], [[yol-haritasi]] |
+| Orta | Instagram bağlantısından zikir çıkarılamaz | Instagram giriş yapmamış istemciye açıklama vermez; kullanıcı açıklamayı yapıştırmalıdır (uyarı ve yönlendirme var). Gerçek Instagram paylaşımı ve iOS paylaşım uzantısı denenmedi: [[zikir-paylasim]] |
+| Düşük | Gemini anahtarı düz metin saklanıyor | `SharedPreferences`, yedekleme kapalı; güvenli depolama (Keystore) kullanılmıyor: [[zikir-paylasim]] |
 | Yüksek | Gerçek telefonda test yok | Bildirim zamanlaması, pil kısıtlamaları (agresif tasarruf yapan üreticiler), GPS ve performans yalnızca emülatörde görüldü: [[bildirimler]] |
 | Orta | Dört tema görsel test edilmedi | Koyu, Okyanus, Gül, Altın; kontrast sorunları çıkabilir: [[tema-sistemi]] |
 | Orta | Arka plan görevinin periyodik tetiklenmesi gözlenmedi | 12 saatlik görev emülatör oturumuna sığmadı: [[arka-plan-gorevleri]] |

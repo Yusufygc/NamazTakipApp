@@ -47,7 +47,7 @@ Derleme ve yayın ayrıntısı: [[derleme-ve-yayin]]. Testler: [[test-stratejisi
 
 ```bash
 # Başlat (SDK\emulator\emulator.exe)
-emulator -avd namaz_test -no-snapshot -no-audio
+emulator -avd namaz_test -timezone Europe/Istanbul -no-snapshot -no-audio
 
 # Kur ve aç
 adb install -r build/app/outputs/flutter-apk/app-debug.apk
@@ -56,7 +56,7 @@ adb shell am start -n com.namaztakip.app/com.namaztakip.namaz_takip.MainActivity
 
 - **Donanım hızlandırma:** WHPX kullanılabilir (`emulator -accel-check`).
 - **Konum:** Emülatör PC'nin konumunu kullanmaz. `adb emu geo fix 28.9784 41.0082` (boylam, enlem; İstanbul). Konum bir uygulama GPS isterken verilmelidir; uygulama `high` doğrulukta GPS ister: [[konum]].
-- **Saat dilimi:** Emülatör varsayılan olarak UTC'dir ve vakitler 3 saat kayık görünür. `adb shell cmd alarm set-timezone Europe/Istanbul` ile düzeltilir: [[namaz-vakitleri]].
+- **Saat dilimi:** Emülatör bu makinede otomatik saat dilimi tespitini yapamaz ve her soğuk açılışta GMT'ye döner (`adb reboot` ile doğrulandı; `auto_time_zone 0` ve `persist.sys.timezone` ayarı da kalıcı olmadı). Vakitler GMT'de 3 saat kayık görünür. Kalıcı çözüm emülatörü `tool/emulator-baslat.ps1` ile açmaktır; betik `-timezone Europe/Istanbul` verir ve açılıştan sonra `adb shell cmd alarm set-timezone Europe/Istanbul` çalıştırır. Android Studio'dan başlatılırsa zaman bozulabilir; o zaman aynı `adb` komutunu elle çalıştırın: [[namaz-vakitleri]]. Hata uygulamada değil, görüntülenen saat dilimindedir: hesaplanan vakitler doğrudur (Sakarya, 27 Ekim: Sabah 05:51).
 - **Saati değiştirmek (bildirim testi):** `adb root` (yalnızca `google_apis` imajlarında), `adb shell settings put global auto_time 0`, `adb shell date MMDDhhmmYYYY.ss` (örn. `102619342026.30`; yıl dört hane ve **doğru** yazılmalı, `3026` yazılırsa saat 3026'ya gider). Test sonunda `auto_time 1` ve `adb unroot`.
 - **Ekran görüntüsü:** `adb exec-out screencap -p > ekran.png`. Ekran metinleri: `adb shell uiautomator dump`.
 - **Veritabanını okuma (root ile):** `adb shell sqlite3 /data/data/com.namaztakip.app/databases/namaz_takip.db "select * from prayers"`. Root yokken `run-as com.namaztakip.app` ile ayarlar dosyası okunabilir.
